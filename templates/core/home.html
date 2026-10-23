@@ -1,0 +1,1448 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<!-- Structured Data: FAQPage & BreadcrumbList for Google FAQ Rich Results & AI (AEO / GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "หน้าแรก",
+          "item": "https://sengranduan.com/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://sengranduan.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "เซ้งร้านกับเช่าร้าน แตกต่างกันอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "การเช่าร้านคือการจ่ายค่าเช่ารายเดือนเพื่อใช้สถานที่เปล่า ผู้เช่าต้องลงทุนตกแต่งและซื้ออุปกรณ์ใหม่เองทั้งหมด แต่การเซ้งร้านคือการจ่ายเงินก้อนแรกเพื่อรับช่วงกิจการที่ตกแต่งพร้อมเปิด มีอุปกรณ์ครบครัน และมักมีฐานลูกค้าเดิมอยู่แล้ว ช่วยประหยัดงบประมาณและเวลาเริ่มธุรกิจได้ 50-70%"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "เซ้งร้านต้องตรวจสอบเอกสารอะไรบ้างเพื่อป้องกันการถูกหลอกลวง?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ควรตรวจสอบ 5 รายการสำคัญ: 1. สัญญาเช่าฉบับหลักและสำเนาโฉนดว่าตรงกับเจ้าของอาคารตัวจริง 2. หนังสือยินยอมให้เปลี่ยนสัญญาหรือโอนสิทธิการเช่า 3. บัญชีรายการทรัพย์สินและอุปกรณ์ที่ส่งมอบ 4. บิลค่าน้ำ ค่าไฟ และค่าส่วนกลางว่าไม่มีหนี้ค้างชำระ 5. ใบอนุญาตประกอบกิจการ เช่น ใบอนุญาตจำหน่ายสุรา หรือใบอนุญาตสปา"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "ค่าเปลี่ยนสัญญาเช่าคืออะไร และใครต้องเป็นคนจ่าย?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ค่าเปลี่ยนสัญญาคือค่าธรรมเนียมที่เจ้าของอาคารเรียกเก็บเมื่อมีการเปลี่ยนตัวคู่สัญญาเช่ารายใหม่ โดยขึ้นอยู่กับข้อตกลงระหว่างผู้เซ้งเดิมและผู้เซ้งใหม่ ซึ่งบนเซ้งร้านด่วน.com มีให้เลือกทั้งแบบฟรีค่าเปลี่ยนสัญญา, ผู้ขายออกให้, ผู้ซื้อออกเอง หรือแบ่งจ่ายคนละครึ่ง"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "สิทธิการลงประกาศฟรีบน เซ้งร้านด่วน.com มีเงื่อนไขอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "สมาชิกทุกคนที่ยืนยันตัวตนด้วยรหัส OTP ทางอีเมล สามารถลงประกาศเซ้งร้านได้ฟรี 1 รายการต่อเดือนปฏิทิน โดยโควตาจะรีเซ็ตอัตโนมัติทุกวันที่ 1 ของเดือน และสามารถอัปเกรดเป็นสมาชิก VIP (1,000 บาท/เดือน) เพื่อรับโควตา 4 ประกาศพร้อมดันประกาศขึ้นหน้าแรกได้ทันที"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "เครื่องหมาย VERIFIED BY ADMIN คืออะไร มีประโยชน์อย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "เป็นเครื่องหมายรับรองว่าร้านค้านี้ได้รับการตรวจสอบสถานที่จริง ตรวจสอบตัวตนเจ้าของร้าน และตรวจสอบสัญญาเช่าเดิมโดยทีมงานแอดมินแล้ว ช่วยเพิ่มความมั่นใจให้แก่ผู้ที่กำลังมองหาร้าน และช่วยให้ปิดการเซ้งได้เร็วกว่าประกาศทั่วไป"
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- ============================================================================== -->
+<!-- 1. HERO BANNER (ภาพถ่ายตรงกลาง + กล่องค้นหาเดี่ยวพร้อมปุ่มตัวกรอง) -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 my-4 sm:my-6">
+    <div class="relative rounded-3xl overflow-hidden min-h-[380px] sm:min-h-[420px] shadow-sm flex items-center justify-center text-center p-4 sm:p-8 bg-neutral-900">
+        <!-- Background Storefront Photo (Centered) - LCP optimized -->
+        <img src="/static/images/hero_banner.jpg"
+             alt="ค้นหาร้านเซ้ง ร้านให้เช่า ทั่วประเทศไทย"
+             fetchpriority="high"
+             decoding="async"
+             class="absolute inset-0 w-full h-full object-cover object-center">
+        <!-- Dark Vignette Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/40"></div>
+
+        <!-- Hero Content (Centered) -->
+        <div class="relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center justify-center text-center space-y-3 sm:space-y-4">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
+                ค้นหาร้านเซ้ง ร้านให้เช่า ทั่วประเทศไทย
+            </h1>
+            <p class="text-xs sm:text-sm text-neutral-100 font-medium drop-shadow max-w-xl">
+                รวมเซ้งร้าน ร้านให้เช่า ทำเลดี มากกว่า <span class="text-yellow-400 font-bold">10,000+</span> รายการ ทั่วประเทศ กว่า 10 ปี
+            </p>
+
+            <!-- Single Search Pill + Filter Icon Button (ตามภาพที่ผู้ใช้ต้องการ) -->
+            <div class="w-full mt-3">
+                <form id="hero-search-form" action="{% url 'listings:marketplace' %}" method="get" class="relative w-full">
+                    <!-- Hidden filter inputs populated by the modal -->
+                    <input type="hidden" name="type" id="filter-input-type" value="">
+                    <input type="hidden" name="category" id="filter-input-category" value="">
+                    <input type="hidden" name="province" id="filter-input-province" value="">
+                    <input type="hidden" name="price_min" id="filter-input-price-min" value="">
+                    <input type="hidden" name="price_max" id="filter-input-price-max" value="">
+
+                    <!-- Single Rounded Pill Search Bar -->
+                    <div class="flex items-center rounded-full bg-white shadow-xl border border-white/50 p-1 sm:p-1.5 transition-all focus-within:ring-2 focus-within:ring-brand-500">
+                        <!-- Text Input -->
+                        <input type="text" name="q" id="hero-search-q"
+                               placeholder="ค้นหาร้าน.. (เช่น คาเฟ่, หมูกระทะ, พัทยา, สุขุมวิท)"
+                               class="w-full flex-1 bg-transparent px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm text-neutral-800 placeholder:text-neutral-400 outline-none">
+
+                        <!-- Search Button (Magnifying Glass) -->
+                        <button type="submit"
+                                aria-label="ค้นหา"
+                                class="flex-shrink-0 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-neutral-500 hover:text-brand-600 hover:bg-neutral-100 transition">
+                            <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </button>
+
+                        <!-- Divider Line -->
+                        <div class="h-6 w-px bg-neutral-200 mx-1"></div>
+
+                        <!-- Filter Modal Trigger Button -->
+                        <button type="button"
+                                id="btn-open-filter-modal"
+                                onclick="openFilterModal()"
+                                aria-label="ตัวกรอง"
+                                class="cursor-pointer flex-shrink-0 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full text-neutral-600 hover:text-brand-600 hover:bg-neutral-100 transition">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- FILTER MODAL (ตามภาพ screenshot ที่ผู้ใช้ส่งมาเป๊ะๆ) -->
+<!-- ============================================================================== -->
+<div id="filter-modal-backdrop"
+     style="display: none;"
+     class="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-5 sm:p-6 text-neutral-800 animate-in fade-in zoom-in duration-150"
+         onclick="event.stopPropagation()">
+
+        <!-- Header: Title "ตัวกรอง" + Close Button "✕" -->
+        <div class="flex items-center justify-between pb-3 border-b border-neutral-100">
+            <h3 class="text-lg font-bold text-neutral-900">ตัวกรอง</h3>
+            <button type="button"
+                    id="btn-close-filter-modal"
+                    onclick="closeFilterModal()"
+                    class="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+                    aria-label="ปิด">
+                <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 pt-3">
+            <!-- 1. ประเภท -->
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-neutral-700 mb-1.5">ประเภท</label>
+                <div class="relative">
+                    <select id="modal-select-type"
+                            class="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-neutral-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition appearance-none">
+                        <option value="">ทุกประเภท</option>
+                        <option value="takeover">เซ้งร้าน / กิจการ</option>
+                        <option value="rent">เช่าพื้นที่ / ตึกแถว</option>
+                        <option value="sale_biz">ขายกิจการขาด</option>
+                        <option value="partnership">หาผู้ร่วมทุน / หุ้นส่วน</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                </div>
+            </div>
+
+            <!-- 2. หมวดหมู่ -->
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-neutral-700 mb-1.5">หมวดหมู่</label>
+                <div class="relative">
+                    <select id="modal-select-category"
+                            class="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-neutral-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition appearance-none">
+                        <option value="">ทุกหมวดหมู่</option>
+                        <option value="massage_spa">นวด/สปา</option>
+                        <option value="bar_pub_karaoke">ผับ/บาร์/คาราโอเกะ</option>
+                        <option value="beauty_salon_nails">ตัดผม/เสริมสวย/ทำเล็บ</option>
+                        <option value="restaurant_shabu">หมูกระทะ/ชาบู/ร้านอาหาร</option>
+                        <option value="building_land_condo">ตึก/บ้าน/คอนโด/ที่ดิน</option>
+                        <option value="cafe_beverage">คาเฟ่/กาแฟ/ร้านน้ำปั่น</option>
+                        <option value="rental_booth_space">ล็อค/พื้นที่ให้เช่า</option>
+                        <option value="other">อื่นๆ</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                </div>
+            </div>
+
+            <!-- 3. จังหวัด -->
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-neutral-700 mb-1.5">จังหวัด</label>
+                <div class="relative">
+                    <select id="modal-select-province"
+                            class="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-neutral-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition appearance-none">
+                        <option value="">ทุกจังหวัด</option>
+                        <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                        <option value="ชลบุรี">ชลบุรี (พัทยา)</option>
+                        <option value="เชียงใหม่">เชียงใหม่ (นิมมานฯ)</option>
+                        <option value="นนทบุรี">นนทบุรี</option>
+                        <option value="ภูเก็ต">ภูเก็ต</option>
+                        <option value="สมุทรปราการ">สมุทรปราการ</option>
+                        <option value="ปทุมธานี">ปทุมธานี</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                </div>
+            </div>
+
+            <!-- 4. ช่วงราคา (ราคาต่ำสุด - ราคาสูงสุด) -->
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-neutral-700 mb-1.5">ช่วงราคา</label>
+                <div class="flex items-center gap-2">
+                    <div class="relative w-full">
+                        <select id="modal-select-price-min"
+                                class="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-xs sm:text-sm text-neutral-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition appearance-none">
+                            <option value="">ราคาต่ำสุด</option>
+                            <option value="100000">100,000</option>
+                            <option value="300000">300,000</option>
+                            <option value="500000">500,000</option>
+                            <option value="1000000">1,000,000</option>
+                            <option value="2000000">2,000,000</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                    </div>
+
+                    <span class="text-neutral-400 font-bold px-0.5">-</span>
+
+                    <div class="relative w-full">
+                        <select id="modal-select-price-max"
+                                class="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 text-xs sm:text-sm text-neutral-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition appearance-none">
+                            <option value="">ราคาสูงสุด</option>
+                            <option value="300000">300,000</option>
+                            <option value="500000">500,000</option>
+                            <option value="1000000">1,000,000</option>
+                            <option value="2000000">2,000,000</option>
+                            <option value="5000000">5,000,000</option>
+                            <option value="10000000">10,000,000</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons: [ ล้าง ] [ ค้นหา ] -->
+            <div class="flex items-center gap-3 pt-3">
+                <button type="button"
+                        id="btn-reset-filter-modal"
+                        onclick="resetFilterModal()"
+                        class="cursor-pointer w-28 rounded-xl border border-neutral-300 hover:bg-neutral-50 px-4 py-2.5 text-xs sm:text-sm font-bold text-neutral-700 transition">
+                    ล้าง
+                </button>
+                <button type="button"
+                        id="btn-submit-filter-modal"
+                        onclick="applyFiltersAndSubmit()"
+                        class="cursor-pointer flex-1 rounded-xl bg-brand-600 hover:bg-brand-700 px-6 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition">
+                    ค้นหา
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================================== -->
+<!-- 2. 8 BUSINESS CATEGORIES GRID (สีชมพูตามโลโก้สวยงาม) -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 py-4">
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+        <!-- 1. Massage & Spa -->
+        <a href="{% url 'listings:marketplace' %}?category=massage_spa"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">นวด/สปา</span>
+        </a>
+
+        <!-- 2. Bar / Pub / Karaoke -->
+        <a href="{% url 'listings:marketplace' %}?category=bar_pub_karaoke"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="wine" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">ผับ/บาร์/คาราโอเกะ</span>
+        </a>
+
+        <!-- 3. Beauty / Hair / Nails -->
+        <a href="{% url 'listings:marketplace' %}?category=beauty_salon_nails"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="scissors" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">ตัดผม/เสริมสวย</span>
+        </a>
+
+        <!-- 4. Shabu / Mookata / Restaurant -->
+        <a href="{% url 'listings:marketplace' %}?category=restaurant_shabu"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="utensils" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">หมูกระทะ/ชาบู</span>
+        </a>
+
+        <!-- 5. Building / Land / Condo -->
+        <a href="{% url 'listings:marketplace' %}?category=building_land_condo"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="building-2" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">ตึก/บ้าน/ที่ดิน</span>
+        </a>
+
+        <!-- 6. Cafe / Coffee / Beverage -->
+        <a href="{% url 'listings:marketplace' %}?category=cafe_beverage"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="coffee" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">คาเฟ่/กาแฟ</span>
+        </a>
+
+        <!-- 7. Rental Booth / Commercial Space -->
+        <a href="{% url 'listings:marketplace' %}?category=rental_booth_space"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="store" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">ล็อค/พื้นที่เช่า</span>
+        </a>
+
+        <!-- 8. Other -->
+        <a href="{% url 'listings:marketplace' %}?category=other"
+           class="group flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all text-center">
+            <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-2xs">
+                <i data-lucide="layout-grid" class="w-5 h-5 sm:w-6 sm:h-6 text-brand-600"></i>
+            </div>
+            <span class="text-[11px] sm:text-xs font-bold text-neutral-800 group-hover:text-brand-600 transition line-clamp-1">อื่นๆ</span>
+        </a>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 3. BANNER ฝากเซ้ง ค่านายหน้าเพียง 5% (Brand Pink/Rose Palette) -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 my-4">
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-brand-600 via-rose-500 to-brand-700 p-4 sm:p-6 text-white shadow-md">
+        <!-- Background Decorative Circles -->
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1 sm:space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-yellow-200">
+                        <i data-lucide="clock" class="w-3 h-3"></i> เริ่มได้ภายใน 24 ชั่วโมง
+                    </span>
+                    <span class="text-xs font-bold text-white/90">ขายไว ได้จริง</span>
+                </div>
+                <h3 class="text-xl sm:text-3xl font-black tracking-tight leading-tight">
+                    ฝากเซ้ง ค่านายหน้าเพียง <span class="text-yellow-300 underline decoration-yellow-300 underline-offset-4">5%</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-white/95 font-medium flex items-center gap-2 flex-wrap">
+                    <span>ลงโฆษณาครบทุกช่องทาง: Facebook, Kaidee, LivingInsider, TikTok และกว่า 50 เว็บไซต์</span>
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
+                   class="inline-flex items-center gap-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-black px-5 py-3 text-xs sm:text-sm shadow-lg hover:scale-105 transition-all">
+                    <span>ฝากเซ้งเลย!</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-yellow-400"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 4. SECTION: แผนที่ประกาศเซ้ง ค้นหาร้านใกล้ตัวคุณ (Interactive Map) -->
+<!-- ============================================================================== -->
+<section id="map-section" class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
+    <div class="rounded-3xl border border-neutral-200/90 bg-white p-4 sm:p-6 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-neutral-100">
+            <div>
+                <h2 class="text-base sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-brand-600"></i>
+                    <span>แผนที่ประกาศเซ้ง ค้นหาร้านใกล้ตัวคุณ</span>
+                </h2>
+                <p class="text-xs text-neutral-500 mt-0.5">
+                    คลิกหมุดเพื่อดูข้อมูลร้านเซ้ง และกดค้นหาร้านใกล้ตัวฉันเพื่อคำนวณระยะทางจากพิกัดจริง
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button id="btn-find-near-me"
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition">
+                    <i data-lucide="crosshair" class="w-4 h-4"></i>
+                    <span>ร้านใกล้ตัวฉัน</span>
+                </button>
+                <button id="btn-reset-map"
+                        type="button"
+                        class="inline-flex items-center gap-1 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 px-3 py-2 text-xs font-semibold transition">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-neutral-500"></i>
+                    <span>มุมมองรวม</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div id="geo-status-banner" class="hidden rounded-xl p-2.5 mb-3 text-xs font-medium bg-brand-50 text-brand-800 border border-brand-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="navigation" class="w-4 h-4 text-brand-600"></i>
+                <span id="geo-status-text">กำลังค้นหาตำแหน่งของคุณ...</span>
+            </div>
+            <button type="button" onclick="document.getElementById('geo-status-banner').classList.add('hidden')" class="text-brand-600 hover:underline font-bold">ปิด</button>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div class="relative w-full h-[360px] sm:h-[420px] rounded-2xl overflow-hidden border border-neutral-200 z-0">
+            <div id="interactive-shop-map" class="w-full h-full"></div>
+            {{ map_listings|json_script:"map-listings-data" }}
+        </div>
+
+        <!-- Footer Map Info -->
+        <div class="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-brand-600"></span>
+                <span>หมุดแสดงตำแหน่งร้านพร้อมราคาเซ้งจริง</span>
+            </div>
+            <span class="font-bold text-neutral-800">{{ total_listings }} แห่งบนแผนที่</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 5. SECTION: ฝากเซ้ง-ประเมินราคาแล้ว -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-lg sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                <i data-lucide="badge-check" class="w-5 h-5 text-emerald-600"></i>
+                <span>ฝากเซ้ง-ประเมินราคาแล้ว</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5">
+                ร้านค้าที่ผ่านการตรวจสอบเอกสารสัญญา และประเมินราคากลางอย่างเป็นธรรม
+            </p>
+        </div>
+        <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+            <span>ดูทั้งหมด</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {% for listing in verified_listings %}
+        <div class="group rounded-2xl border border-neutral-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col">
+            <!-- Cover Photo Container with Badges -->
+            <div class="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
+                {% if listing.property.cover_image %}
+                <img src="{{ listing.property.cover_image.image.url }}"
+                     alt="{{ listing.property.title }}"
+                     loading="lazy"
+                     class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="flex h-full w-full items-center justify-center text-xs text-neutral-400 bg-gradient-to-tr from-neutral-100 to-neutral-200 flex-col gap-1">
+                    <i data-lucide="store" class="w-8 h-8 text-neutral-400"></i>
+                    <span>ไม่มีรูปภาพ</span>
+                </div>
+                {% endif %}
+
+                <!-- Top Badges Overlay -->
+                <div class="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1.5">
+                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                        {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-lg bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow inline-flex items-center gap-1">
+                        <i data-lucide="badge-check" class="w-3 h-3"></i>
+                        <span>ประเมินราคาแล้ว</span>
+                    </span>
+                </div>
+
+                {% if listing.is_admin_verified %}
+                <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                </div>
+                {% endif %}
+
+                <!-- Monthly Profit Pill -->
+                {% if listing.avg_profit_3m %}
+                <div class="absolute bottom-2.5 left-2.5 rounded-lg bg-emerald-600/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-white shadow flex items-center gap-1">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    <span>กำไรเฉลี่ย ฿{{ listing.avg_profit_3m|floatformat:0 }}/ด.</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Card Body Content -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">{{ listing.property.get_type_display }}</span>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block">
+                        <h3 class="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
+                            {{ listing.property.title }}
+                        </h3>
+                    </a>
+                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 flex-shrink-0"></i>
+                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    </p>
+                </div>
+
+                <!-- Financial Metrics Breakdown Grid -->
+                <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">ค่าเช่าต่อเดือน</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">เงินประกัน</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.security_deposit|floatformat:0 }}</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
+                        <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">รายได้เฉลี่ย 3 ด.</span>
+                        <span class="font-bold text-emerald-700">฿{{ listing.avg_revenue_3m|floatformat:0 }}</span>
+                    </div>
+                </div>
+
+                <!-- Price & Action CTA -->
+                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 font-medium block">ราคาเซ้ง</span>
+                        <span class="text-xl font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</span>
+                    </div>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                       class="rounded-xl bg-neutral-900 hover:bg-brand-600 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs">
+                        ดูร้านนี้ →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
+            ยังไม่มีรายการในหมวดนี้
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 6. SECTION: โปรโมชั่นล่าสุด -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-lg sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                <i data-lucide="tag" class="w-5 h-5 text-rose-500"></i>
+                <span>โปรโมชั่นล่าสุด</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5">
+                รวมดีลเด็ด ฟรีค่าเปลี่ยนสัญญา หรือปรับลดราคาพิเศษเพื่อเซ้งด่วน
+            </p>
+        </div>
+        <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+            <span>ดูทั้งหมด</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {% for listing in promo_listings %}
+        <div class="group rounded-2xl border-2 border-brand-200 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col relative">
+            <div class="bg-gradient-to-r from-brand-600 to-rose-500 text-white text-[10px] font-bold py-1 px-3 flex items-center justify-between">
+                <span>ดีลพิเศษ: ฟรีค่าเปลี่ยนสัญญา (เจ้าของออกให้)</span>
+                <span class="bg-white/20 px-1 py-0.2 rounded text-[9px]">HOT</span>
+            </div>
+
+            <div class="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
+                {% if listing.property.cover_image %}
+                <img src="{{ listing.property.cover_image.image.url }}"
+                     alt="{{ listing.property.title }}"
+                     loading="lazy"
+                     class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="flex h-full w-full items-center justify-center text-xs text-neutral-400 bg-gradient-to-tr from-neutral-100 to-neutral-200 flex-col gap-1">
+                    <i data-lucide="store" class="w-8 h-8 text-neutral-400"></i>
+                    <span>ไม่มีรูปภาพ</span>
+                </div>
+                {% endif %}
+
+                <div class="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1.5">
+                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                        {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-lg bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                        เซ้งด่วน
+                    </span>
+                </div>
+
+                {% if listing.is_admin_verified %}
+                <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">{{ listing.property.get_type_display }}</span>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block">
+                        <h3 class="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
+                            {{ listing.property.title }}
+                        </h3>
+                    </a>
+                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 flex-shrink-0"></i>
+                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 bg-brand-50/60 rounded-xl p-2.5 text-[11px] border border-brand-100">
+                    <div>
+                        <span class="text-[10px] text-neutral-500 block">ค่าเปลี่ยนสัญญา</span>
+                        <span class="font-bold text-emerald-700">ฟรี</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-500 block">ค่าเช่าต่อเดือน</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 font-medium block">ราคาโปรโมชั่น</span>
+                        <span class="text-xl font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</span>
+                    </div>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                       class="rounded-xl bg-brand-600 hover:bg-brand-700 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs">
+                        รับสิทธิ์ →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
+            ยังไม่มีรายการโปรโมชั่นในขณะนี้
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 7. SECTION: ประกาศล่าสุด -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-lg sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                <i data-lucide="clock" class="w-5 h-5 text-blue-600"></i>
+                <span>ประกาศล่าสุด</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5">
+                รายการประกาศเซ้งร้านและพื้นที่ธุรกิจใหม่ล่าสุด อัปเดตสดใหม่ทุกวัน
+            </p>
+        </div>
+        <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+            <span>ดูทั้งหมด ({{ total_listings }} แห่ง)</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {% for listing in recent_listings %}
+        <div class="group rounded-2xl border border-neutral-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col">
+            <div class="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
+                {% if listing.property.cover_image %}
+                <img src="{{ listing.property.cover_image.image.url }}"
+                     alt="{{ listing.property.title }}"
+                     loading="lazy"
+                     class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="flex h-full w-full items-center justify-center text-xs text-neutral-400 bg-gradient-to-tr from-neutral-100 to-neutral-200 flex-col gap-1">
+                    <i data-lucide="store" class="w-8 h-8 text-neutral-400"></i>
+                    <span>ไม่มีรูปภาพ</span>
+                </div>
+                {% endif %}
+
+                <div class="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1.5">
+                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                        {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-lg bg-neutral-800 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                        {{ listing.get_type_display }}
+                    </span>
+                </div>
+
+                {% if listing.is_admin_verified %}
+                <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">{{ listing.property.get_type_display }}</span>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block">
+                        <h3 class="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
+                            {{ listing.property.title }}
+                        </h3>
+                    </a>
+                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 flex-shrink-0"></i>
+                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">ค่าเช่าต่อเดือน</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
+                        <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 font-medium block">ราคาเซ้ง</span>
+                        <span class="text-xl font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</span>
+                    </div>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                       class="rounded-xl bg-neutral-900 hover:bg-brand-600 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs">
+                        ดูร้านนี้ →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
+            ยังไม่มีรายการประกาศในระบบ
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 8. TRUST SECTION: ทำไมต้องเลือกเซ้งร้านด่วน.com -->
+<!-- ============================================================================== -->
+<section class="bg-white border-y border-neutral-200/80 py-10 px-3 sm:px-6">
+    <div class="mx-auto max-w-6xl">
+        <div class="text-center max-w-2xl mx-auto mb-8 space-y-1.5">
+            <h2 class="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
+                ทำไมต้องเลือกเซ้งร้าน<span class="text-brand-600">ด่วน.com</span>
+            </h2>
+            <p class="text-xs text-neutral-500">
+                เราคัดกรองข้อมูลอย่างเข้มงวด ช่วยให้ผู้รับเซ้งต่อเริ่มต้นธุรกิจได้อย่างมั่นใจ ปลอดภัยจากปัญหาฟ้องร้องและสัญญาแฝง
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">1. ตรวจสอบร้านจริง</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    ตรวจเช็คสภาพสถานที่ อุปกรณ์จริง และเอกสารสิทธิ์ ป้องกันการลงประกาศหลอกลวง
+                </p>
+            </div>
+
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">2. ประเมินราคากลาง</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    วิเคราะห์ข้อมูลรายได้และกำไรเฉลี่ย 3 เดือนจริง ไม่ตั้งราคาเซ้งเว่อร์เกินจริง
+                </p>
+            </div>
+
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">3. สัญญารัดกุม</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    มีสัญญามาตรฐานฝ่ายกฎหมาย และช่วยตรวจสอบเงื่อนไขการโอนสิทธิเช่ากับเจ้าของอาคาร
+                </p>
+            </div>
+
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">4. ผู้ชมตรงกลุ่ม 50,000+</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    เข้าถึงเครือข่ายผู้ประกอบการ นักลงทุน และผู้มองหาทำเลเปิดธุรกิจ ปิดการขายได้รวดเร็ว
+                </p>
+            </div>
+
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="handshake" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">5. ดูแลถึงวันส่งมอบ</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    มีตัวแทนพาชมร้านจริง ช่วยตรวจนับสต็อก และเจรจาต่อรองให้เป็นธรรมทั้งสองฝ่าย
+                </p>
+            </div>
+
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/70 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-neutral-900">6. ข้อมูลปลอดภัย PDPA</h3>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    จัดเก็บเอกสารสัญญา สลิปเงินมัดจำ และข้อมูลส่วนบุคคลอย่างปลอดภัยด้วยการเข้ารหัส
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 9. PACKAGES & PRICING SECTION: แพ็กเกจการลงประกาศเซ้งร้าน -->
+<!-- ============================================================================== -->
+<section class="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#fcfcfa] via-white to-pink-50/20 border-b border-neutral-200/80">
+    <div class="mx-auto max-w-6xl space-y-10">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2 max-w-2xl mx-auto">
+            <div class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-200 px-3 py-1 text-xs font-bold text-brand-700">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>แพ็กเกจการลงประกาศเซ้งร้าน</span>
+            </div>
+            <h2 class="text-2xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+                เซ้งร้านไว ปิดดีลสำเร็จ กับแพ็กเกจที่คุ้มค่าที่สุด
+            </h2>
+            <p class="text-xs sm:text-sm text-neutral-500">
+                ลงประกาศตรงถึงกลุ่มผู้สนใจเซ้งกิจการกว่าแสนคนทั่วประเทศ พร้อมระบบดันประกาศและบริการเสริมครบวงจร
+            </p>
+        </div>
+
+        <!-- 3 Packages Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            
+            <!-- 1. โพสต์ฟรี -->
+            <div class="rounded-3xl border border-neutral-200 bg-white p-6 sm:p-7 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-neutral-400 tracking-wider">เริ่มต้นฟรี</span>
+                            <h3 class="text-xl font-black text-neutral-900">โพสต์ฟรี</h3>
+                        </div>
+                        <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-600">฿0 / ด.</span>
+                    </div>
+                    <div class="my-4 border-t border-neutral-100"></div>
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-600">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+                            <span>สามารถโพสต์ได้ <strong>1 ครั้งต่อเดือน</strong> ที่เว็บไซต์</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+                            <span>แสดงในผลการค้นหาตามปกติ</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-neutral-400">
+                            <i data-lucide="x" class="w-4 h-4 text-neutral-300 shrink-0 mt-0.5"></i>
+                            <span>ไม่มีป้าย VIP ดันประกาศ</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-8 pt-4 border-t border-neutral-100">
+                    <a href="{% url 'listings:listing_create' %}"
+                       class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl border-2 border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white py-3 text-xs font-black transition">
+                        <span>เริ่มลงประกาศฟรี [คลิก]</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. โพสต์ VIP (1,000 บาท) -->
+            <div class="relative rounded-3xl border-2 border-brand-500 bg-gradient-to-b from-brand-50/40 via-white to-white p-6 sm:p-7 shadow-md flex flex-col justify-between hover:shadow-xl transition">
+                <div class="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-brand-600 to-pink-500 px-3 py-0.5 text-[11px] font-black text-white shadow-xs">
+                    ยอดนิยม 🔥
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-brand-600 tracking-wider">แพ็กเกจยอดฮิต</span>
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="crown" class="w-5 h-5 text-amber-500"></i>
+                                <h3 class="text-xl font-black text-neutral-900">โพสต์ VIP</h3>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-brand-600 font-mono">฿1,000</div>
+                            <div class="text-[10px] text-neutral-400 font-semibold">ต่อเดือน (30 วัน)</div>
+                        </div>
+                    </div>
+                    <div class="my-4 border-t border-brand-100"></div>
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-700">
+                        <li class="flex items-start gap-2 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ <strong>4 ครั้งต่อเดือน</strong> ที่เว็บไซต์</span>
+                        </li>
+                        <li class="flex items-start gap-2 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ที่กลุ่ม <strong>"เซ้งร้านด่วน" ได้ไม่จำกัด</strong> ใน 1 เดือน</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ติดป้าย <strong>👑 VIP</strong> สีทองเด่นสะดุดตา</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>ดันประกาศขึ้น <strong>อันดับต้นๆ ในการค้นหา</strong></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-8 pt-4 border-t border-brand-100">
+                    <a href="{% url 'accounts:vip_membership' %}?tier=vip"
+                       class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3 text-xs font-black shadow-md hover:shadow-lg transition">
+                        <span>เลือกแพ็กเกจ VIP ฿1,000 [คลิก]</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. โพสต์ Super VIP (5,000 บาท) -->
+            <div class="relative rounded-3xl border-2 border-amber-400 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/20 p-6 sm:p-7 shadow-lg flex flex-col justify-between hover:shadow-xl transition ring-2 ring-amber-400/30">
+                <div class="absolute -top-3.5 right-6 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-3.5 py-0.5 text-[11px] font-black text-white shadow-md flex items-center gap-1">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>คุ้มค่าสูงสุด 👑</span>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-amber-600 tracking-wider">ดูแลจนกว่าจะเซ้งได้</span>
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+                                <h3 class="text-xl font-black text-neutral-900">โพสต์ Super VIP</h3>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-amber-600 font-mono">฿5,000</div>
+                            <div class="text-[10px] text-neutral-500 font-semibold">ครั้งเดียวจนเซ้งได้!</div>
+                        </div>
+                    </div>
+                    <div class="my-4 border-t border-amber-200"></div>
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-800">
+                        <li class="flex items-start gap-2 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ <strong>ไม่จำกัดจำนวน ไม่จำกัดระยะเวลา จนกว่าจะเซ้งได้</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ทั้งที่เว็บไซต์ และที่กลุ่ม <strong>"เซ้งร้านด่วน"</strong> ไม่จำกัด</span>
+                        </li>
+                        <li class="flex items-start gap-2 font-black text-amber-700 bg-amber-100/70 p-2.5 rounded-xl border border-amber-200">
+                            <i data-lucide="gift" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                            <span>แถมฟรี! แอดมินช่วยโพสต์ที่ <strong>TikTok, เพจ Facebook, และ YouTube</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ดันประกาศสม่ำเสมอทุกสัปดาห์</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-8 pt-4 border-t border-amber-200">
+                    <a href="{% url 'accounts:vip_membership' %}?tier=super_vip"
+                       class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white py-3 text-xs font-black shadow-md hover:shadow-lg transition">
+                        <span>เลือกแพ็กเกจ Super VIP ฿5,000 [คลิก]</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Callout 1: บริการนายหน้า -->
+        <div class="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-50/80 via-white to-indigo-50/60 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <i data-lucide="handshake" class="w-6 h-6"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base sm:text-lg font-black text-neutral-900">
+                        หากต้องการให้แอดมินช่วยเป็นนายหน้า
+                    </h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed max-w-2xl">
+                        ทีมงานนายหน้ามืออาชีพช่วยพาชมร้านจริง เจรจาต่อรอง คัดกรองผู้สนใจเซ้งที่มีงบจริง และทำสัญญาจะซื้อจะขายให้ถูกต้องจนปิดดีลสำเร็จ
+                    </p>
+                </div>
+            </div>
+            <div class="shrink-0">
+                <a href="{% url 'core:contact' %}?topic=agent_broker"
+                   class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 text-xs font-black transition shadow-xs">
+                    <i data-lucide="phone-call" class="w-4 h-4"></i>
+                    <span>กรุณาติดต่อแอดมิน [คลิก]</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Callout 2: หมายเหตุ ป้าย เวอร์ริไฟร์ (Admin Verified Badge) -->
+        <div class="rounded-3xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-white to-emerald-50/50 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <div class="w-28 sm:w-36 shrink-0 filter drop-shadow-sm">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified Badge ตราแอดมิน เวอร์ริไฟร์" class="w-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-0.5 text-[11px] font-black text-emerald-800">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span>เครื่องหมายการันตีความน่าเชื่อถือ</span>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-black text-neutral-900">
+                        หมายเหตุ: ทุกร้านมีสิทธิ์รับป้าย "เวอร์ริไฟร์ (Admin Verified)"
+                    </h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed max-w-xl">
+                        เป็นเครื่องการันตีว่าร้านนี้ได้รับการตรวจสอบจากแอดมินแล้ว ตรวจสอบสถานที่จริงและสัญญาเช่าถูกต้อง เพิ่มความมั่นใจให้ผู้ซื้อเซ้งได้ไวยิ่งขึ้น
+                    </p>
+                </div>
+            </div>
+            <div class="shrink-0">
+                <a href="{% url 'core:contact' %}?topic=request_verified_badge"
+                   class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 text-xs font-black transition shadow-xs">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                    <span>ขอรับป้ายเวอร์ริไฟร์ [คลิก]</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 10. FAQ SECTION: คำถามที่พบบ่อยเกี่ยวกับการเซ้งร้าน (AEO & AI Knowledge Extraction) -->
+<!-- ============================================================================== -->
+<section id="faq-section" class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-neutral-200/80">
+    <div class="mx-auto max-w-4xl space-y-6">
+        <div class="text-center space-y-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-50 border border-pink-200 px-3 py-1 text-xs font-bold text-brand-600">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span>ศูนย์ความรู้ & คำถามที่พบบ่อย (FAQ)</span>
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+                รวมข้อสงสัยยอดฮิตเกี่ยวกับการเซ้งร้านค้า
+            </h2>
+            <p class="text-xs sm:text-sm text-neutral-500 max-w-xl mx-auto">
+                คู่มือเบื้องต้นสำหรับผู้เริ่มต้นเซ้งร้าน พร้อมคำแนะนำทางกฎหมายและการเงินเพื่อป้องกันความเสี่ยง
+            </p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+            <!-- FAQ 1 -->
+            <details class="group rounded-2xl border border-neutral-200 bg-[#fcfcfa] p-4 sm:p-5 transition open:bg-white open:shadow-xs open:border-brand-300">
+                <summary class="flex cursor-pointer items-center justify-between font-bold text-neutral-900 text-sm sm:text-base list-none">
+                    <span class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">1</span>
+                        <span>เซ้งร้านกับเช่าร้าน แตกต่างกันอย่างไร?</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180 shrink-0"></i>
+                </summary>
+                <div class="mt-3 pl-8 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
+                    การ <strong>"เช่าร้าน"</strong> คือการจ่ายค่าเช่ารายเดือนเพื่อใช้สถานที่เปล่า โดยผู้เช่าต้องลงทุนตกแต่ง ซื้อแอร์ เดินไฟ และซื้ออุปกรณ์ใหม่เองทั้งหมด ซึ่งใช้เงินลงทุนสูงและเสียเวลาหลายเดือน <br><br>
+                    ส่วนการ <strong>"เซ้งร้าน"</strong> คือการจ่ายเงินก้อนแรกเพื่อรับช่วงกิจการที่ตกแต่งพร้อมเปิดทันที มีอุปกรณ์ครัวหรือเฟอร์นิเจอร์ครบ และมักมีฐานลูกค้าเดิมอยู่แล้ว จึงช่วยประหยัดงบก่อสร้างได้มากกว่า 50-70% และสามารถเริ่มขายสร้างรายได้ตั้งแต่วันแรก
+                </div>
+            </details>
+
+            <!-- FAQ 2 -->
+            <details class="group rounded-2xl border border-neutral-200 bg-[#fcfcfa] p-4 sm:p-5 transition open:bg-white open:shadow-xs open:border-brand-300">
+                <summary class="flex cursor-pointer items-center justify-between font-bold text-neutral-900 text-sm sm:text-base list-none">
+                    <span class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">2</span>
+                        <span>เซ้งร้านต้องตรวจสอบเอกสารอะไรบ้างเพื่อป้องกันการถูกหลอกลวง?</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180 shrink-0"></i>
+                </summary>
+                <div class="mt-3 pl-8 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
+                    ควรตรวจสอบ 5 รายการสำคัญอย่างรอบคอบ:
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li><strong>สัญญาเช่าฉบับหลักและสำเนาโฉนด</strong>: ตรวจสอบว่าคู่สัญญาเดิมเป็นเจ้าของอาคารตัวจริงหรือไม่</li>
+                        <li><strong>หนังสือยินยอมให้เปลี่ยนสัญญา</strong>: เจ้าของอาคารรับทราบและอนุญาตให้เปลี่ยนตัวผู้เช่ารายใหม่</li>
+                        <li><strong>บัญชีรายการทรัพย์สิน (Inventory)</strong>: ตรวจนับอุปกรณ์ แอร์ ตู้แช่ เครื่องชงกาแฟ ที่ส่งมอบจริง</li>
+                        <li><strong>บิลค่าน้ำ ค่าไฟ ค่าส่วนกลาง</strong>: ยืนยันว่าไม่มีหนี้ค้างชำระก่อนวันส่งมอบ</li>
+                        <li><strong>ใบอนุญาตประกอบกิจการ</strong>: เช่น ใบอนุญาตจำหน่ายสุรา หรือใบอนุญาตสปา ว่าสามารถโอนสิทธิ์ได้หรือไม่</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- FAQ 3 -->
+            <details class="group rounded-2xl border border-neutral-200 bg-[#fcfcfa] p-4 sm:p-5 transition open:bg-white open:shadow-xs open:border-brand-300">
+                <summary class="flex cursor-pointer items-center justify-between font-bold text-neutral-900 text-sm sm:text-base list-none">
+                    <span class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">3</span>
+                        <span>ค่าเปลี่ยนสัญญาเช่าคืออะไร และใครต้องเป็นคนจ่าย?</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180 shrink-0"></i>
+                </summary>
+                <div class="mt-3 pl-8 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
+                    ค่าเปลี่ยนสัญญาคือค่าธรรมเนียมที่เจ้าของอาคารหรือนิติบุคคลเรียกเก็บเมื่อมีการเปลี่ยนตัวคู่สัญญาเช่ารายใหม่ โดยทั่วไปขึ้นอยู่กับข้อตกลงระหว่างผู้เซ้งเดิมและผู้เซ้งใหม่ บนแพลตฟอร์มเซ้งร้านด่วน.com จะแสดงเงื่อนไขชัดเจน 4 รูปแบบ: <strong>ฟรีค่าเปลี่ยนสัญญา, ผู้ขายออกให้, ผู้ซื้อออกเอง หรือแบ่งคนละครึ่ง</strong>
+                </div>
+            </details>
+
+            <!-- FAQ 4 -->
+            <details class="group rounded-2xl border border-neutral-200 bg-[#fcfcfa] p-4 sm:p-5 transition open:bg-white open:shadow-xs open:border-brand-300">
+                <summary class="flex cursor-pointer items-center justify-between font-bold text-neutral-900 text-sm sm:text-base list-none">
+                    <span class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">4</span>
+                        <span>สิทธิการลงประกาศฟรีบน เซ้งร้านด่วน.com มีเงื่อนไขอย่างไร?</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180 shrink-0"></i>
+                </summary>
+                <div class="mt-3 pl-8 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
+                    สมาชิกทุกคนที่สมัครและยืนยันตัวตนด้วยรหัส OTP ทางอีเมล สามารถลงประกาศเซ้งร้านได้ <strong>ฟรี 1 ประกาศต่อเดือนปฏิทิน</strong> (รีเซ็ตทุกวันที่ 1 ของเดือน) และหากต้องการเพิ่มความเร็วในการปิดดีล สามารถอัปเกรดเป็นแพ็กเกจ <strong>VIP (1,000 บาท/เดือน โควตา 4 ประกาศ + ดันประกาศขึ้นหน้าแรก)</strong> ได้ทันที
+                </div>
+            </details>
+
+            <!-- FAQ 5 -->
+            <details class="group rounded-2xl border border-neutral-200 bg-[#fcfcfa] p-4 sm:p-5 transition open:bg-white open:shadow-xs open:border-brand-300">
+                <summary class="flex cursor-pointer items-center justify-between font-bold text-neutral-900 text-sm sm:text-base list-none">
+                    <span class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">5</span>
+                        <span>เครื่องหมาย VERIFIED BY ADMIN คืออะไร มีประโยชน์อย่างไร?</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180 shrink-0"></i>
+                </summary>
+                <div class="mt-3 pl-8 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
+                    เป็นเครื่องหมายรับรองพิเศษว่าร้านนี้ได้รับการตรวจสอบสถานที่จริง มีตัวตนอยู่จริง สัญญาเช่าถูกต้อง และไม่มีข้อพิพาท ช่วยสร้างความมั่นใจให้ผู้ที่กำลังมองหาร้านกล้าติดต่อสอบถาม และช่วยเพิ่มโอกาสปิดการเซ้งได้เร็วกว่าประกาศทั่วไปถึง 2-3 เท่า
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Modal Handlers & Leaflet Initialization -->
+<script nonce="{{ request.csp_nonce }}">
+    function openFilterModal() {
+        const backdrop = document.getElementById('filter-modal-backdrop');
+        if (backdrop) {
+            backdrop.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+    window.openFilterModal = openFilterModal;
+
+    function closeFilterModal() {
+        const backdrop = document.getElementById('filter-modal-backdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+    window.closeFilterModal = closeFilterModal;
+
+    function resetFilterModal() {
+        const typeEl = document.getElementById('modal-select-type');
+        const catEl = document.getElementById('modal-select-category');
+        const provEl = document.getElementById('modal-select-province');
+        const pminEl = document.getElementById('modal-select-price-min');
+        const pmaxEl = document.getElementById('modal-select-price-max');
+        if (typeEl) typeEl.value = '';
+        if (catEl) catEl.value = '';
+        if (provEl) provEl.value = '';
+        if (pminEl) pminEl.value = '';
+        if (pmaxEl) pmaxEl.value = '';
+    }
+    window.resetFilterModal = resetFilterModal;
+
+    function applyFiltersAndSubmit() {
+        const typeEl = document.getElementById('modal-select-type');
+        const catEl = document.getElementById('modal-select-category');
+        const provEl = document.getElementById('modal-select-province');
+        const pminEl = document.getElementById('modal-select-price-min');
+        const pmaxEl = document.getElementById('modal-select-price-max');
+
+        if (typeEl) document.getElementById('filter-input-type').value = typeEl.value;
+        if (catEl) document.getElementById('filter-input-category').value = catEl.value;
+        if (provEl) document.getElementById('filter-input-province').value = provEl.value;
+        if (pminEl) document.getElementById('filter-input-price-min').value = pminEl.value;
+        if (pmaxEl) document.getElementById('filter-input-price-max').value = pmaxEl.value;
+
+        const form = document.getElementById('hero-search-form');
+        if (form) form.submit();
+    }
+    window.applyFiltersAndSubmit = applyFiltersAndSubmit;
+
+    function initFilterModalEvents() {
+        const openBtn = document.getElementById('btn-open-filter-modal');
+        if (openBtn) {
+            openBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.openFilterModal();
+            });
+        }
+
+        const closeBtn = document.getElementById('btn-close-filter-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.closeFilterModal();
+            });
+        }
+
+        const modalResetBtn = document.getElementById('btn-reset-filter-modal');
+        if (modalResetBtn) {
+            modalResetBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.resetFilterModal();
+            });
+        }
+
+        const submitBtn = document.getElementById('btn-submit-filter-modal');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.applyFiltersAndSubmit();
+            });
+        }
+
+        const backdrop = document.getElementById('filter-modal-backdrop');
+        if (backdrop) {
+            backdrop.addEventListener('click', function (e) {
+                if (e.target === backdrop) {
+                    window.closeFilterModal();
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                window.closeFilterModal();
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFilterModalEvents);
+    } else {
+        initFilterModalEvents();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const mapDataEl = document.getElementById('map-listings-data');
+        const mapListings = mapDataEl ? JSON.parse(mapDataEl.textContent) : [];
+        const mapContainer = document.getElementById('interactive-shop-map');
+        if (!mapContainer || typeof L === 'undefined') return;
+
+        // Default Center (Thailand Overview)
+        const defaultLat = 13.7563;
+        const defaultLng = 100.5018;
+        const map = L.map('interactive-shop-map', {
+            zoomControl: true,
+            scrollWheelZoom: false,
+        }).setView([defaultLat, defaultLng], 6);
+
+        // OpenStreetMap Positron Tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const markersLayer = L.featureGroup().addTo(map);
+        let userMarker = null;
+
+        // Helper: Format Baht numbers
+        function formatBaht(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
+            }
+            return num.toLocaleString();
+        }
+
+        // Plot Listing Markers with Brand Pink Theme
+        mapListings.forEach(function (shop) {
+            if (!shop.lat || !shop.lng) return;
+
+            const iconHtml = `
+                <div class="relative cursor-pointer group">
+                    <div class="px-2.5 py-1 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold shadow-md border-2 border-white flex items-center gap-1 transition-transform group-hover:scale-110 whitespace-nowrap">
+                        <span>฿${formatBaht(shop.price)}</span>
+                    </div>
+                    <div class="w-2 h-2 bg-brand-600 rotate-45 mx-auto -mt-1 border-r border-b border-white"></div>
+                </div>
+            `;
+
+            const customIcon = L.divIcon({
+                html: iconHtml,
+                className: 'custom-shop-marker',
+                iconSize: [70, 30],
+                iconAnchor: [35, 30],
+                popupAnchor: [0, -25]
+            });
+
+            const popupContent = `
+                <div class="w-64 font-sans text-neutral-900 p-1">
+                    ${shop.cover_url ? `
+                        <div class="relative aspect-[16/9] rounded-xl overflow-hidden mb-2 bg-neutral-100">
+                            <img src="${shop.cover_url}" alt="${shop.title}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-neutral-900/90 text-white font-mono text-[10px] font-bold">${shop.ref_code}</span>
+                        </div>
+                    ` : ''}
+                    <h4 class="font-bold text-xs text-neutral-900 line-clamp-2 leading-tight">${shop.title}</h4>
+                    <p class="text-[11px] text-neutral-500 mt-1 flex items-center gap-1">
+                        <svg class="w-3 h-3 text-neutral-400 inline" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                        ${shop.district}, ${shop.province}
+                    </p>
+                    <div class="mt-2 pt-2 border-t border-neutral-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-neutral-400 block">ราคาเซ้ง</span>
+                            <span class="text-sm font-black text-brand-600">฿${shop.price.toLocaleString()}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            ${shop.google_maps_url ? `
+                                <a href="${shop.google_maps_url}" target="_blank" rel="noopener noreferrer" class="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1.5 transition" title="เปิด Google Maps นำทาง">
+                                    🗺️ แผนที่
+                                </a>
+                            ` : ''}
+                            <a href="${shop.detail_url}" class="rounded-lg bg-neutral-900 hover:bg-brand-600 text-white text-[11px] font-bold px-3 py-1.5 transition">
+                                ดูร้านนี้ →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const marker = L.marker([shop.lat, shop.lng], { icon: customIcon });
+            marker.bindPopup(popupContent, { maxWidth: 300 });
+            markersLayer.addLayer(marker);
+        });
+
+        if (markersLayer.getLayers().length > 0) {
+            map.fitBounds(markersLayer.getBounds(), { padding: [40, 40], maxZoom: 13 });
+        }
+
+        const mapResetBtn = document.getElementById('btn-reset-map');
+        if (mapResetBtn) {
+            mapResetBtn.addEventListener('click', function () {
+                if (markersLayer.getLayers().length > 0) {
+                    map.fitBounds(markersLayer.getBounds(), { padding: [40, 40] });
+                } else {
+                    map.setView([defaultLat, defaultLng], 6);
+                }
+            });
+        }
+
+        function calcDistanceKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        const nearMeBtn = document.getElementById('btn-find-near-me');
+        const statusBanner = document.getElementById('geo-status-banner');
+        const statusText = document.getElementById('geo-status-text');
+
+        if (nearMeBtn) {
+            nearMeBtn.addEventListener('click', function () {
+                if (!navigator.geolocation) {
+                    alert('เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง (Geolocation)');
+                    return;
+                }
+
+                statusBanner.classList.remove('hidden');
+                statusText.innerText = 'กำลังตรวจจับพิกัดของคุณ...';
+
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        if (userMarker) {
+                            userMarker.setLatLng([userLat, userLng]);
+                        } else {
+                            const userIcon = L.divIcon({
+                                html: `
+                                    <div class="relative flex items-center justify-center">
+                                        <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-brand-400 opacity-75"></span>
+                                        <div class="h-4 w-4 rounded-full bg-brand-600 border-2 border-white shadow-lg"></div>
+                                    </div>
+                                `,
+                                className: 'user-location-marker',
+                                iconSize: [32, 32],
+                                iconAnchor: [16, 16]
+                            });
+                            userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+                            userMarker.bindPopup('<b>คุณอยู่ที่นี่</b>').openPopup();
+                        }
+
+                        let nearestShop = null;
+                        let minDistance = Infinity;
+
+                        mapListings.forEach(function (shop) {
+                            if (shop.lat && shop.lng) {
+                                const dist = calcDistanceKm(userLat, userLng, shop.lat, shop.lng);
+                                shop.distanceKm = dist;
+                                if (dist < minDistance) {
+                                    minDistance = dist;
+                                    nearestShop = shop;
+                                }
+                            }
+                        });
+
+                        map.setView([userLat, userLng], 12);
+
+                        if (nearestShop) {
+                            statusText.innerHTML = `พบร้านใกล้ตัวคุณที่สุด: <strong>${nearestShop.title}</strong> (ห่างประมาณ ${minDistance.toFixed(1)} กม.)`;
+                        } else {
+                            statusText.innerText = 'ระบุตำแหน่งของคุณสำเร็จแล้ว';
+                        }
+                    },
+                    function (error) {
+                        statusText.innerText = 'ไม่สามารถดึงตำแหน่งได้: ' + (error.message || 'โปรดอนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+# ==============================================================================
+# PropTech Core Dependencies - PINNED VERSIONS (PRODUCTION ONLY)
+# Security Baseline: All packages reviewed against CVEs via pip-audit
+# Dev/test tooling lives in requirements-dev.txt
+# ==============================================================================
+
+# Core Framework & Database (Django 5.2 LTS - security support until April 2028)
+Django==5.2.18
+psycopg[binary]==3.2.10
+
+# Authentication & Cryptography
+argon2-cffi==23.1.0          # Mandatory: Replaces PBKDF2 for password hashing
+django-axes==6.5.2           # Login throttling & brute-force defense
+django-otp==1.5.4            # 2FA Core Framework
+qrcode==8.0                  # TOTP QR generation for 2FA enrollment
+
+# Security Headers & Defense
+django-csp==3.8              # Content Security Policy (Nonce-based) - 4.x changes config format
+django-ratelimit==4.1.0      # Endpoint-level request rate limiting
+bleach==6.4.0                # Safe HTML sanitization (Patched against XSS)
+
+# File & Media Security
+Pillow==13.0.0               # Image sanitization & EXIF stripping (Pinned for Python 3.14+)
+python-magic==0.4.27         # MIME type verification via magic bytes inspection
+
+# Outbound HTTP (EasySlip slip verification, Telegram alerts)
+requests==2.34.2
+
+# Environment & Settings
+python-decouple==3.8         # Strict env secrets separation
+
+# Production Server & Monitoring
+gunicorn==23.0.0             # Production WSGI HTTP Server
+sentry-sdk==2.17.0           # Error tracking with PII sanitization

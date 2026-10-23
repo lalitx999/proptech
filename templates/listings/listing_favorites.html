@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}ร้านเซ้งที่บันทึกไว้ — เซ้งร้านด่วน.com{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfa] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl space-y-6">
+
+        <!-- Top Header Breadcrumb -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
+            <div>
+                <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 transition mb-2">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>กลับสู่ตลาดร้านเซ้งทั้งหมด</span>
+                </a>
+                <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                    <i data-lucide="heart" class="w-7 h-7 text-brand-600 fill-brand-600"></i>
+                    <span>ร้านเซ้งที่ถูกใจ ({{ total_count }} ร้าน)</span>
+                </h1>
+                <p class="text-xs text-neutral-500 mt-1">
+                    รายการร้านค้าที่คุณบันทึกไว้เพื่อกลับมาดูย้อนหลังหรือติดต่อเจ้าของร้าน
+                </p>
+            </div>
+
+            {% if listings %}
+            <button type="button" id="clear-favs-btn"
+                    class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-700 px-3.5 py-2 text-xs font-bold transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 text-neutral-500"></i>
+                <span>ล้างรายการที่ถูกใจทั้งหมด</span>
+            </button>
+            {% endif %}
+        </div>
+
+        {% if listings %}
+        <!-- 4-Column Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {% for listing in listings %}
+            <div class="group bg-white rounded-2xl border border-neutral-200/80 shadow-2xs hover:shadow-xl hover:border-brand-300 transition-all duration-300 flex flex-col overflow-hidden">
+                <!-- Property Cover Image -->
+                <div class="relative h-52 bg-neutral-100 overflow-hidden">
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block w-full h-full">
+                        {% if listing.property.cover_image %}
+                        <img src="{{ listing.property.cover_image.image.url }}"
+                             alt="{{ listing.property.title }}"
+                             loading="lazy"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-neutral-400 bg-neutral-100">
+                            <i data-lucide="store" class="w-10 h-10 text-neutral-300"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+
+                    <!-- Top Left Badges -->
+                    <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
+                        {% if listing.property.owner.is_vip_active %}
+                        <span class="rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-2 py-0.5 text-[10px] font-black text-neutral-900 shadow-sm flex items-center gap-1 pulse-badge">
+                            <i data-lucide="crown" class="w-3 h-3 text-neutral-900"></i>
+                            <span>VIP</span>
+                        </span>
+                        {% endif %}
+                        <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                            {{ listing.ref_code }}
+                        </span>
+                    </div>
+
+                    <!-- Remove from Favs Button -->
+                    <button type="button" class="remove-fav-btn absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md hover:bg-red-50 text-brand-600 flex items-center justify-center shadow-xs transition" data-id="{{ listing.id }}">
+                        <i data-lucide="heart" class="w-4 h-4 fill-brand-600 text-brand-600"></i>
+                    </button>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+                    <div class="space-y-1">
+                        <!-- Price -->
+                        <div class="text-xl sm:text-2xl font-black text-brand-600 tracking-tight font-sans">
+                            ฿{{ listing.price|intcomma }}
+                        </div>
+
+                        <!-- Location -->
+                        <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-400 flex-shrink-0"></i>
+                            <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                        </p>
+
+                        <!-- Title -->
+                        <h3 class="text-sm font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 pt-1 leading-snug">
+                            <a href="{% url 'listings:listing_detail' pk=listing.pk %}">
+                                {{ listing.property.title }}
+                            </a>
+                        </h3>
+                    </div>
+
+                    <!-- Financial Specs Strip -->
+                    <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
+                        <div>
+                            <span class="text-[10px] text-neutral-400 block">ค่าเช่า</span>
+                            <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|intcomma }}/ด.</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
+                            <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom CTA -->
+                    <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                        <span class="text-[10px] text-neutral-400 font-medium">{{ listing.property.get_type_display }}</span>
+                        <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                           class="text-xs font-extrabold text-neutral-900 group-hover:text-brand-600 inline-flex items-center gap-1 transition">
+                            <span>ดูรายละเอียด</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+
+        <!-- Empty Favorites State -->
+        <div class="rounded-3xl border-2 border-dashed border-neutral-200 bg-white p-12 text-center space-y-5">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-pink-50 text-brand-600 flex items-center justify-center">
+                <i data-lucide="heart" class="w-8 h-8"></i>
+            </div>
+            <div class="max-w-md mx-auto space-y-1">
+                <h2 class="text-xl font-black text-neutral-900">ยังไม่มีร้านค้าที่คุณบันทึกไว้</h2>
+                <p class="text-xs text-neutral-500">
+                    คลิกที่รูปหัวใจบนการ์ดร้านค้าในหน้าตลาด เพื่อบันทึกร้านที่คุณสนใจไว้ดูภายหลัง
+                </p>
+            </div>
+            <a href="{% url 'listings:marketplace' %}"
+               class="inline-flex items-center gap-2 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 text-xs sm:text-sm font-bold shadow-md transition">
+                <span>ไปยังตลาดค้นหาร้านเซ้ง</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script nonce="{{ request.csp_nonce }}">
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Client-side auto-load if query string is empty
+        var urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('ids')) {
+            var storedFavs = JSON.parse(localStorage.getItem('sengran_fav_ids') || '[]');
+            if (storedFavs.length > 0) {
+                window.location.replace('/listings/favorites/?ids=' + storedFavs.join(','));
+                return;
+            }
+        }
+
+        // Remove single favorite
+        var removeBtns = document.querySelectorAll('.remove-fav-btn');
+        removeBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = btn.getAttribute('data-id');
+                var stored = JSON.parse(localStorage.getItem('sengran_fav_ids') || '[]');
+                stored = stored.filter(function(x) { return String(x) !== String(id); });
+                localStorage.setItem('sengran_fav_ids', JSON.stringify(stored));
+                
+                if (stored.length > 0) {
+                    window.location.href = '/listings/favorites/?ids=' + stored.join(',');
+                } else {
+                    window.location.href = '/listings/favorites/';
+                }
+            });
+        });
+
+        // Clear all
+        var clearBtn = document.getElementById('clear-favs-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                localStorage.removeItem('sengran_fav_ids');
+                window.location.href = '/listings/favorites/';
+            });
+        }
+    });
+</script>
+{% endblock %}

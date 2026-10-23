@@ -1,0 +1,1296 @@
+{% extends "base.html" %}
+
+{% block title %}ศูนย์ควบคุมระบบหลังบ้าน — เซ้งร้านด่วน.com (Admin Command Center){% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#f8fafc] text-neutral-900 pb-16">
+
+    <!-- Top Command Header Bar -->
+    <div class="bg-neutral-900 text-white border-b border-neutral-800 sticky top-14 sm:top-16 z-30 shadow-md">
+        <div class="mx-auto max-w-[1720px] w-full px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-xs">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-black tracking-tight">ศูนย์ควบคุมระบบแอดมิน</h1>
+                        <span class="rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2 py-0.2">LIVE</span>
+                    </div>
+                    <div class="text-[11px] text-neutral-400">
+                        Admin Command Center • แพลตฟอร์มเซ้งร้าน.com (Role: {{ user.get_role_display }})
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Quick Action Controls -->
+            <div class="flex items-center gap-2">
+                <button type="button" id="open-fast-post-btn"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>+ ลงทรัพย์แทนลูกค้า (Fast Post)</span>
+                </button>
+                <a href="{% url 'listings:marketplace' %}" target="_blank"
+                   class="inline-flex items-center gap-1 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-3 py-1.5 text-xs font-semibold border border-neutral-700 transition">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">ดูหน้าบ้าน</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Command Container (Widescreen Breathing Room) -->
+    <div class="mx-auto max-w-[1720px] w-full px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Command Sidebar Navigation (3 cols on lg, 2 cols on xl) -->
+            <div class="lg:col-span-3 xl:col-span-2 space-y-2 bg-white rounded-3xl p-3 border border-neutral-200 shadow-2xs sticky top-36">
+                <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-3 pt-2 pb-1">
+                    ระบบจัดการหลัก
+                </div>
+
+                <nav class="space-y-1" id="admin-nav-tabs">
+                    <a href="?tab=overview" data-tab="overview"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'overview' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-500"></i>
+                            <span>1. แดชบอร์ดภาพรวม</span>
+                        </div>
+                    </a>
+
+                    <a href="?tab=shops" data-tab="shops"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'shops' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="store" class="w-4 h-4 text-sunset-500"></i>
+                            <span>2. ระบบจัดการร้านค้า</span>
+                        </div>
+                        {% if pending_shops > 0 %}
+                        <span class="rounded-full bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.2">{{ pending_shops }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="?tab=slips" data-tab="slips"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'slips' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="receipt" class="w-4 h-4 text-emerald-500"></i>
+                            <span>3. ตรวจสลิป VIP (EasySlip)</span>
+                        </div>
+                        {% if pending_slips_count > 0 %}
+                        <span class="rounded-full bg-red-600 text-white text-[10px] font-black px-1.5 py-0.2 animate-pulse">{{ pending_slips_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="?tab=crm" data-tab="crm"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'crm' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="users" class="w-4 h-4 text-blue-500"></i>
+                            <span>4. CRM ลีดลูกค้า</span>
+                        </div>
+                        {% if new_leads_count > 0 %}
+                        <span class="rounded-full bg-blue-600 text-white text-[10px] font-black px-1.5 py-0.2">{{ new_leads_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="?tab=pipeline" data-tab="pipeline"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'pipeline' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="git-pull-request" class="w-4 h-4 text-purple-500"></i>
+                            <span>5. ติดตามดีลเซ้งร้าน</span>
+                        </div>
+                        <span class="text-[11px] font-mono text-neutral-400">{{ active_deals_count }} ดีล</span>
+                    </a>
+
+                    <a href="?tab=agents" data-tab="agents"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'agents' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="briefcase" class="w-4 h-4 text-amber-500"></i>
+                            <span>6. ทีมนายหน้า & ตัวแทน</span>
+                        </div>
+                        <span class="text-[11px] font-mono text-neutral-400">{{ agents_list|length }} คน</span>
+                    </a>
+
+                    <a href="?tab=revenue" data-tab="revenue"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'revenue' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i>
+                            <span>7. รายได้ & ค่าคอม 5%</span>
+                        </div>
+                    </a>
+
+                    <a href="?tab=documents" data-tab="documents"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'documents' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="folder-lock" class="w-4 h-4 text-indigo-500"></i>
+                            <span>8. คลังสัญญา & ข้อความ</span>
+                        </div>
+                        {% if unresolved_messages_count > 0 %}
+                        <span class="rounded-full bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.2">{{ unresolved_messages_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="?tab=analytics" data-tab="analytics"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'analytics' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-rose-500"></i>
+                            <span>9. สถิติและการวิเคราะห์</span>
+                        </div>
+                    </a>
+                </nav>
+
+                <!-- Official KBank Info Widget in Sidebar -->
+                <div class="pt-4 border-t border-neutral-100">
+                    <div class="rounded-2xl bg-emerald-50/80 border border-emerald-200/80 p-3 space-y-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#00A950]"></span>
+                            <span class="text-[11px] font-black text-emerald-900">บัญชีรับเงินกสิกรไทย (K+)</span>
+                        </div>
+                        <div class="font-mono text-xs font-bold text-neutral-800">
+                            {{ official_bank_account_no }}
+                        </div>
+                        <div class="text-[10px] text-neutral-500 truncate">
+                            ชื่อ: <strong>{{ official_bank_account_name }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content Panels (9 cols on lg, 10 cols on xl) -->
+            <div class="lg:col-span-9 xl:col-span-10 space-y-6">
+
+                <!-- TAB 1: OVERVIEW & KPIS -->
+                {% if active_tab == 'overview' %}
+                <div class="space-y-6">
+                    <!-- 4 Big Stat Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
+                            <div class="text-[11px] font-bold text-neutral-400">ทรัพย์ทั้งหมดในระบบ</div>
+                            <div class="text-2xl sm:text-3xl font-black text-neutral-900 font-mono">{{ total_shops }}</div>
+                            <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                <span>กำลังประกาศ {{ published_shops }}</span>
+                                {% if pending_shops > 0 %}
+                                <span class="text-amber-600">• รอตรวจ {{ pending_shops }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
+                            <div class="text-[11px] font-bold text-neutral-400">สมาชิก VIP (1,000 บ.)</div>
+                            <div class="text-2xl sm:text-3xl font-black text-amber-500 font-mono">{{ active_vip_users }}</div>
+                            <div class="text-[11px] text-neutral-500">
+                                รายได้ VIP เดือนนี้: <strong>฿{{ month_vip_revenue|floatformat:0 }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
+                            <div class="text-[11px] font-bold text-neutral-400">สลิปรอตรวจสอบ</div>
+                            <div class="text-2xl sm:text-3xl font-black {% if pending_slips_count > 0 %}text-red-600{% else %}text-neutral-900{% endif %} font-mono">
+                                {{ pending_slips_count }}
+                            </div>
+                            <div class="text-[11px] text-neutral-500">
+                                {% if pending_slips_count > 0 %}
+                                <a href="?tab=slips" class="text-brand-600 font-bold hover:underline">คลิกเพื่อตรวจสลิป ➔</a>
+                                {% else %}
+                                <span>ตรวจครบเรียบร้อยแล้ว</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
+                            <div class="text-[11px] font-bold text-neutral-400">มูลค่าดีลใน Pipeline</div>
+                            <div class="text-2xl sm:text-3xl font-black text-brand-600 font-mono">฿{{ pipeline_volume|floatformat:0 }}</div>
+                            <div class="text-[11px] text-neutral-500">
+                                ประมาณการคอม 5%: <strong>฿{{ pipeline_commission_est|floatformat:0 }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Hero Banner -->
+                    <div class="rounded-3xl bg-gradient-to-r from-neutral-900 via-neutral-900 to-midnight-900 text-white p-6 sm:p-8 relative overflow-hidden shadow-sm">
+                        <div class="relative z-10 max-w-xl space-y-3">
+                            <div class="inline-flex items-center gap-1.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-bold px-3 py-0.5 border border-brand-500/30">
+                                ⚡ ศูนย์ปฏิบัติการด่วนสำหรับแอดมิน
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black tracking-tight">
+                                ต้องการลงประกาศทรัพย์ใหม่แทนลูกค้า หรือตรวจสลิปโอนเงิน?
+                            </h2>
+                            <p class="text-xs text-neutral-300 leading-relaxed">
+                                สามารถใช้ฟอร์ม All-in-One Fast Post เพื่อลงประกาศร้านค้าพร้อมอัปโหลดรูปภาพได้ในหน้าเดียว โดยไม่ต้องสลับหน้า Property และ Listing
+                            </p>
+                            <div class="flex flex-wrap items-center gap-3 pt-2">
+                                <button type="button" id="hero-fast-post-btn"
+                                        class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-xs font-bold shadow transition">
+                                    + เปิดฟอร์มลงทรัพย์ Fast Post
+                                </button>
+                                <a href="?tab=slips"
+                                   class="rounded-xl bg-white/10 hover:bg-white/20 text-white px-4 py-2 text-xs font-bold border border-white/10 transition">
+                                    ตรวจสลิปเงินเข้า ({{ pending_slips_count }})
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Pending Tasks Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Pending Shops -->
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                                    <i data-lucide="store" class="w-4 h-4 text-sunset-500"></i>
+                                    <span>ประกาศร้านค้ารออนุมัติ ({{ pending_shops }})</span>
+                                </h3>
+                                <a href="?tab=shops&shop_status=pending" class="text-xs font-bold text-brand-600 hover:underline">ดูทั้งหมด</a>
+                            </div>
+
+                            <div class="space-y-2">
+                                {% for shop in shops_list %}
+                                    {% if shop.status == 'pending' %}
+                                    <div class="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
+                                        <div class="space-y-0.5 max-w-xs md:max-w-sm xl:max-w-md truncate">
+                                            <div class="font-bold text-neutral-900 truncate">{{ shop.property.title }}</div>
+                                            <div class="text-[11px] text-neutral-500">{{ shop.property.district }} • ฿{{ shop.price|floatformat:0 }}</div>
+                                        </div>
+                                        <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-xs font-bold transition">
+                                                อนุมัติทันที
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <div class="py-6 text-center text-xs text-neutral-400">ไม่มีร้านค้ารออนุมัติในขณะนี้</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Pending Slips -->
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                                    <i data-lucide="receipt" class="w-4 h-4 text-emerald-500"></i>
+                                    <span>สลิปรอตรวจสอบ ({{ pending_slips_count }})</span>
+                                </h3>
+                                <a href="?tab=slips" class="text-xs font-bold text-brand-600 hover:underline">ดูทั้งหมด</a>
+                            </div>
+
+                            <div class="space-y-2">
+                                {% for slip in pending_slips|slice:":5" %}
+                                <div class="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
+                                    <div class="space-y-0.5">
+                                        <div class="font-bold text-neutral-900">{{ slip.user.username }}</div>
+                                        <div class="text-[11px] text-neutral-500 font-mono">{{ slip.ref_number }} • ฿{{ slip.amount|floatformat:0 }}</div>
+                                    </div>
+                                    <a href="?tab=slips" class="rounded-xl bg-neutral-900 hover:bg-brand-600 text-white px-3 py-1 text-xs font-bold transition">
+                                        ตรวจสลิป
+                                    </a>
+                                </div>
+                                {% empty %}
+                                <div class="py-6 text-center text-xs text-neutral-400">ไม่มีสลิปรอตรวจสอบ</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telegram Bot Integration & Chat ID Detector Widget -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-neutral-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center shrink-0">
+                                    <i data-lucide="send" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                                        <span>ระบบแจ้งเตือน Telegram Bot เข้ากลุ่มห้องแอดมิน</span>
+                                        {% if telegram_chat_id %}
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-0.5 text-[11px] font-bold border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เชื่อมต่อสำเร็จ
+                                        </span>
+                                        {% else %}
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-[11px] font-bold border border-amber-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> รอตรวจจับเลขห้อง
+                                        </span>
+                                        {% endif %}
+                                    </h3>
+                                    <p class="text-xs text-neutral-400 mt-0.5">
+                                        บอท: <strong class="text-neutral-700">@proptech2026_th_bot</strong> (ชื่อ: เซ้งร้านด่วน) • แจ้งเตือนทันทีเมื่อมีคนฝากร้าน, สมัคร VIP, หรือโอนเงิน
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form method="post" action="{% url 'accounts:admin_telegram_detect' %}" class="shrink-0">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 rounded-xl bg-[#229ED9] hover:bg-[#1e8ec3] text-white px-4 py-2.5 text-xs font-bold shadow-xs hover:scale-[1.02] transition cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                    <span>ตรวจหาเลขห้องอัตโนมัติ & เทสยิงข้อความ</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 text-xs">
+                            <div class="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 space-y-1">
+                                <span class="text-[11px] font-bold text-neutral-400 block">ขั้นตอนที่ 1</span>
+                                <p class="text-neutral-700 font-medium">เพิ่มบอท <strong class="text-brand-600 font-mono">@proptech2026_th_bot</strong> เข้าไปในกลุ่ม Telegram</p>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 space-y-1">
+                                <span class="text-[11px] font-bold text-neutral-400 block">ขั้นตอนที่ 2</span>
+                                <p class="text-neutral-700 font-medium">พิมพ์ข้อความอะไรก็ได้ 1 ข้อความลงในกลุ่ม (เช่น <code class="bg-white px-1.5 py-0.5 rounded border border-neutral-200">test</code> หรือ <code class="bg-white px-1.5 py-0.5 rounded border border-neutral-200">/start</code>)</p>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 space-y-1">
+                                <span class="text-[11px] font-bold text-neutral-400 block">ขั้นตอนที่ 3: สถานะปัจจุบัน</span>
+                                <p class="text-neutral-700 font-medium">
+                                    Chat ID: 
+                                    {% if telegram_chat_id %}
+                                    <strong class="text-emerald-600 font-mono">{{ telegram_chat_id }}</strong>
+                                    {% else %}
+                                    <span class="text-amber-600">ยังไม่ระบุ (กดปุ่มด้านบนเพื่อเชื่อมต่อ)</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 2: SHOPS MANAGEMENT -->
+                {% if active_tab == 'shops' %}
+                <div class="space-y-6">
+                    <!-- Filter Toolbar -->
+                    <div class="bg-white rounded-3xl p-5 border border-neutral-200 shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                <i data-lucide="store" class="w-5 h-5 text-sunset-500"></i>
+                                <span>รายการร้านค้าเซ้งทั้งหมด ({{ shops_list|length }} รายการ)</span>
+                            </h2>
+                            <button type="button" id="table-fast-post-btn"
+                                    class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-xs font-bold transition shadow-xs">
+                                + สร้างร้านใหม่ (Fast Post)
+                            </button>
+                        </div>
+
+                        <form method="get" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                            <input type="hidden" name="tab" value="shops">
+                            <input type="text" name="shop_q" value="{{ request.GET.shop_q|default:'' }}"
+                                   placeholder="ค้นหาชื่อร้าน รหัสทรัพย์ ทำเล..."
+                                   class="rounded-xl border border-neutral-200 px-3 py-2 text-xs focus:outline-none focus:border-brand-500">
+                            
+                            <select name="shop_status" class="rounded-xl border border-neutral-200 px-3 py-2 text-xs">
+                                <option value="">ทุกสถานะ</option>
+                                {% for val, label in listing_statuses %}
+                                <option value="{{ val }}" {% if request.GET.shop_status == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <select name="shop_cat" class="rounded-xl border border-neutral-200 px-3 py-2 text-xs">
+                                <option value="">ทุกหมวดหมู่ร้าน</option>
+                                {% for val, label in property_types %}
+                                <option value="{{ val }}" {% if request.GET.shop_cat == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="submit" class="rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2 font-bold transition">
+                                กรองข้อมูล
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Shops Table -->
+                    <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">ร้านค้า / ข้อมูล</th>
+                                        <th class="py-3 px-4">หมวดหมู่ & ทำเล</th>
+                                        <th class="py-3 px-4">ราคาเซ้ง & ค่าเช่า</th>
+                                        <th class="py-3 px-4">สถานะ</th>
+                                        <th class="py-3 px-4 text-right">การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for shop in shops_list %}
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4">
+                                            <div class="flex items-center gap-3">
+                                                {% if shop.property.cover_image %}
+                                                <img src="{{ shop.property.cover_image.image.url }}" alt="{{ shop.property.title }}"
+                                                     class="w-12 h-12 rounded-xl object-cover shrink-0 border border-neutral-200">
+                                                {% else %}
+                                                <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 shrink-0">
+                                                    <i data-lucide="image" class="w-5 h-5"></i>
+                                                </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                                        <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank"
+                                                           class="font-black text-neutral-900 hover:text-brand-600 transition block truncate max-w-xs md:max-w-md xl:max-w-xl">
+                                                            {{ shop.property.title }}
+                                                        </a>
+                                                        {% if shop.is_admin_verified %}
+                                                        <span class="inline-flex items-center gap-1 text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs" title="ผ่านการตรวจสอบจากแอดมินแล้ว (Admin Verified)">
+                                                            <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-3 object-contain">
+                                                            <span>VERIFIED</span>
+                                                        </span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="text-[11px] text-neutral-400 font-mono">
+                                                        รหัส {{ shop.ref_code }} • เจ้าของ: {{ shop.property.owner.username }}
+                                                        {% if shop.property.owner.membership_tier == 'SUPER_VIP' and shop.property.owner.is_vip_active %}
+                                                        <span class="text-rose-500 font-bold">✨ SUPER VIP</span>
+                                                        {% elif shop.property.owner.is_vip %}
+                                                        <span class="text-amber-500 font-bold">👑 VIP</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-semibold text-neutral-800">{{ shop.property.get_type_display }}</div>
+                                            <div class="text-[11px] text-neutral-400">{{ shop.property.district }}, {{ shop.property.province }}</div>
+                                        </td>
+                                        <td class="py-3.5 px-4 font-mono">
+                                            <div class="font-black text-brand-600 text-sm">฿{{ shop.price|floatformat:0 }}</div>
+                                            <div class="text-[11px] text-neutral-400">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0 }}/ด.</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            {% if shop.status == 'published' %}
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> เผยแพร่แล้ว
+                                                </span>
+                                            {% elif shop.status == 'pending' %}
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> รออนุมัติ
+                                                </span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-neutral-100 text-neutral-600">
+                                                    {{ shop.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right">
+                                            <div class="flex items-center justify-end gap-1.5">
+                                                {% if shop.status != 'published' %}
+                                                <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <button type="submit" title="อนุมัติเผยแพร่"
+                                                            class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition cursor-pointer">
+                                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <button type="submit" title="ระงับประกาศ"
+                                                            class="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition cursor-pointer">
+                                                        <i data-lucide="pause" class="w-4 h-4"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+
+                                                <!-- 1-Click Toggle Admin Verified Badge -->
+                                                <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="toggle_verified">
+                                                    <button type="submit" title="{% if shop.is_admin_verified %}ถอดป้าย Admin Verified{% else %}มอบป้าย Admin Verified (ผ่านการตรวจสอบแล้ว){% endif %}"
+                                                            class="p-1.5 rounded-lg {% if shop.is_admin_verified %}bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs{% else %}bg-neutral-100 hover:bg-emerald-50 text-neutral-500 hover:text-emerald-700{% endif %} transition cursor-pointer">
+                                                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                                    </button>
+                                                </form>
+
+                                                <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="toggle_vip">
+                                                    <button type="submit" title="สลับสิทธิ์ VIP ของเจ้าของร้าน"
+                                                            class="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 transition cursor-pointer">
+                                                        <i data-lucide="crown" class="w-4 h-4"></i>
+                                                    </button>
+                                                </form>
+
+                                                <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank" title="เปิดดูหน้าร้าน"
+                                                   class="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition cursor-pointer">
+                                                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="py-8 text-center text-xs text-neutral-400">
+                                            ไม่พบรายการร้านค้าตามเงื่อนไข
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 3: VIP SLIPS & EASYLIP VERIFICATION -->
+                {% if active_tab == 'slips' %}
+                <div class="space-y-6">
+                    <!-- KBank Banner & EasySlip Engine Status -->
+                    <div class="rounded-3xl border-2 border-emerald-500/20 bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/40 p-6 shadow-2xs space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-[#00A950] text-white flex items-center justify-center font-black text-base shadow-sm">
+                                    K+
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider">บัญชีรับเงินทางการ (ธนาคารกสิกรไทย)</div>
+                                    <div class="text-lg font-black text-neutral-900 font-mono">{{ official_bank_account_no }}</div>
+                                </div>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <div class="text-xs text-neutral-500">ชื่อบัญชีรับเงิน</div>
+                                <div class="text-base font-black text-neutral-900">{{ official_bank_account_name }}</div>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-emerald-200/50 flex flex-wrap items-center justify-between text-xs text-neutral-600 gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span>ระบบตรวจสลิปอัตโนมัติ: <strong>EasySlip API v2 Active</strong> (ตรวจยอด 1,000 บ. + จับคู่บัญชี)</span>
+                            </div>
+                            <div class="font-bold text-brand-600">
+                                สลิปรอตรวจด้วยตนเอง: {{ pending_slips_count }} รายการ
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Slips List -->
+                    <div class="bg-white rounded-3xl border border-neutral-200 p-6 shadow-xs space-y-4">
+                        <h3 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span>รายการสลิปที่รอเจ้าหน้าที่ตรวจสอบ ({{ pending_slips|length }} รายการ)</span>
+                        </h3>
+
+                        {% if pending_slips %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% for tx in pending_slips %}
+                            <div class="rounded-2xl border border-neutral-200 p-4 space-y-4 bg-neutral-50/50 flex flex-col justify-between">
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-mono text-xs font-black bg-neutral-900 text-white px-2 py-0.5 rounded-md">
+                                            {{ tx.ref_number }}
+                                        </span>
+                                        <span class="text-[11px] text-neutral-400">{{ tx.created_at|date:"d/m/Y H:i" }}</span>
+                                    </div>
+
+                                    <div class="text-xs space-y-1">
+                                        <div>ผู้ใช้: <strong class="text-brand-600">{{ tx.user.username }}</strong> ({{ tx.user.get_full_name|default:"-" }})</div>
+                                        <div>โทร: {{ tx.user.phone|default:"-" }} • ยอดชำระ: <strong class="text-emerald-700 font-mono">฿{{ tx.amount|floatformat:2 }}</strong></div>
+                                    </div>
+
+                                    <!-- Slip Image Thumbnail with Zoom Button -->
+                                    <div class="relative rounded-xl overflow-hidden border border-neutral-200 bg-neutral-900/5 aspect-4/3 flex items-center justify-center">
+                                        {% if tx.slip_image %}
+                                        <img src="{{ tx.slip_image.url }}" alt="สลิปโอนเงิน"
+                                             class="max-h-full max-w-full object-contain cursor-pointer slip-preview-img"
+                                             data-img-url="{{ tx.slip_image.url }}"
+                                             data-ref="{{ tx.ref_number }}">
+                                        {% else %}
+                                        <div class="flex flex-col items-center justify-center text-neutral-400 p-3 text-center">
+                                            <i data-lucide="receipt" class="w-8 h-8 text-neutral-300 mb-1"></i>
+                                            <span class="text-[11px] font-bold text-neutral-500">ไม่มีไฟล์รูปสลิปแนบ</span>
+                                            <span class="text-[9px] text-neutral-400 mt-0.5 font-mono">{{ tx.ref_number }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2 pt-2 border-t border-neutral-200">
+                                    <form method="post" action="{% url 'accounts:vip_approve' tx.pk %}" class="flex-1">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-bold transition shadow-xs">
+                                            ✓ อนุมัติ VIP 30 วัน
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'accounts:vip_approve' tx.pk %}" class="flex-1">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="w-full rounded-xl bg-red-100 hover:bg-red-200 text-red-700 py-2 text-xs font-bold transition">
+                                            ✕ ปฏิเสธ
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="py-8 text-center text-xs text-neutral-400">
+                            ไม่มีสลิปที่รอการตรวจสอบ ทุกสลิปได้รับการตรวจอัตโนมัติหรืออนุมัติเรียบร้อยแล้ว
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Past Transactions History -->
+                    <div class="bg-white rounded-3xl border border-neutral-200 p-6 shadow-xs space-y-4">
+                        <h3 class="text-sm font-black text-neutral-900">ประวัติการตรวจสอบย้อนหลัง (30 รายการล่าสุด)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">รหัสอ้างอิง</th>
+                                        <th class="py-3 px-4">ผู้ใช้งาน</th>
+                                        <th class="py-3 px-4">ยอดเงิน</th>
+                                        <th class="py-3 px-4">สถานะการตรวจ</th>
+                                        <th class="py-3 px-4">ผู้ตรวจสอบ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for tx in recent_slips %}
+                                    <tr>
+                                        <td class="py-3 px-4 font-mono font-bold text-neutral-900">{{ tx.ref_number }}</td>
+                                        <td class="py-3 px-4">{{ tx.user.username }}</td>
+                                        <td class="py-3 px-4 font-mono font-bold text-brand-600">฿{{ tx.amount|floatformat:2 }}</td>
+                                        <td class="py-3 px-4">
+                                            {% if tx.status == 'AUTO_VERIFIED' %}
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-black">
+                                                    ⚡ EasySlip Auto
+                                                </span>
+                                            {% elif tx.status == 'MANUAL_APPROVED' %}
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 text-blue-800 px-2 py-0.5 text-[10px] font-bold">
+                                                    ✓ เจ้าหน้าที่อนุมัติ
+                                                </span>
+                                            {% elif tx.status == 'REJECTED' %}
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-red-100 text-red-800 px-2 py-0.5 text-[10px] font-bold">
+                                                    ✕ ปฏิเสธ
+                                                </span>
+                                            {% else %}
+                                                <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-[10px] font-bold">
+                                                    รอตรวจ
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 px-4 text-neutral-400">
+                                            {% if tx.reviewed_by %}{{ tx.reviewed_by.username }}{% else %}EasySlip System{% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="py-4 text-center text-xs text-neutral-400">ยังไม่มีประวัติ</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 4: CRM LEADS -->
+                {% if active_tab == 'crm' %}
+                <div class="space-y-6">
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                <i data-lucide="users" class="w-5 h-5 text-blue-500"></i>
+                                <span>รายชื่อผู้สนใจเซ้งร้าน (Leads CRM)</span>
+                            </h2>
+                            <span class="text-xs text-neutral-400">ลีดใหม่: {{ new_leads_count }} • ด่วนที่สุด: {{ immediate_leads_count }}</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">ผู้สนใจ</th>
+                                        <th class="py-3 px-4">ร้านค้าที่สนใจ</th>
+                                        <th class="py-3 px-4">งบประมาณ & ความเร่งด่วน</th>
+                                        <th class="py-3 px-4">นายหน้าที่ดูแล</th>
+                                        <th class="py-3 px-4">สถานะ</th>
+                                        <th class="py-3 px-4 text-right">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for lead in leads_list %}
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-neutral-900">{{ lead.full_name }}</div>
+                                            <div class="text-[11px] text-neutral-400 font-mono">
+                                                โทร: {{ lead.phone }} {% if lead.line_id %}| LINE: {{ lead.line_id }}{% endif %}
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            {% if lead.listing %}
+                                                <a href="{% url 'listings:listing_detail' lead.listing.pk %}" target="_blank" class="font-semibold text-brand-600 hover:underline">
+                                                    {{ lead.listing.property.title|truncatechars:25 }}
+                                                </a>
+                                                <div class="text-[10px] text-neutral-400">รหัส {{ lead.listing.ref_code }}</div>
+                                            {% else %}
+                                                <span class="text-neutral-400">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 font-mono">
+                                            <div class="font-bold text-neutral-800">
+                                                {% if lead.budget_max %}฿{{ lead.budget_max|floatformat:0 }}{% else %}ไม่ระบุงบ{% endif %}
+                                            </div>
+                                            <div class="text-[10px] text-brand-600 font-sans">{{ lead.get_urgency_display }}</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <form method="post" action="{% url 'accounts:admin_lead_action' lead.pk %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="assign">
+                                                <select name="agent_id" class="agent-assign-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
+                                                    <option value="">ยังไม่มอบหมาย</option>
+                                                    {% for ag in agents_list %}
+                                                    <option value="{{ ag.pk }}" {% if lead.assigned_agent_id == ag.pk %}selected{% endif %}>
+                                                        {{ ag.username }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold {% if lead.status == 'new' %}bg-blue-100 text-blue-800{% elif lead.status == 'site_visit' %}bg-purple-100 text-purple-800{% elif lead.status == 'closed' %}bg-emerald-100 text-emerald-800{% else %}bg-neutral-100 text-neutral-700{% endif %}">
+                                                {{ lead.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right">
+                                            <form method="post" action="{% url 'accounts:admin_lead_action' lead.pk %}" class="inline-block">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="status">
+                                                <select name="status" class="lead-status-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
+                                                    {% for val, label in lead_statuses %}
+                                                    <option value="{{ val }}" {% if lead.status == val %}selected{% endif %}>{{ label }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีลีดลูกค้า</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 5: DEAL PIPELINE -->
+                {% if active_tab == 'pipeline' %}
+                <div class="space-y-6">
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                <i data-lucide="git-pull-request" class="w-5 h-5 text-purple-500"></i>
+                                <span>กระดานติดตามดีลเซ้งร้านค้า (Deal Pipeline)</span>
+                            </h2>
+                            <a href="{% url 'contracts:deal_pipeline' %}" target="_blank"
+                               class="text-xs font-bold text-brand-600 hover:underline">เปิดมุมมอง Kanban CRM ➔</a>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">รหัสดีล</th>
+                                        <th class="py-3 px-4">ร้านค้าเซ้ง</th>
+                                        <th class="py-3 px-4">ผู้สนใจ (Lead)</th>
+                                        <th class="py-3 px-4">ราคาตกลง / ค่าคอม 5%</th>
+                                        <th class="py-3 px-4">ขั้นตอนปัจจุบัน</th>
+                                        <th class="py-3 px-4 text-right">เปลี่ยนขั้นตอน</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for deal in deals_list %}
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4 font-mono font-bold text-neutral-900">
+                                            <a href="{% url 'contracts:deal_detail' deal.pk %}" class="text-brand-600 hover:underline">
+                                                {{ deal.deal_code }}
+                                            </a>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-neutral-900 truncate max-w-xs xl:max-w-md">{{ deal.listing.property.title }}</div>
+                                            <div class="text-[10px] text-neutral-400 font-mono">{{ deal.listing.ref_code }}</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            {% if deal.lead %}{{ deal.lead.full_name }} ({{ deal.lead.phone }}){% else %}-{% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 font-mono">
+                                            <div class="font-black text-neutral-900">฿{{ deal.agreed_price|default:deal.listing.price|floatformat:0 }}</div>
+                                            <div class="text-[10px] text-brand-600 font-bold">คอมมิชชั่น: ฿{{ deal.gross_commission|floatformat:0 }}</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                {{ deal.get_stage_display }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right">
+                                            <form method="post" action="{% url 'accounts:admin_deal_action' deal.pk %}">
+                                                {% csrf_token %}
+                                                <select name="stage" class="deal-stage-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
+                                                    {% for val, label in stages_choices %}
+                                                    <option value="{{ val }}" {% if deal.stage == val %}selected{% endif %}>{{ label }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีดีลในกระดาน</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 6: AGENTS PERFORMANCE -->
+                {% if active_tab == 'agents' %}
+                <div class="space-y-6">
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i>
+                            <span>ทีมนายหน้า & ประสิทธิภาพการปิดดีล (Brokers & Agents)</span>
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {% for agent in agents_list %}
+                            <div class="rounded-2xl border border-neutral-200 p-4 bg-neutral-50/50 space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 font-black text-sm flex items-center justify-center">
+                                        {{ agent.username|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-neutral-900">{{ agent.get_full_name|default:agent.username }}</div>
+                                        <div class="text-[11px] text-neutral-400">{{ agent.email }} • โทร: {{ agent.phone|default:"-" }}</div>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-neutral-200 grid grid-cols-2 gap-2 text-xs font-mono">
+                                    <div class="bg-white p-2 rounded-xl border border-neutral-100 text-center">
+                                        <div class="text-[10px] text-neutral-400 font-sans">ดีลที่ดูแล</div>
+                                        <div class="font-black text-neutral-900 text-base">{{ agent.deals_count }}</div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded-xl border border-neutral-100 text-center">
+                                        <div class="text-[10px] text-neutral-400 font-sans">คอมมิชชั่นสะสม</div>
+                                        <div class="font-black text-emerald-600 text-base">฿{{ agent.total_payout|default:0|floatformat:0 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 7: REVENUE & COMMISSIONS -->
+                {% if active_tab == 'revenue' %}
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
+                            <div class="text-xs font-bold text-neutral-400">รายได้ค่าสมาชิก VIP รวม</div>
+                            <div class="text-3xl font-black text-neutral-900 font-mono">฿{{ month_vip_revenue|floatformat:2 }}</div>
+                            <div class="text-xs text-neutral-500">จากค่าสมาชิกรายเดือน 1,000 บ.</div>
+                        </div>
+
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
+                            <div class="text-xs font-bold text-neutral-400">ส่วนแบ่งค่าคอมมิชชั่นปิดดีล</div>
+                            <div class="text-3xl font-black text-emerald-600 font-mono">฿{{ total_deal_commission|floatformat:2 }}</div>
+                            <div class="text-xs text-neutral-500">ส่วนแบ่งแพลตฟอร์ม 50% จากค่าคอม 5%</div>
+                        </div>
+
+                        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
+                            <div class="text-xs font-bold text-neutral-400">รายรับสุทธิของแพลตฟอร์ม</div>
+                            <div class="text-3xl font-black text-brand-600 font-mono">฿{{ total_platform_revenue|floatformat:2 }}</div>
+                            <div class="text-xs text-emerald-600 font-semibold">Net Platform Revenue สะสม</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 8: DOCUMENTS VAULT & MESSAGES -->
+                {% if active_tab == 'documents' %}
+                <div class="space-y-6">
+                    <!-- Contact Inquiries Messages -->
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="mail" class="w-5 h-5 text-indigo-500"></i>
+                            <span>ข้อความติดต่อจากหน้า Contact Us ({{ unresolved_messages_count }} ข้อความรอดำเนินการ)</span>
+                        </h2>
+
+                        <div class="space-y-3">
+                            {% for msg in contact_messages %}
+                            <div class="p-4 rounded-2xl border {% if not msg.is_resolved %}border-amber-200 bg-amber-50/30{% else %}border-neutral-200 bg-neutral-50/50{% endif %} flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-black text-neutral-900">{{ msg.name }}</span>
+                                        <span class="text-neutral-400 font-mono">โทร: {{ msg.phone }}</span>
+                                        {% if not msg.is_resolved %}
+                                        <span class="rounded bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.2">รอดำเนินการ</span>
+                                        {% else %}
+                                        <span class="rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2">รับเรื่องแล้ว</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="font-bold text-neutral-800">หัวข้อ: {{ msg.subject }}</div>
+                                    <p class="text-neutral-600 leading-relaxed">{{ msg.message }}</p>
+                                    <div class="text-[10px] text-neutral-400">{{ msg.created_at|date:"d/m/Y H:i" }}</div>
+                                </div>
+
+                                {% if not msg.is_resolved %}
+                                <form method="post" action="{% url 'accounts:admin_resolve_message' msg.pk %}" class="shrink-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="rounded-xl bg-neutral-900 hover:bg-emerald-600 text-white px-3 py-1.5 font-bold transition">
+                                        ✓ ทำเครื่องหมายรับเรื่องแล้ว
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <div class="py-6 text-center text-xs text-neutral-400">ยังไม่มีข้อความติดต่อ</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- TAB 9: ANALYTICS -->
+                {% if active_tab == 'analytics' %}
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Top Categories -->
+                        <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                            <h3 class="text-sm font-black text-neutral-900">สัดส่วนหมวดหมู่ร้านค้าที่มีการเซ้งสูงสุด</h3>
+                            <div class="space-y-2">
+                                {% for cat in category_analytics %}
+                                <div class="flex items-center justify-between text-xs p-2 rounded-xl bg-neutral-50">
+                                    <span class="font-bold text-neutral-800">{{ cat.type }}</span>
+                                    <span class="font-mono font-bold text-brand-600">{{ cat.count }} ร้าน</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Top Provinces -->
+                        <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                            <h3 class="text-sm font-black text-neutral-900">5 ทำเลทองที่มีการเซ้งสูงสุด</h3>
+                            <div class="space-y-2">
+                                {% for prov in province_analytics %}
+                                <div class="flex items-center justify-between text-xs p-2 rounded-xl bg-neutral-50">
+                                    <span class="font-bold text-neutral-800">{{ prov.province }}</span>
+                                    <span class="font-mono font-bold text-neutral-900">{{ prov.count }} ประกาศ</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- FAST SHOP CREATOR MODAL (ALL-IN-ONE FOR ADMINS - HORIZONTAL 2-COLUMN) -->
+<!-- ========================================================================= -->
+<div id="fast-post-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-hidden">
+    <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-neutral-200 overflow-hidden my-auto">
+        
+        <form method="post" action="{% url 'accounts:admin_fast_create_shop' %}" enctype="multipart/form-data" class="flex flex-col h-full max-h-[92vh]">
+            {% csrf_token %}
+
+            <!-- Sticky Modal Header -->
+            <div class="px-6 py-4 border-b border-neutral-100 flex items-center justify-between shrink-0 bg-neutral-50/70">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-neutral-900 flex items-center gap-2">
+                            <span>ลงประกาศเซ้งร้านแทนลูกค้า (Admin Fast Post)</span>
+                            <span class="text-[10px] font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full">แนวนอน 2 คอลัมน์</span>
+                        </h3>
+                        <p class="text-xs text-neutral-500 mt-0.5">รวมทุกฟิลด์ในหน้าเดียว อัปโหลดรูปหลายรูป และอนุมัติเผยแพร่อัตโนมัติ</p>
+                    </div>
+                </div>
+                <button type="button" id="close-fast-post-modal-btn" class="p-2 rounded-full hover:bg-neutral-200 text-neutral-400 hover:text-neutral-700 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Modal Body (Horizontal 2-Column Grid) -->
+            <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 text-xs">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 items-start">
+                    
+                    <!-- LEFT COLUMN: Shop Information & Location -->
+                    <div class="space-y-4">
+                        <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
+                            <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="store" class="w-4 h-4 text-brand-500"></i>
+                                <span>1. ข้อมูลร้านค้าและเจ้าของ</span>
+                            </div>
+
+                            <!-- Owner Picker -->
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">เลือกลูกค้าเจ้าของร้าน (Owner) <span class="text-red-500">*</span></label>
+                                <select name="owner_id" required class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                                    {% for own in owners_list %}
+                                    <option value="{{ own.pk }}">{{ own.username }} ({{ own.get_full_name|default:own.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Shop Title -->
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">ชื่อร้าน / หัวข้อประกาศ <span class="text-red-500">*</span></label>
+                                <input type="text" name="title" required placeholder="เช่น เซ้งด่วน คาเฟ่มินิมอล ย่านทองหล่อ"
+                                       class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                            </div>
+
+                            <!-- Category -->
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">หมวดหมู่ร้านค้า <span class="text-red-500">*</span></label>
+                                <select name="category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                                    {% for val, label in property_types %}
+                                    <option value="{{ val }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Location & Map -->
+                        <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
+                            <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-emerald-500"></i>
+                                <span>2. ทำเลและแผนที่</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">อำเภอ/เขต <span class="text-red-500">*</span></label>
+                                    <input type="text" name="district" required placeholder="เช่น วัฒนา"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">จังหวัด</label>
+                                    <input type="text" name="province" value="กรุงเทพมหานคร"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                            </div>
+
+                            <!-- Google Maps URL -->
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700 flex items-center justify-between">
+                                    <span>ลิงก์ Google Maps ของร้าน</span>
+                                    <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">
+                                        <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                        <span>ปักหมุดแผนที่จริง</span>
+                                    </span>
+                                </label>
+                                <input type="url" name="google_maps_url" placeholder="เช่น https://maps.app.goo.gl/... หรือ https://goo.gl/maps/..."
+                                       class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                <p class="text-[10px] text-neutral-400">คัดลอกลิงก์แชร์จาก Google Maps นำมาวาง ระบบจะดึงพิกัดเพื่อปักหมุดบนแผนที่ให้อัตโนมัติ</p>
+                            </div>
+                        </div>
+
+                        <!-- Description & Equipment -->
+                        <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
+                            <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="file-text" class="w-4 h-4 text-neutral-500"></i>
+                                <span>3. รายละเอียดและของแถม</span>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">จุดเด่น & รายละเอียดร้าน</label>
+                                <textarea name="description" rows="3" placeholder="ทำเลติดถนนใหญ่ ใกล้สถานีรถไฟฟ้า พร้อมสูตรและฐานลูกค้าประจำ..."
+                                          class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500"></textarea>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">อุปกรณ์และของแถมที่ให้</label>
+                                <input type="text" name="equipment_included" placeholder="เครื่องชงกาแฟ, แอร์ 3 ตัว, โต๊ะเก้าอี้ 15 ชุด, ตู้เย็น 2 เครื่อง"
+                                       class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Financials, Media, Publish Options -->
+                    <div class="space-y-4">
+                        <!-- Financial Figures -->
+                        <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
+                            <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="coins" class="w-4 h-4 text-amber-500"></i>
+                                <span>4. ตัวเลขการเงิน & รายได้</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">ราคาเซ้ง (บาท) <span class="text-red-500">*</span></label>
+                                    <input type="number" name="price" required placeholder="550000"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono font-bold text-brand-600 focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">ค่าเช่า/เดือน (บาท)</label>
+                                    <input type="number" name="monthly_rent" placeholder="35000"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">เงินประกันตึก (บาท)</label>
+                                    <input type="number" name="deposit_amount" placeholder="70000"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">กำไรสุทธิ/ด. (3 ด.)</label>
+                                    <input type="number" name="avg_profit_3m" placeholder="65000"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">รายได้เฉลี่ย/ด. (3 ด.)</label>
+                                    <input type="number" name="avg_revenue_3m" placeholder="220000"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">สัญญาคงเหลือ (ด.)</label>
+                                    <input type="number" name="remaining_lease_months" value="18"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media / Photos Upload -->
+                        <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
+                            <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="image" class="w-4 h-4 text-sky-500"></i>
+                                <span>5. รูปถ่ายร้านค้า</span>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-neutral-700">เลือกรูปถ่ายร้านค้า (เลือกได้พร้อมกันหลายรูป)</label>
+                                <input type="file" name="images" multiple accept="image/jpeg,image/png,image/webp"
+                                       class="w-full rounded-xl border border-dashed border-neutral-300 bg-white p-3 text-xs focus:outline-none focus:border-brand-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-600 hover:file:bg-brand-100 cursor-pointer">
+                                <p class="text-[10px] text-neutral-400">รองรับ JPG, PNG, WEBP • รูปภาพแรกจะถูกตั้งเป็นภาพหน้าปกประกาศโดยอัตโนมัติ</p>
+                            </div>
+                        </div>
+
+                        <!-- Publish & Live Status -->
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 space-y-2">
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" name="is_published" value="1" id="publish-check" checked class="w-4 h-4 text-emerald-600 rounded mt-0.5 focus:ring-emerald-500">
+                                <div>
+                                    <label for="publish-check" class="font-bold text-emerald-950 block text-xs cursor-pointer">
+                                        อนุมัติและเผยแพร่ขึ้นหน้าเว็บทันที (Published Live)
+                                    </label>
+                                    <p class="text-[11px] text-emerald-700 mt-0.5">
+                                        ติ๊กถูกเพื่อให้ร้านแสดงผลในหน้าร้านทั้งหมด (/listings/) ทันทีที่กดบันทึก
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sticky Modal Footer -->
+            <div class="px-6 py-3.5 bg-neutral-50 border-t border-neutral-100 flex items-center justify-end gap-3 shrink-0">
+                <button type="button" id="cancel-fast-post-btn" class="px-5 py-2.5 text-xs font-bold text-neutral-500 hover:text-neutral-700 transition rounded-xl">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 text-xs font-bold shadow-md hover:shadow-lg transition flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>สร้างและลงประกาศทันที</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- SLIP ZOOM MODAL -->
+<!-- ========================================================================= -->
+<div id="slip-zoom-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+        <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div>
+                <h4 class="font-black text-sm text-neutral-900" id="zoom-slip-ref">สลิปการโอนเงิน</h4>
+                <div class="text-[10px] text-emerald-700 font-bold">
+                    บัญชีทางการ: {{ official_bank_name }} • {{ official_bank_account_no }} ({{ official_bank_account_name }})
+                </div>
+            </div>
+            <button type="button" id="close-zoom-modal-btn" class="p-1 rounded-full hover:bg-neutral-100 text-neutral-400">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="flex items-center justify-center max-h-[70vh] overflow-hidden bg-neutral-900/5 rounded-2xl p-2">
+            <img id="zoom-slip-img" src="" alt="สลิปขยาย" class="max-h-[65vh] w-auto object-contain rounded-xl">
+        </div>
+    </div>
+</div>
+
+<!-- Admin Dashboard JavaScript (Strict CSP Nonce Compliant) -->
+<script nonce="{{ request.csp_nonce }}">
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Fast Post Modal Controls
+    var fastPostModal = document.getElementById('fast-post-modal');
+    var openBtn1 = document.getElementById('open-fast-post-btn');
+    var openBtn2 = document.getElementById('hero-fast-post-btn');
+    var openBtn3 = document.getElementById('table-fast-post-btn');
+    var closeBtn = document.getElementById('close-fast-post-modal-btn');
+    var cancelBtn = document.getElementById('cancel-fast-post-btn');
+
+    function openModal() {
+        if (fastPostModal) fastPostModal.classList.remove('hidden');
+    }
+    function closeModal() {
+        if (fastPostModal) fastPostModal.classList.add('hidden');
+    }
+
+    if (openBtn1) openBtn1.addEventListener('click', openModal);
+    if (openBtn2) openBtn2.addEventListener('click', openModal);
+    if (openBtn3) openBtn3.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // 2. Slip Zoom Modal Controls
+    var zoomModal = document.getElementById('slip-zoom-modal');
+    var zoomImg = document.getElementById('zoom-slip-img');
+    var zoomRef = document.getElementById('zoom-slip-ref');
+    var closeZoomBtn = document.getElementById('close-zoom-modal-btn');
+
+    document.querySelectorAll('.slip-preview-img').forEach(function (img) {
+        img.addEventListener('click', function () {
+            var url = this.getAttribute('data-img-url');
+            var ref = this.getAttribute('data-ref');
+            if (zoomImg) zoomImg.src = url;
+            if (zoomRef) zoomRef.textContent = 'ตรวจสอบสลิป: ' + ref;
+            if (zoomModal) zoomModal.classList.remove('hidden');
+        });
+    });
+
+    if (closeZoomBtn) {
+        closeZoomBtn.addEventListener('click', function () {
+            if (zoomModal) zoomModal.classList.add('hidden');
+        });
+    }
+
+    // 3. Auto-submit dropdowns for agent assignment and stage update
+    document.querySelectorAll('.agent-assign-select, .lead-status-select, .deal-stage-select').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            if (this.form) this.form.submit();
+        });
+    });
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

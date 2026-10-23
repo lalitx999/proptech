@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}นโยบายความเป็นส่วนตัว (Privacy Policy) — เซ้งร้านด่วน.com ตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA){% endblock %}
+
+{% block meta_description %}นโยบายความเป็นส่วนตัวของ เซ้งร้านด่วน.com รายละเอียดการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA){% endblock %}
+
+{% block og_title %}นโยบายความเป็นส่วนตัว — เซ้งร้านด่วน.com (PDPA Compliant){% endblock %}
+{% block og_description %}อ่านนโยบายความเป็นส่วนตัวและสิทธิในการคุ้มครองข้อมูลส่วนบุคคลของผู้ใช้บริการบน เซ้งร้านด่วน.com{% endblock %}
+
+{% block extra_head %}
+<!-- Structured Data: WebPage & BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "{{ request.build_absolute_uri }}#webpage",
+      "url": "{{ request.build_absolute_uri }}",
+      "name": "นโยบายความเป็นส่วนตัว (Privacy Policy) — เซ้งร้านด่วน.com",
+      "description": "นโยบายการคุ้มครองข้อมูลส่วนบุคคลตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)",
+      "inLanguage": "th-TH"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "หน้าแรก",
+          "item": "{{ site_url }}/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "นโยบายความเป็นส่วนตัว",
+          "item": "{{ request.build_absolute_uri }}"
+        }
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#fcfcfa] min-h-screen pb-20">
+    <!-- Hero Header Banner -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-neutral-900 via-neutral-900 to-midnight-900 text-white py-14 sm:py-18">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#e11d74_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        
+        <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
+            <div class="inline-flex items-center gap-2 rounded-full bg-brand-500/15 border border-brand-500/30 px-3.5 py-1 text-xs font-bold text-brand-300">
+                <i data-lucide="shield-check" class="w-4 h-4 text-brand-400"></i>
+                <span>สอดคล้องตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</span>
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+                นโยบายความเป็นส่วนตัว
+            </h1>
+            
+            <p class="mx-auto max-w-2xl text-xs sm:text-sm text-neutral-300">
+                เซ้งร้านด่วน.com ให้ความสำคัญสูงสุดต่อการรักษาความปลอดภัยของข้อมูลส่วนบุคคลและความโปร่งใสในการดำเนินงาน
+            </p>
+
+            <div class="pt-2 flex items-center justify-center gap-4 text-[11px] text-neutral-400">
+                <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-neutral-400"></i> ปรับปรุงล่าสุด: 22 ตุลาคม 2026</span>
+                <span>•</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="file-check" class="w-3.5 h-3.5 text-emerald-400"></i> เอกสารฉบับทางการ v2.4</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container: 2 Columns (Sticky TOC + Content) -->
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Sticky Table of Contents (4 cols) -->
+            <div class="lg:col-span-4 sticky top-24 space-y-5">
+                <div class="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-2xs">
+                    <h2 class="text-xs font-black tracking-wider uppercase text-neutral-400 mb-3 flex items-center gap-2">
+                        <i data-lucide="list" class="w-4 h-4 text-brand-600"></i>
+                        <span>สารบัญเนื้อหา</span>
+                    </h2>
+                    <nav class="space-y-1.5 text-xs text-neutral-600">
+                        <a href="#sec-1" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">1. บทนำและขอบเขตการบังคับใช้</a>
+                        <a href="#sec-2" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">2. ข้อมูลส่วนบุคคลที่เราจัดเก็บ</a>
+                        <a href="#sec-3" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">3. วัตถุประสงค์และฐานทางกฎหมาย</a>
+                        <a href="#sec-4" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">4. การเปิดเผยข้อมูลแก่บุคคลภายนอก</a>
+                        <a href="#sec-5" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">5. ระยะเวลาและมาตรการรักษาความมั่นคงปลอดภัย</a>
+                        <a href="#sec-6" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">6. สิทธิของเจ้าของข้อมูล (Data Subject Rights)</a>
+                        <a href="#sec-7" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">7. การใช้งานคุกกี้ (Cookies Policy)</a>
+                        <a href="#sec-8" class="block px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 hover:text-brand-600 font-medium transition">8. ช่องทางการติดต่อเจ้าหน้าที่คุ้มครองข้อมูล (DPO)</a>
+                    </nav>
+                </div>
+
+                <!-- Quick Help Card -->
+                <div class="rounded-2xl bg-gradient-to-br from-brand-50 to-pink-50 border border-brand-100 p-4.5 text-neutral-800 text-xs space-y-2">
+                    <div class="font-bold flex items-center gap-1.5 text-brand-900">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-brand-600"></i>
+                        <span>ต้องการใช้สิทธิข้อมูลส่วนบุคคล?</span>
+                    </div>
+                    <p class="text-neutral-600 leading-relaxed text-[11px]">
+                        ท่านสามารถยื่นคำร้องขอเข้าถึง แก้ไข หรือขอลบข้อมูลบัญชีของท่านได้ตลอดเวลาผ่านอีเมล DPO
+                    </p>
+                    <a href="mailto:dpo@sengranduan.com" class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 hover:underline">
+                        <span>ส่งคำร้องมาที่ dpo@sengranduan.com</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Policy Document Body (8 cols) -->
+            <div class="lg:col-span-8 bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-sm space-y-10 text-neutral-800 leading-relaxed text-sm">
+                
+                <!-- Section 1 -->
+                <section id="sec-1" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">1</span>
+                        <span>บทนำและขอบเขตการบังคับใช้</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        เซ้งร้านด่วน.com (ต่อไปนี้เรียกว่า <strong>"แพลตฟอร์ม"</strong> หรือ <strong>"เรา"</strong>) ดำเนินงานโดยตระหนักและเคารพในสิทธิความเป็นส่วนตัวของผู้ใช้งานทุกคน (ต่อไปนี้เรียกว่า <strong>"ท่าน"</strong> หรือ <strong>"เจ้าของข้อมูลส่วนบุคคล"</strong>) นโยบายฉบับนี้จัดทำขึ้นเพื่อชี้แจงแนวปฏิบัติเกี่ยวกับการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล (Personal Data) ตาม <strong>พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</strong>
+                    </p>
+                    <div class="rounded-xl bg-neutral-50 border border-neutral-200/80 p-3.5 text-xs text-neutral-600 flex items-start gap-2.5">
+                        <i data-lucide="info" class="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5"></i>
+                        <span>การเข้าถึง ใช้งาน หรือลงทะเบียนบัญชีบนแพลตฟอร์ม ถือว่าท่านได้รับทราบและตกลงปฏิบัติตามแนวทางที่ระบุไว้ในนโยบายความเป็นส่วนตัวฉบับนี้แล้ว</span>
+                    </div>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="sec-2" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">2</span>
+                        <span>ข้อมูลส่วนบุคคลที่เราจัดเก็บ</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        เราเก็บรวบรวมข้อมูลส่วนบุคคลเท่าที่จำเป็นต่อการดำเนินงานของแพลตฟอร์ม ได้แก่:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-neutral-700">
+                        <li><strong>ข้อมูลสำหรับการลงทะเบียนและยืนยันตัวตน</strong>: หมายเลขโทรศัพท์มือถือ, ที่อยู่อีเมล, รหัส OTP (One-Time Password), ชื่อผู้ใช้ และรหัสผ่านที่ผ่านการแฮชด้วยอัลกอริทึม Argon2 / PBKDF2 อย่างปลอดภัย</li>
+                        <li><strong>ข้อมูลประกาศร้านค้าและธุรกิจ</strong>: ชื่อกิจการ, ที่ตั้งสถานที่, ละติจูด/ลองจิจูด (GPS Coordinates), ภาพถ่ายหน้าร้านและอุปกรณ์, ยอดขายเฉลี่ย และกำไรสุทธิ 3 เดือนล่าสุด</li>
+                        <li><strong>ข้อมูลการชำระเงินและสมัครสมาชิก VIP</strong>: สลิปหลักฐานการโอนเงินธนาคาร, วันที่-เวลาโอน, จำนวนเงิน, ธนาคารต้นทาง/ปลายทาง (ประมวลผลผ่าน EasySlip API แบบอัตโนมัติ)</li>
+                        <li><strong>ข้อมูลทางเทคนิคและการใช้งาน</strong>: หมายเลข IP Address, ชนิดเบราว์เซอร์, บันทึกการเข้าสู่ระบบ (Security Audit Logs), คุกกี้ และประวัติการสืบค้นข้อมูลร้านค้า</li>
+                    </ul>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="sec-3" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">3</span>
+                        <span>วัตถุประสงค์และฐานทางกฎหมาย (Legal Basis)</span>
+                    </h2>
+                    <p class="text-neutral-700">เราประมวลผลข้อมูลส่วนบุคคลของท่านภายใต้ฐานความชอบธรรมตามกฎหมาย ดังนี้:</p>
+                    <div class="space-y-3 pt-1">
+                        <div class="p-3.5 rounded-xl border border-neutral-200/80 bg-neutral-50/60">
+                            <span class="font-bold text-neutral-900 block text-xs uppercase tracking-wide text-brand-600 mb-1">1. ฐานการปฏิบัติตามสัญญา (Contractual Necessity)</span>
+                            <span class="text-xs text-neutral-600">เพื่อสร้างบัญชีผู้ใช้งาน, เผยแพร่ประกาศเซ้งร้านตามที่ท่านส่งข้อมูล, อำนวยความสะดวกในการติดต่อระหว่างผู้ซื้อและผู้ให้เซ้ง, และการเปิดใช้งานสิทธิประโยชน์แพ็กเกจสมาชิก VIP</span>
+                        </div>
+                        <div class="p-3.5 rounded-xl border border-neutral-200/80 bg-neutral-50/60">
+                            <span class="font-bold text-neutral-900 block text-xs uppercase tracking-wide text-brand-600 mb-1">2. ฐานความยินยอม (Consent)</span>
+                            <span class="text-xs text-neutral-600">สำหรับการส่งการแจ้งเตือนความคืบหน้าของประกาศ, จดหมายข่าวข้อเสนอร้านค้าทำเลทองที่ตรงกับความสนใจ, หรือการยืนยันตัวตนด้วยอีเมล OTP</span>
+                        </div>
+                        <div class="p-3.5 rounded-xl border border-neutral-200/80 bg-neutral-50/60">
+                            <span class="font-bold text-neutral-900 block text-xs uppercase tracking-wide text-brand-600 mb-1">3. ฐานประโยชน์อันชอบด้วยกฎหมาย (Legitimate Interest)</span>
+                            <span class="text-xs text-neutral-600">เพื่อตรวจสอบและป้องกันพฤติกรรมมิจฉาชีพ การปลอมแปลงสลิปโอนเงิน การป้องกันการโจมตีทางไซเบอร์ และการปรับปรุงประสิทธิภาพระบบ (Core Web Vitals)</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="sec-4" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">4</span>
+                        <span>การเปิดเผยข้อมูลแก่บุคคลภายนอก</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        เรา<strong>ไม่มีนโยบายจำหน่าย แลกเปลี่ยน หรือส่งต่อข้อมูลส่วนบุคคลของท่านให้กับบุคคลภายนอกเพื่อผลประโยชน์ทางการค้า</strong> โดยข้อมูลจะถูกเปิดเผยเฉพาะกรณีที่จำเป็น ดังนี้:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-1.5 text-neutral-700">
+                        <li><strong>ผู้ใช้บริการรายอื่น</strong>: ข้อมูลติดต่อ (เบอร์โทร หรือ LINE ID) ที่ท่านเลือกเปิดเผยบนหน้าประกาศร้านค้าเพื่อให้ผู้สนใจสามารถติดต่อสอบถามได้</li>
+                        <li><strong>ผู้ให้บริการเทคโนโลยีและโครงสร้างพื้นฐาน</strong>: เช่น ระบบคลาวด์เซิร์ฟเวอร์, ผู้ให้บริการตรวจสอบสลิป EasySlip, ผู้ให้บริการแผนที่ Google Maps API (ภายใต้สัญญาคุ้มครองข้อมูลส่วนบุคคล Data Processing Agreement)</li>
+                        <li><strong>หน่วยงานบังคับใช้กฎหมาย</strong>: เจ้าหน้าที่ตำรวจ ศาล หรือหน่วยงานรัฐที่มีอำนาจตามหมายศาลหรือกฎหมายกรณีเกิดข้อพิพาทฉ้อโกง</li>
+                    </ul>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="sec-5" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">5</span>
+                        <span>ระยะเวลาและมาตรการรักษาความมั่นคงปลอดภัย</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        เราจัดเก็บข้อมูลส่วนบุคคลของท่านไว้ตราบเท่าที่ท่านยังมีสถานะเป็นสมาชิกของแพลตฟอร์ม และจะเก็บรักษาข้อมูลบันทึกทางเทคนิค (Log Files) ต่อไปอีกไม่เกิน 90 วันตาม พ.ร.บ. คอมพิวเตอร์ฯ ก่อนทำการลบหรือทำให้อยู่ในรูปแบบที่ไม่สามารถระบุตัวบุคคลได้ (Anonymization)
+                    </p>
+                    <p class="text-neutral-700">
+                        เราใช้มาตรการความปลอดภัยทางเทคนิคและการบริหารจัดการระดับสากล ได้แก่ การเข้ารหัสข้อมูลระหว่างส่งผ่าน HTTPS/TLS, การแยก Environment ข้อมูล, ระบบ Content Security Policy (CSP Nonce), และการจำกัดสิทธิ์การเข้าถึงข้อมูลเฉพาะแอดมินที่ได้รับอนุญาต
+                    </p>
+                </section>
+
+                <!-- Section 6 -->
+                <section id="sec-6" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">6</span>
+                        <span>สิทธิของเจ้าของข้อมูล (Data Subject Rights)</span>
+                    </h2>
+                    <p class="text-neutral-700">ตามกฎหมาย PDPA ท่านมีสิทธิตามกฎหมายดังต่อไปนี้:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 text-xs">
+                            <span class="font-bold text-neutral-900 block mb-0.5">สิทธิขอเข้าถึงและรับสำเนา (Right to Access)</span>
+                            <span class="text-neutral-500">ขอรับสำเนาข้อมูลส่วนบุคคลของท่านที่อยู่ในความดูแลของเรา</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 text-xs">
+                            <span class="font-bold text-neutral-900 block mb-0.5">สิทธิขอแก้ไขข้อมูล (Right to Rectification)</span>
+                            <span class="text-neutral-500">ขอแก้ไขข้อมูลส่วนบุคคลให้ถูกต้อง เป็นปัจจุบัน และสมบูรณ์</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 text-xs">
+                            <span class="font-bold text-neutral-900 block mb-0.5">สิทธิขอลบหรือทำลาย (Right to Erasure)</span>
+                            <span class="text-neutral-500">ขอลบข้อมูลส่วนบุคคลหรือยกเลิกบัญชีผู้ใช้งาน</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 text-xs">
+                            <span class="font-bold text-neutral-900 block mb-0.5">สิทธิถอนความยินยอม (Right to Withdraw)</span>
+                            <span class="text-neutral-500">ถอนความยินยอมที่เคยให้ไว้ได้ตลอดเวลาผ่านการตั้งค่าบัญชี</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7 -->
+                <section id="sec-7" class="scroll-mt-28 space-y-3">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">7</span>
+                        <span>การใช้งานคุกกี้ (Cookies Policy)</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        เราใช้งานคุกกี้ที่จำเป็น (Strictly Necessary Cookies) เพื่อการเข้าสู่ระบบ การจัดการ Session และการป้องกัน CSRF และคุกกี้เชิงฟังก์ชันเพื่อจดจำตัวกรองการค้นหาร้านเซ้งของท่าน ท่านสามารถตั้งค่าปิดการใช้งานคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของท่าน
+                    </p>
+                </section>
+
+                <!-- Section 8 -->
+                <section id="sec-8" class="scroll-mt-28 space-y-4 pt-2">
+                    <h2 class="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2.5 border-b border-neutral-100 pb-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-xl bg-brand-50 text-brand-600 font-mono text-xs font-black">8</span>
+                        <span>ช่องทางการติดต่อเจ้าหน้าที่คุ้มครองข้อมูล (DPO)</span>
+                    </h2>
+                    <p class="text-neutral-700">
+                        หากท่านมีข้อสงสัย ข้อเสนอแนะ หรือประสงค์จะใช้สิทธิของเจ้าของข้อมูลส่วนบุคคล สามารถติดต่อเจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล (Data Protection Officer) ได้ที่:
+                    </p>
+                    <div class="rounded-2xl border border-brand-200/80 bg-brand-50/40 p-5 space-y-2 text-xs">
+                        <div class="font-bold text-sm text-neutral-900">ฝ่ายคุ้มครองข้อมูลส่วนบุคคล — เซ้งร้านด่วน.com</div>
+                        <div class="text-neutral-600 flex items-center gap-2"><i data-lucide="mail" class="w-3.5 h-3.5 text-brand-600"></i><span>อีเมล: dpo@sengranduan.com</span></div>
+                        <div class="text-neutral-600 flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-600"></i><span>โทรศัพท์: 081-234-5678 (เวลา 09:00 - 18:00 น. วันจันทร์ - เสาร์)</span></div>
+                        <div class="text-neutral-600 flex items-center gap-2"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-600"></i><span>ที่อยู่: อาคารพาณิชย์สุขุมวิท กรุงเทพมหานคร 10110</span></div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

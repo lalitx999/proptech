@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — เซ้งร้านด่วน{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 py-10">
+    <div class="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+        <h1 class="text-xl font-bold text-neutral-900">{{ title }}</h1>
+        <p class="mt-1 text-xs text-neutral-500">กรอกข้อมูลสถานที่และขนาดพื้นที่ให้ครบถ้วน</p>
+
+        {% if form.errors %}
+        <div class="mt-4 rounded-xl bg-red-50 p-4 border border-red-200 text-xs text-red-700">
+            <p class="font-bold flex items-center gap-1.5 text-sm mb-1 text-red-800">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i>
+                <span>กรุณาตรวจสอบข้อมูลที่กรอก:</span>
+            </p>
+            <ul class="list-disc pl-5 space-y-0.5">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="post" class="mt-6 space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">ประเภทสถานที่</label>
+                {{ form.type }}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">ชื่อร้าน / ชื่อสถานที่</label>
+                <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
+                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                {% if form.title.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.title.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">รายละเอียดพื้นที่และสภาพแวดล้อม</label>
+                <textarea name="desc" rows="4" required class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ form.desc.value|default:'' }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">จังหวัด</label>
+                    <input type="text" name="province" value="{{ form.province.value|default:'' }}" required
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">เขต / อำเภอ</label>
+                    <input type="text" name="district" value="{{ form.district.value|default:'' }}" required
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">ที่อยู่ / ถนน / ซอย</label>
+                <input type="text" name="address" value="{{ form.address.value|default:'' }}" required
+                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700 flex items-center justify-between">
+                    <span>ลิงก์ Google Maps ของร้าน</span>
+                    <span class="text-xs text-emerald-600 font-normal">ปักหมุดแผนที่จริง</span>
+                </label>
+                <input type="url" name="google_maps_url" value="{{ form.google_maps_url.value|default:'' }}"
+                       placeholder="เช่น https://maps.app.goo.gl/... หรือ https://goo.gl/maps/..."
+                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                <p class="mt-1 text-xs text-neutral-400">คัดลอกลิงก์แชร์จากแอป Google Maps แล้วนำมาวางได้ทันที เพื่อให้ขึ้นพิกัดในแผนที่แบบจริงๆ</p>
+                {% if form.google_maps_url.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.google_maps_url.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">พื้นที่ (ตร.ม.)</label>
+                    <input type="number" step="0.01" name="area_sqm" value="{{ form.area_sqm.value|default:'50.00' }}" required
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">จำนวนชั้น</label>
+                    <input type="number" min="1" name="floors" value="{{ form.floors.value|default:'1' }}"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">รหัสไปรษณีย์</label>
+                    <input type="text" name="postal" value="{{ form.postal.value|default:'20000' }}"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t">
+                <a href="{% url 'properties:property_list' %}" class="text-sm font-medium text-neutral-600 hover:text-neutral-900">ยกเลิก</a>
+                <button type="submit" class="rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                    บันทึกข้อมูลร้านค้า →
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

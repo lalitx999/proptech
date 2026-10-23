@@ -1,0 +1,38 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.prod.example
+*.key
+*.pem
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Django media, static, logs & backups
+media/
+staticfiles/
+logs/
+*.log
+backups/
+*.dump
+
+# Database
+*.sqlite3
+
+# Testing & coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}ประกาศเซ้งร้านของฉัน — เซ้งร้านด่วน{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8">
+    <div class="flex items-center justify-between border-b pb-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-neutral-900">ประกาศเซ้งร้านของฉัน</h1>
+            <p class="text-xs text-neutral-500">ติดตามสถานะการเผยแพร่ ยอดวิว และผลตอบรับ</p>
+        </div>
+        <a href="{% url 'properties:property_list' %}"
+           class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+            + สร้างประกาศใหม่
+        </a>
+    </div>
+
+    <div class="space-y-4">
+        {% for listing in listings %}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-brand-600">รหัส {{ listing.ref_code }}</span>
+                    <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {% if listing.status == 'published' %}bg-emerald-100 text-emerald-800{% elif listing.status == 'pending' %}bg-amber-100 text-amber-800{% else %}bg-neutral-100 text-neutral-800{% endif %}">
+                        {{ listing.get_status_display }}
+                    </span>
+                    <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">{{ listing.get_type_display }}</span>
+                </div>
+                <h3 class="text-base font-bold text-neutral-900">{{ listing.property.title }}</h3>
+                <p class="text-xs text-neutral-500 flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-400"></i>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    <span>•</span>
+                    <span class="inline-flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5 text-neutral-400"></i>{{ listing.view_count }} วิว</span>
+                </p>
+            </div>
+            <div class="flex sm:flex-col items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0">
+                <p class="text-lg font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</p>
+                <p class="text-xs text-neutral-400">ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0 }}/ด.</p>
+                <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="mt-2 text-xs font-semibold text-brand-600 hover:underline inline-flex items-center gap-0.5">
+                    <span>ดูหน้าร้านค้า</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="py-12 text-center text-sm text-neutral-500">
+            ยังไม่มีประกาศเซ้งร้านในระบบ <a href="{% url 'properties:property_list' %}" class="font-semibold text-brand-600 hover:underline">เลือกทรัพย์สินเพื่อเริ่มต้นลงประกาศ</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

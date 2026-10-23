@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}403 — ปฏิเสธการเข้าถึง | เซ้งร้านด่วน{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 py-20 text-center">
+    <p class="text-6xl font-bold text-red-500">403</p>
+    <h1 class="mt-4 text-2xl font-bold tracking-tight text-neutral-900">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
+    <p class="mt-2 text-sm text-neutral-600">บัญชีของคุณไม่มีสิทธิ์ในการเข้าถึงทรัพยากรหรือข้อมูลส่วนนี้ หากคิดว่าเป็นข้อผิดพลาด กรุณาติดต่อผู้ดูแลระบบ</p>
+    <div class="mt-6">
+        <a href="/" class="rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-neutral-800 transition">
+            กลับสู่หน้าแรก
+        </a>
+    </div>
+</div>
+{% endblock %}

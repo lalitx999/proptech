@@ -1,0 +1,705 @@
+{% extends "base.html" %}
+
+{% block title %}[{{ listing.ref_code }}] {{ listing.property.title }} — เซ้งร้านด่วน.com{% endblock %}
+{% block meta_description %}[{{ listing.ref_code }}] {{ listing.property.title }} เซ้งราคา ฿{{ listing.price|floatformat:0 }} (ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0 }}/ด.) ทำเล{{ listing.property.district }} {{ listing.property.province }} พื้นที่ {{ listing.property.area_sqm }} ตร.ม. พร้อมอุปกรณ์ครบครัน ดำเนินกิจการต่อได้ทันที{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}[{{ listing.ref_code }}] {{ listing.property.title }} (เซ้ง ฿{{ listing.price|floatformat:0 }}) — เซ้งร้านด่วน.com{% endblock %}
+{% block og_description %}เซ้งร้าน {{ listing.property.title }} ทำเล{{ listing.property.district }} {{ listing.property.province }} ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0 }}/เดือน พร้อมอุปกรณ์ครบ สนใจติดต่อด่วน{% endblock %}
+{% block og_image %}{% if listing.property.cover_image %}{{ request.scheme }}://{{ request.get_host }}{{ listing.property.cover_image.image.url }}{% else %}{{ site_url }}/static/images/og-cover.png{% endif %}{% endblock %}
+
+{% block extra_head %}
+<!-- Structured Data: RealEstateListing, Product/Offer & BreadcrumbList (SEO & AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "RealEstateListing",
+      "@id": "{{ request.build_absolute_uri }}#listing",
+      "name": "[{{ listing.ref_code }}] {{ listing.property.title|escapejs }}",
+      "description": "{{ listing.property.desc|striptags|truncatewords:60|escapejs }}",
+      "url": "{{ request.build_absolute_uri }}",
+      "datePosted": "{{ listing.created_at|date:'c' }}",
+      "dateModified": "{{ listing.updated_at|date:'c' }}",
+      "category": "{{ listing.property.get_type_display|escapejs }}",
+      "price": "{{ listing.price }}",
+      "priceCurrency": "THB",
+      "offers": {
+        "@type": "Offer",
+        "price": "{{ listing.price }}",
+        "priceCurrency": "THB",
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": "2027-12-31",
+        "url": "{{ request.build_absolute_uri }}",
+        "seller": {
+          "@type": "Person",
+          "name": "{{ listing.property.owner.get_full_name|default:'เจ้าของร้าน'|escapejs }}"
+        }
+      },
+      "itemOffered": {
+        "@type": "Place",
+        "name": "{{ listing.property.title|escapejs }}",
+        "description": "{{ listing.property.desc|striptags|truncatewords:60|escapejs }}",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "{{ listing.property.address|escapejs }}",
+          "addressLocality": "{{ listing.property.district|escapejs }}",
+          "addressRegion": "{{ listing.property.province|escapejs }}",
+          "postalCode": "{{ listing.property.postal|default:'10000' }}",
+          "addressCountry": "TH"
+        }{% if listing.property.lat and listing.property.lng %},
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": {{ listing.property.lat }},
+          "longitude": {{ listing.property.lng }}
+        }{% endif %}
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ request.build_absolute_uri }}#breadcrumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "หน้าแรก",
+          "item": "{{ site_url }}/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "ตลาดเซ้งร้าน",
+          "item": "{{ site_url }}/listings/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ listing.property.province|escapejs }}",
+          "item": "{{ site_url }}/listings/?province={{ listing.property.province|urlencode }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "{{ listing.property.title|escapejs }}",
+          "item": "{{ request.build_absolute_uri }}"
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- Check if any 360 panorama image exists for this property -->
+{% for img in listing.property.images.all %}
+    {% if img.is_360_panorama %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" nonce="{{ request.csp_nonce }}"></script>
+    {% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfa] pb-24">
+    <!-- 1. Header Banner & Breadcrumb (สไตล์ Findinghouse) -->
+    <div class="relative bg-neutral-900 text-white py-8 sm:py-10 overflow-hidden">
+        <img src="/static/images/hero_banner.jpg" alt="เซ้งร้าน" class="absolute inset-0 w-full h-full object-cover object-center opacity-25">
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-900/95 to-neutral-950/60"></div>
+
+        <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <!-- Back Button & Breadcrumbs -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <a href="{% url 'listings:marketplace' %}"
+                   class="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white transition">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>กลับหน้ารวมร้านเซ้ง</span>
+                </a>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    {% if listing.is_admin_verified %}
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-neutral-900 shadow-md font-bold text-xs border border-white/20">
+                        <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-4 sm:h-5 object-contain">
+                        <span class="text-xs font-black text-neutral-900">VERIFIED BY ADMIN</span>
+                    </div>
+                    {% endif %}
+                    {% if listing.property.owner.membership_tier == 'SUPER_VIP' and listing.property.owner.is_vip_active %}
+                    <span class="rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-brand-500 px-3 py-1 text-xs font-black text-white shadow flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+                        <span>👑 SUPER VIP</span>
+                    </span>
+                    {% elif listing.property.owner.is_vip_active %}
+                    <span class="rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 text-xs font-black text-neutral-900 shadow flex items-center gap-1 pulse-badge">
+                        <i data-lucide="crown" class="w-3.5 h-3.5 text-neutral-900"></i>
+                        <span>👑 VIP LISTING</span>
+                    </span>
+                    {% endif %}
+                    <span class="rounded-full bg-brand-500/90 backdrop-blur-md px-3 py-1 text-xs font-mono font-bold text-white shadow">
+                        รหัสประกาศ: {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-full px-3 py-1 text-xs font-bold {% if listing.status == 'published' %}bg-emerald-500/90 text-white{% else %}bg-amber-500/90 text-white{% endif %}">
+                        {{ listing.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Title & Location -->
+            <div class="space-y-2 max-w-4xl">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-bold text-white shadow-xs">
+                        {{ listing.get_type_display }}
+                    </span>
+                    <span class="rounded-lg bg-white/20 backdrop-blur-md px-2.5 py-1 text-xs font-semibold text-neutral-200">
+                        {{ listing.property.get_type_display }}
+                    </span>
+                    {% if listing.includes_staff %}
+                    <span class="rounded-lg bg-teal-500/80 backdrop-blur-md px-2.5 py-1 text-xs font-bold text-white inline-flex items-center gap-1">
+                        <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                        <span>มีพนักงานพร้อมทำต่อ</span>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
+                    {{ listing.property.title }}
+                </h1>
+
+                <p class="text-xs sm:text-sm text-neutral-300 flex items-center gap-1.5 pt-1">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-brand-400 flex-shrink-0"></i>
+                    <span>{{ listing.property.address }} {{ listing.property.district }} {{ listing.property.province }} {{ listing.property.postal }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Main Content Grid (Left 2/3 Content, Right 1/3 Sticky Sidebar) -->
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- LEFT COLUMN (2 Cols) -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- 2.1 Image Gallery Viewer & Slideshow (สไตล์ Findinghouse) -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white shadow-sm overflow-hidden p-3 sm:p-4">
+                    <!-- Main Image Display Container -->
+                    <div class="relative h-[360px] sm:h-[460px] rounded-2xl overflow-hidden bg-neutral-900 group">
+                        {% if listing.property.images.all %}
+                            {% for img in listing.property.images.all %}
+                            <img src="{{ img.image.url }}"
+                                 alt="{{ listing.property.title }}"
+                                 id="gallery-main-img-{{ forloop.counter0 }}"
+                                 class="gallery-main-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-300 {% if forloop.first %}opacity-100 z-10{% else %}opacity-0 z-0 pointer-events-none{% endif %}">
+                            {% endfor %}
+                        {% elif listing.property.cover_image %}
+                            <img src="{{ listing.property.cover_image.image.url }}"
+                                 alt="{{ listing.property.title }}"
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex flex-col items-center justify-center text-neutral-500 gap-2">
+                                <i data-lucide="store" class="w-16 h-16 text-neutral-600"></i>
+                                <span class="text-xs">ไม่มีรูปภาพสถานที่</span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Badges Overlay -->
+                        <div class="absolute top-4 left-4 z-20 flex items-center gap-2">
+                            <span class="rounded-xl bg-brand-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-md">
+                                {{ listing.get_type_display }}
+                            </span>
+                            {% if listing.status == 'published' %}
+                            <span class="rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-md inline-flex items-center gap-1">
+                                <i data-lucide="badge-check" class="w-3.5 h-3.5"></i>
+                                <span>ประเมินราคาแล้ว</span>
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Image Counter Badge -->
+                        {% if listing.property.images.count > 0 %}
+                        <div class="absolute bottom-4 right-4 z-20 rounded-full bg-neutral-950/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-md border border-white/20 flex items-center gap-1.5">
+                            <i data-lucide="camera" class="w-3.5 h-3.5 text-brand-400"></i>
+                            <span><span id="gallery-current-num">1</span> / {{ listing.property.images.count }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Prev / Next Navigation Arrows -->
+                        {% if listing.property.images.count > 1 %}
+                        <button type="button"
+                                id="btn-gallery-prev"
+                                aria-label="รูปก่อนหน้า"
+                                class="cursor-pointer absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs transition hover:bg-black/90 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="chevron-left" class="w-5 h-5 pointer-events-none"></i>
+                        </button>
+                        <button type="button"
+                                id="btn-gallery-next"
+                                aria-label="รูปถัดไป"
+                                class="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs transition hover:bg-black/90 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="chevron-right" class="w-5 h-5 pointer-events-none"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Horizontal Thumbnails Strip (สไตล์ Findinghouse) -->
+                    {% if listing.property.images.count > 1 %}
+                    <div class="mt-3 flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
+                        {% for img in listing.property.images.all %}
+                        <button type="button"
+                                data-slide-index="{{ forloop.counter0 }}"
+                                class="gallery-thumb-btn cursor-pointer relative h-16 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all {% if forloop.first %}border-brand-600 ring-2 ring-brand-400/40 opacity-100 scale-95{% else %}border-transparent opacity-70 hover:opacity-100{% endif %}">
+                            <img src="{{ img.image.url }}" alt="Thumbnail {{ forloop.counter }}" class="h-full w-full object-cover">
+                            <span class="absolute bottom-0 right-0 rounded-tl-md bg-neutral-900/80 px-1.5 py-0.2 font-mono text-[9px] font-bold text-white">
+                                {{ forloop.counter }}
+                            </span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 2.2 Financial Transparency 4-Block Grid (ความโปร่งใสทางการเงิน สไตล์ เซ้งร้าน.com) -->
+                <div class="rounded-3xl border border-brand-200/80 bg-gradient-to-br from-brand-50/70 via-rose-50/40 to-white p-5 sm:p-6 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4 pb-2 border-b border-brand-100">
+                        <i data-lucide="calculator" class="w-5 h-5 text-brand-600"></i>
+                        <h2 class="text-base font-bold text-neutral-900">ตัวเลขความโปร่งใสทางการเงิน (Financial Highlights)</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 font-sans">
+                        <!-- 1. ราคาเซ้ง -->
+                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
+                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">ราคาเซ้งทั้งหมด</span>
+                            <div class="text-xl sm:text-2xl font-black text-brand-600 mt-0.5">
+                                ฿{{ listing.price|floatformat:0 }}
+                            </div>
+                        </div>
+
+                        <!-- 2. ค่าเช่าต่อเดือน -->
+                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
+                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">ค่าเช่าต่อเดือน</span>
+                            <div class="text-lg sm:text-xl font-bold text-neutral-800 mt-0.5">
+                                ฿{{ listing.monthly_rent|floatformat:0 }} <span class="text-[10px] font-normal text-neutral-400">/ด.</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. ยอดขายเฉลี่ย -->
+                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
+                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">รายได้เฉลี่ย (3 ด.)</span>
+                            <div class="text-lg sm:text-xl font-bold text-emerald-600 mt-0.5">
+                                {% if listing.avg_revenue_3m %}฿{{ listing.avg_revenue_3m|floatformat:0 }}{% else %}—{% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 4. กำไรสุทธิเฉลี่ย -->
+                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
+                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">กำไรเฉลี่ยสุทธิ</span>
+                            <div class="text-lg sm:text-xl font-black text-emerald-700 mt-0.5">
+                                {% if listing.avg_profit_3m %}฿{{ listing.avg_profit_3m|floatformat:0 }}{% else %}—{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.3 Shop Description & Details -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-4">
+                    <h2 class="text-lg font-bold text-neutral-900 flex items-center gap-2 border-b border-neutral-100 pb-3">
+                        <i data-lucide="file-text" class="w-5 h-5 text-brand-600"></i>
+                        <span>รายละเอียดและจุดเด่นของร้าน</span>
+                    </h2>
+                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
+                        {{ listing.property.desc }}
+                    </div>
+                </div>
+
+                <!-- 2.4 Lease Terms & Inventory Table -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-5">
+                    <h2 class="text-lg font-bold text-neutral-900 flex items-center gap-2 border-b border-neutral-100 pb-3">
+                        <i data-lucide="file-check" class="w-5 h-5 text-brand-600"></i>
+                        <span>เงื่อนไขสัญญาและสิ่งที่ได้รับพร้อมร้าน</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 text-xs sm:text-sm">
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-brand-600"></i>
+                                <span>สัญญาเช่าคงเหลือ</span>
+                            </span>
+                            <strong class="text-neutral-900 font-bold">{{ listing.lease_remaining_months }} เดือน</strong>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>
+                                <span>เงินประกัน/มัดจำกับตึก</span>
+                            </span>
+                            <strong class="text-neutral-900 font-bold">฿{{ listing.security_deposit|floatformat:0 }}</strong>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="tag" class="w-4 h-4 text-brand-600"></i>
+                                <span>ค่าเปลี่ยนสัญญา</span>
+                            </span>
+                            <strong class="text-neutral-900 font-bold">{{ listing.get_lease_transfer_fee_payer_display }}</strong>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="users" class="w-4 h-4 text-brand-600"></i>
+                                <span>พนักงานเดิม</span>
+                            </span>
+                            <strong class="font-bold {% if listing.includes_staff %}text-emerald-700{% else %}text-neutral-500{% endif %}">
+                                {% if listing.includes_staff %}มีพนักงานพร้อมทำต่อ{% else %}ไม่มี{% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="maximize" class="w-4 h-4 text-brand-600"></i>
+                                <span>พื้นที่ใช้สอย</span>
+                            </span>
+                            <strong class="text-neutral-900 font-bold">{{ listing.property.area_sqm }} ตร.ม.</strong>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100">
+                            <span class="text-neutral-500 flex items-center gap-2">
+                                <i data-lucide="building" class="w-4 h-4 text-brand-600"></i>
+                                <span>จำนวนชั้น</span>
+                            </span>
+                            <strong class="text-neutral-900 font-bold">{{ listing.property.floors }} ชั้น</strong>
+                        </div>
+                    </div>
+
+                    {% if listing.includes_equipment %}
+                    <div class="mt-4 pt-4 border-t border-neutral-100">
+                        <h3 class="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i data-lucide="package" class="w-4 h-4 text-brand-600"></i>
+                            <span>อุปกรณ์และเฟอร์นิเจอร์ที่ยกให้พร้อมร้าน</span>
+                        </h3>
+                        <div class="rounded-2xl bg-brand-50/50 p-4 border border-brand-100 text-xs sm:text-sm text-neutral-800 leading-relaxed whitespace-pre-line">
+                            {{ listing.includes_equipment }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 2.5 Map Location & Coordinates (สไตล์ Findinghouse) -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+                        <h2 class="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-brand-600"></i>
+                            <span>แผนที่ตั้งและพิกัดร้าน</span>
+                        </h2>
+                        {% if listing.property.google_maps_url %}
+                        <a href="{{ listing.property.google_maps_url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-900 hover:bg-neutral-800 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs hover:scale-[1.02]">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-400"></i>
+                            <span>เปิด Google Maps (นำทาง) 🚗</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-neutral-400"></i>
+                        </a>
+                        {% elif listing.property.lat and listing.property.lng %}
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ listing.property.lat }},{{ listing.property.lng }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-900 hover:bg-neutral-800 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs hover:scale-[1.02]">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-400"></i>
+                            <span>เปิด Google Maps (นำทาง) 🚗</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-neutral-400"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="h-72 sm:h-80 w-full rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-100 z-0">
+                        <div id="listing-detail-map" class="w-full h-full"></div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-neutral-500 pt-1">
+                        <p class="flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-400"></i>
+                            <span>ที่ตั้ง: {{ listing.property.address }} {{ listing.property.district }} {{ listing.property.province }} {{ listing.property.postal }}</span>
+                        </p>
+                        {% if listing.property.google_maps_url %}
+                        <a href="{{ listing.property.google_maps_url }}" target="_blank" rel="noopener noreferrer" class="text-brand-600 font-bold hover:underline inline-flex items-center gap-1">
+                            <span>ดูพิกัดจริงบน Google Maps</span>
+                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (Sticky Sidebar 1 Col) -->
+            <div class="space-y-6 lg:sticky lg:top-20">
+                <!-- 2.6 Price Box & Fast Action Card -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 shadow-md space-y-5">
+                    <div>
+                        <span class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block">ราคาเซ้งเบ็ดเสร็จ</span>
+                        <div class="text-3xl sm:text-4xl font-black text-brand-600 tracking-tight font-sans mt-0.5">
+                            ฿{{ listing.price|floatformat:0 }}
+                        </div>
+                        <p class="text-[11px] text-neutral-400 mt-1">
+                            ค่าเปลี่ยนสัญญา: <strong class="text-neutral-700">{{ listing.get_lease_transfer_fee_payer_display }}</strong>
+                        </p>
+                    </div>
+
+                    {% if listing.is_admin_verified %}
+                    <!-- Admin Verified Trust Guarantee Callout -->
+                    <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-3.5 flex items-center gap-3">
+                        <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-9 object-contain shrink-0 drop-shadow-xs">
+                        <div class="text-xs">
+                            <div class="font-black text-emerald-900">ร้านนี้ได้รับการตรวจและยืนยันโดยแอดมิน</div>
+                            <div class="text-[11px] text-emerald-700 leading-tight mt-0.5">ผ่านการยืนยันตัวตนเจ้าของและเอกสารสัญญาเรียบร้อย</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons: Phone & LINE -->
+                    <div class="space-y-2.5 pt-2 border-t border-neutral-100">
+                        <a href="tel:{% if listing.agent and listing.agent.phone %}{{ listing.agent.phone }}{% else %}0812345678{% endif %}"
+                           class="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 py-3.5 text-sm font-bold text-white shadow-md transition hover:scale-[1.01]">
+                            <i data-lucide="phone" class="w-4 h-4 text-brand-400"></i>
+                            <span>โทรนัดหมายดูสถานที่จริง</span>
+                        </a>
+
+                        <a href="https://line.me/R/ti/p/@salebiz"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] py-3.5 text-sm font-bold text-white shadow-md transition hover:scale-[1.01]">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            <span>ทัก LINE ปรึกษาดีลนี้</span>
+                        </a>
+                    </div>
+
+                    <!-- Assigned Agent Profile -->
+                    <div class="border-t border-neutral-100 pt-4 flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700 font-bold text-base shadow-2xs">
+                            {% if listing.agent %}{{ listing.agent.first_name|default:"A"|first }}{% else %}S{% endif %}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-[10px] text-neutral-400 block font-medium">นายหน้าผู้ดูแลเคส</span>
+                            <span class="text-xs font-bold text-neutral-900 truncate block">
+                                {% if listing.agent %}{{ listing.agent.get_full_name|default:listing.agent.email }}{% else %}ทีมงานเซ้งร้านด่วน (LINE: @salebiz){% endif %}
+                            </span>
+                            <span class="text-[10px] text-brand-600 font-semibold block">รหัสเคส: {{ listing.ref_code }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.7 Lead / Inquiry Submission Form (สไตล์ Findinghouse) -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-neutral-900 flex items-center gap-2 border-b border-neutral-100 pb-3">
+                        <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
+                        <span>สนใจนัดชมร้าน / ขอข้อมูลเพิ่ม</span>
+                    </h3>
+
+                    <form action="{% url 'leads:submit_inquiry' listing_pk=listing.pk %}" method="post" class="space-y-3.5">
+                        {% csrf_token %}
+                        <!-- Honeypot -->
+                        <div style="display:none;">{{ lead_form.website }}</div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">ชื่อ-นามสกุล</label>
+                            <input type="text"
+                                   name="full_name"
+                                   required
+                                   placeholder="เช่น คุณสมชาย"
+                                   class="w-full rounded-xl border border-neutral-300 bg-[#fbfcfb] px-3.5 py-2 text-xs text-neutral-900 outline-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+                            <input type="tel"
+                                   name="phone"
+                                   required
+                                   placeholder="เช่น 0812345678"
+                                   class="w-full rounded-xl border border-neutral-300 bg-[#fbfcfb] px-3.5 py-2 text-xs text-neutral-900 outline-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">LINE ID (ถ้ามี)</label>
+                            <input type="text"
+                                   name="line_id"
+                                   placeholder="Line ID สำหรับส่งรายละเอียด"
+                                   class="w-full rounded-xl border border-neutral-300 bg-[#fbfcfb] px-3.5 py-2 text-xs text-neutral-900 outline-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">ข้อความเพิ่มเติม / วันที่สะดวกชมร้าน</label>
+                            <textarea name="notes"
+                                      rows="3"
+                                      placeholder="สนใจสอบถามรายละเอียดเพิ่มเติมเกี่ยวกับร้านนี้..."
+                                      class="w-full rounded-xl border border-neutral-300 bg-[#fbfcfb] px-3.5 py-2 text-xs text-neutral-900 outline-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">สนใจร้านรหัส {{ listing.ref_code }} - {{ listing.property.title }}</textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full cursor-pointer rounded-xl bg-brand-600 hover:bg-brand-700 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition">
+                            ส่งข้อมูลนัดหมาย
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Related Listings Section (ร้านใกล้เคียงแนะนำ) -->
+        {% if related_listings %}
+        <div class="mt-16 pt-10 border-t border-neutral-200">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-black text-neutral-900 tracking-tight">ร้านเซ้งอื่นๆ ในทำเลนี้</h2>
+                    <p class="text-xs text-neutral-500 mt-0.5">ประกาศเซ้งร้านและพื้นที่ธุรกิจในจังหวัด {{ listing.property.province }}</p>
+                </div>
+                <a href="{% url 'listings:marketplace' %}?province={{ listing.property.province }}" class="text-xs font-bold text-brand-600 hover:underline inline-flex items-center gap-1">
+                    <span>ดูทั้งหมด</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {% for item in related_listings %}
+                <div class="group bg-white rounded-2xl border border-neutral-200/80 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
+                    <div class="relative h-44 bg-neutral-100 overflow-hidden">
+                        <a href="{% url 'listings:listing_detail' pk=item.pk %}" class="block w-full h-full">
+                            {% if item.property.cover_image %}
+                            <img src="{{ item.property.cover_image.image.url }}" alt="{{ item.property.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-neutral-400"><i data-lucide="store" class="w-8 h-8"></i></div>
+                            {% endif %}
+                        </a>
+                        <span class="absolute top-2.5 left-2.5 rounded-lg bg-neutral-900/90 text-white font-mono text-[10px] font-bold px-2 py-0.5">
+                            {{ item.ref_code }}
+                        </span>
+                    </div>
+                    <div class="p-3.5 flex-1 flex flex-col justify-between space-y-2">
+                        <div>
+                            <div class="text-lg font-black text-brand-600">฿{{ item.price|floatformat:0 }}</div>
+                            <h4 class="text-xs font-bold text-neutral-900 line-clamp-1 group-hover:text-brand-600 transition">{{ item.property.title }}</h4>
+                            <p class="text-[11px] text-neutral-400 truncate">{{ item.property.district }}, {{ item.property.province }}</p>
+                        </div>
+                        <a href="{% url 'listings:listing_detail' pk=item.pk %}" class="text-[11px] font-bold text-brand-600 hover:underline inline-flex items-center gap-1">
+                            <span>ดูร้านนี้</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script nonce="{{ request.csp_nonce }}">
+    function initGalleryAndDetailMap() {
+        // 1. Gallery Slideshow logic
+        const slides = document.querySelectorAll('.gallery-main-slide');
+        const thumbs = document.querySelectorAll('.gallery-thumb-btn');
+        const counterEl = document.getElementById('gallery-current-num');
+        const prevBtn = document.getElementById('btn-gallery-prev');
+        const nextBtn = document.getElementById('btn-gallery-next');
+        let currentIdx = 0;
+        const totalSlides = slides.length;
+
+        function showSlide(idx) {
+            if (totalSlides === 0) return;
+            currentIdx = (idx + totalSlides) % totalSlides;
+
+            slides.forEach((slide, i) => {
+                if (i === currentIdx) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none');
+                    slide.classList.add('opacity-100', 'z-10');
+                } else {
+                    slide.classList.add('opacity-0', 'pointer-events-none');
+                    slide.classList.remove('opacity-100', 'z-10');
+                }
+            });
+
+            thumbs.forEach((thumb, i) => {
+                if (i === currentIdx) {
+                    thumb.classList.add('border-brand-600', 'ring-2', 'ring-brand-400/40', 'opacity-100', 'scale-95');
+                    thumb.classList.remove('border-transparent', 'opacity-70');
+                } else {
+                    thumb.classList.remove('border-brand-600', 'ring-2', 'ring-brand-400/40', 'opacity-100', 'scale-95');
+                    thumb.classList.add('border-transparent', 'opacity-70');
+                }
+            });
+
+            if (counterEl) {
+                counterEl.textContent = (currentIdx + 1);
+            }
+        }
+
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', function () {
+                const idx = parseInt(this.getAttribute('data-slide-index'), 10);
+                showSlide(idx);
+            });
+        });
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                showSlide(currentIdx - 1);
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                showSlide(currentIdx + 1);
+            });
+        }
+
+        // 2. Leaflet Map for Detail Page
+        const mapContainer = document.getElementById('listing-detail-map');
+        if (mapContainer && typeof L !== 'undefined') {
+            const rawLat = parseFloat('{{ listing.property.lat|default:"13.7563" }}');
+            const rawLng = parseFloat('{{ listing.property.lng|default:"100.5018" }}');
+            const lat = isNaN(rawLat) ? 13.7563 : rawLat;
+            const lng = isNaN(rawLng) ? 100.5018 : rawLng;
+
+            const map = L.map('listing-detail-map', {
+                zoomControl: true,
+                scrollWheelZoom: false,
+            }).setView([lat, lng], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const shopIcon = L.divIcon({
+                html: `
+                    <div class="relative flex items-center justify-center">
+                        <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-brand-400 opacity-75"></span>
+                        <div class="h-6 w-6 rounded-full bg-brand-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
+                            🏪
+                        </div>
+                    </div>
+                `,
+                className: 'detail-shop-marker',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            var popupHtml = '<div class="space-y-1 py-1 font-sans">' +
+                '<strong class="text-neutral-900 block text-xs">{{ listing.property.title }}</strong>' +
+                '<span class="text-[11px] text-neutral-500 block">รหัส {{ listing.ref_code }} • ฿{{ listing.price|floatformat:0 }}</span>' +
+                {% if listing.property.google_maps_url %}
+                '<a href="{{ listing.property.google_maps_url }}" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-brand-600 hover:underline">เปิด Google Maps นำทาง ➔</a>' +
+                {% endif %}
+                '</div>';
+
+            L.marker([lat, lng], { icon: shopIcon })
+                .addTo(map)
+                .bindPopup(popupHtml)
+                .openPopup();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGalleryAndDetailMap);
+    } else {
+        initGalleryAndDetailMap();
+    }
+</script>
+{% endblock %}

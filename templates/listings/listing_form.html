@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}สร้างประกาศเซ้งร้าน — {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 py-10">
+    <div class="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+        <h1 class="text-xl font-bold text-neutral-900">สร้างประกาศเซ้งร้าน</h1>
+        <p class="mt-1 text-xs text-neutral-500">สำหรับทรัพย์สิน: <span class="font-bold text-brand-600">{{ property.title }}</span> ({{ property.district }}, {{ property.province }})</p>
+
+        {% if form.errors %}
+        <div class="mt-4 rounded-xl bg-red-50 p-4 border border-red-200 text-xs text-red-700">
+            <p class="font-bold flex items-center gap-1.5 text-sm mb-1 text-red-800">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i>
+                <span>กรุณาตรวจสอบข้อมูลที่กรอก:</span>
+            </p>
+            <ul class="list-disc pl-5 space-y-0.5">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">ประเภทประกาศ</label>
+                {{ form.type }}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">ราคาเซ้ง (บาท) <span class="text-red-500">*</span></label>
+                    <input type="number" step="1000" name="price" value="{{ form.price.value|default:'' }}" required placeholder="เช่น 350000"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                    {% if form.price.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.price.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">ค่าเช่าต่อเดือน (บาท)</label>
+                    <input type="number" step="500" name="monthly_rent" value="{{ form.monthly_rent.value|default:'0' }}" placeholder="เช่น 15000"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">เงินประกัน/มัดจำ (บาท)</label>
+                    <input type="number" step="500" name="security_deposit" value="{{ form.security_deposit.value|default:'0' }}"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700">สัญญาคงเหลือ (เดือน)</label>
+                    <input type="number" name="lease_remaining_months" value="{{ form.lease_remaining_months.value|default:'12' }}"
+                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <!-- Image Upload Box -->
+            <div class="rounded-xl border border-neutral-200 bg-neutral-50/70 p-4 space-y-2">
+                <label class="block text-sm font-bold text-neutral-800 flex items-center gap-1.5">
+                    <i data-lucide="image" class="w-4 h-4 text-brand-600"></i>
+                    <span>รูปภาพร้านค้าและบรรยากาศ (อัปโหลดได้หลายรูป)</span>
+                </label>
+                <input type="file" name="images" multiple accept="image/jpeg,image/png,image/webp"
+                       class="block w-full text-xs text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-white hover:file:bg-brand-600 cursor-pointer">
+                <p class="text-[11px] text-neutral-400">รองรับไฟล์ JPG, PNG, WebP ขนาดไม่เกิน 10MB ต่อรูป รูปแรกจะเป็นรูปภาพหน้าปก</p>
+            </div>
+
+            <div class="rounded-xl bg-brand-50 p-4 border border-brand-100 space-y-3">
+                <h3 class="text-xs font-bold text-brand-800 uppercase tracking-wider">ข้อมูลทางการเงินเพื่อดึงดูดผู้ซื้อ (ถ้ามี)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-neutral-700">ยอดขายเฉลี่ย (3 เดือนล่าสุด)</label>
+                        <input type="number" step="1000" name="avg_revenue_3m" value="{{ form.avg_revenue_3m.value|default:'' }}" placeholder="บาท/เดือน"
+                               class="mt-1 block w-full rounded-lg border border-neutral-300 bg-white p-2 text-xs shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-neutral-700">กำไรสุทธิเฉลี่ย (3 เดือนล่าสุด)</label>
+                        <input type="number" step="1000" name="avg_profit_3m" value="{{ form.avg_profit_3m.value|default:'' }}" placeholder="บาท/เดือน"
+                               class="mt-1 block w-full rounded-lg border border-neutral-300 bg-white p-2 text-xs shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-700">รายการอุปกรณ์และทรัพย์สินที่ยกให้</label>
+                <textarea name="includes_equipment" rows="3" placeholder="เช่น แอร์ 3 เครื่อง, ชุดโต๊ะเก้าอี้ 10 ชุด, ตู้แช่, เคาเตอร์บาร์..."
+                          class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ form.includes_equipment.value|default:'' }}</textarea>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="includes_staff" id="id_includes_staff" {% if form.includes_staff.value %}checked{% endif %}
+                       class="h-4 w-4 rounded border-neutral-300 text-brand-600 focus:ring-brand-500">
+                <label for="id_includes_staff" class="text-sm font-medium text-neutral-700">มีทีมงาน/พนักงานเดิมพร้อมส่งต่องาน</label>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t">
+                <a href="{% url 'properties:property_detail' pk=property.pk %}" class="text-sm font-medium text-neutral-600 hover:text-neutral-900">ยกเลิก</a>
+                <button type="submit" class="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-brand-700 transition">
+                    🚀 บันทึกและเผยแพร่ประกาศเซ้งร้านทันที
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

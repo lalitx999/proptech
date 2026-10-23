@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}ค้นหาร้านเซ้ง & พื้นที่ธุรกิจทั่วไทย — เซ้งร้านด่วน.com{% endblock %}
+{% block meta_description %}ค้นหาร้านเซ้ง กิจการ และทำเลทองทั่วไทย คาเฟ่ ร้านอาหาร ชาบู นวดสปา ซาลอน พร้อมงบกำไรขาดทุน 3 เดือนโปร่งใส ปักหมุดพิกัดจริง{% endblock %}
+
+{% block extra_head %}
+<!-- Structured Data: CollectionPage & BreadcrumbList for Marketplace (SEO / AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "{{ site_url }}/listings/#collection",
+      "name": "ค้นหาร้านเซ้ง & ธุรกิจทั่วไทย — เซ้งร้านด่วน.com",
+      "description": "คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลรายได้ กำไรเฉลี่ย 3 เดือน และสัญญาชัดเจน",
+      "url": "{{ site_url }}/listings/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "หน้าแรก",
+          "item": "{{ site_url }}/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "ตลาดเซ้งร้าน",
+          "item": "{{ site_url }}/listings/"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfa] pb-20">
+    <!-- 1. Page Header Hero Banner (Responsive Height) -->
+    <div class="relative h-44 sm:h-56 md:h-64 overflow-hidden bg-neutral-900">
+        <!-- Background Storefront Photo with Dark Overlay -->
+        <img src="/static/images/hero_banner.jpg" alt="ค้นหาร้านเซ้ง" class="absolute inset-0 w-full h-full object-cover object-center opacity-30">
+        <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-900/90 to-neutral-950/40"></div>
+        
+        <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+            <div>
+                <div class="mb-2 sm:mb-3 h-1 w-10 sm:w-12 bg-brand-500 rounded-full"></div>
+                <p class="mb-1 text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-brand-300">FIND YOUR BUSINESS</p>
+                <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+                    ค้นหาร้านเซ้ง & ธุรกิจทั่วไทย
+                </h1>
+                <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-300 max-w-xl line-clamp-1 sm:line-clamp-none">
+                    คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลรายได้ กำไรเฉลี่ย 3 เดือน และสัญญาชัดเจน
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <!-- 2. Floating Filter Form (Mobile First, Collapsible & Sleek) -->
+        <form id="marketplace-filter-form"
+              method="get"
+              action="{% url 'listings:marketplace' %}"
+              hx-get="{% url 'listings:marketplace' %}"
+              hx-target="#listings-container"
+              hx-indicator="#loading-spinner"
+              class="relative -mt-7 sm:-mt-9 mb-8 sm:mb-10 rounded-2xl sm:rounded-3xl border border-neutral-200/90 bg-white p-3.5 sm:p-6 shadow-[0_12px_30px_rgba(0,0,0,0.06)]">
+            
+            <!-- Hidden input for deal type -->
+            <input type="hidden" name="type" id="filter-type-input" value="{{ current_params.type|default:'' }}">
+
+            <!-- Deal Type Pills Row (Horizontal Scroll on Mobile) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 border-b border-neutral-100">
+                <span class="text-[11px] font-bold text-neutral-400 mr-1 hidden sm:inline">ประเภท:</span>
+                <button type="button"
+                        data-type-val=""
+                        class="deal-type-btn shrink-0 rounded-full px-3.5 py-1 text-xs font-bold transition cursor-pointer {% if not current_params.type %}bg-brand-600 text-white shadow-xs{% else %}bg-neutral-100 text-neutral-600 hover:bg-neutral-200{% endif %}">
+                    ทั้งหมด
+                </button>
+                <button type="button"
+                        data-type-val="takeover"
+                        class="deal-type-btn shrink-0 rounded-full px-3.5 py-1 text-xs font-bold transition cursor-pointer {% if current_params.type == 'takeover' %}bg-brand-600 text-white shadow-xs{% else %}bg-neutral-100 text-neutral-600 hover:bg-neutral-200{% endif %}">
+                    เซ้งร้าน/กิจการ
+                </button>
+                <button type="button"
+                        data-type-val="rent"
+                        class="deal-type-btn shrink-0 rounded-full px-3.5 py-1 text-xs font-bold transition cursor-pointer {% if current_params.type == 'rent' %}bg-brand-600 text-white shadow-xs{% else %}bg-neutral-100 text-neutral-600 hover:bg-neutral-200{% endif %}">
+                    เช่าพื้นที่/ตึกแถว
+                </button>
+                <button type="button"
+                        data-type-val="sale_biz"
+                        class="deal-type-btn shrink-0 rounded-full px-3.5 py-1 text-xs font-bold transition cursor-pointer {% if current_params.type == 'sale_biz' %}bg-brand-600 text-white shadow-xs{% else %}bg-neutral-100 text-neutral-600 hover:bg-neutral-200{% endif %}">
+                    ขายกิจการขาด
+                </button>
+            </div>
+
+            <!-- Primary Search Bar & Filter Toggle Row -->
+            <div class="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <!-- Search Input Field -->
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-3.5 flex items-center text-neutral-400 pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           id="filter-q"
+                           value="{{ current_params.q|default:'' }}"
+                           placeholder="ค้นหาชื่อร้าน ทำเล หรือรหัสร้าน (เช่น คาเฟ่, N-032, พัทยา)..."
+                           class="w-full rounded-xl sm:rounded-2xl border border-neutral-200 bg-neutral-50/70 py-2.5 sm:py-3 pl-10 pr-3 text-xs sm:text-sm text-neutral-900 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20">
+                </div>
+
+                <!-- Action Buttons: Toggle Filters + Search Button -->
+                <div class="flex items-center gap-2">
+                    <!-- Toggle Filter Drawer Button -->
+                    <button type="button"
+                            id="toggle-filter-drawer-btn"
+                            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-xl sm:rounded-2xl border border-neutral-200 hover:border-brand-300 bg-white hover:bg-neutral-50 py-2.5 sm:py-3 px-3.5 sm:px-4 text-xs font-bold text-neutral-700 shadow-2xs transition cursor-pointer">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-brand-600"></i>
+                        <span>ตัวกรอง</span>
+                        {% if current_params.category or current_params.province or current_params.price_min or current_params.price_max %}
+                        <span class="rounded-full bg-brand-600 text-white text-[10px] font-black w-4 h-4 flex items-center justify-center ml-0.5">✓</span>
+                        {% endif %}
+                        <i data-lucide="chevron-down" id="filter-chevron" class="w-3.5 h-3.5 text-neutral-400 transition-transform {% if current_params.category or current_params.province or current_params.price_min or current_params.price_max %}rotate-180{% endif %}"></i>
+                    </button>
+
+                    <!-- Submit Search Button -->
+                    <button type="submit"
+                            id="btn-search-marketplace"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-2.5 sm:py-3 px-5 sm:px-7 text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition hover:scale-[1.01] cursor-pointer">
+                        <i data-lucide="search" class="w-4 h-4 pointer-events-none"></i>
+                        <span>ค้นหา</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Collapsible Advanced Filter Drawer -->
+            <div id="advanced-filters-panel" class="{% if not current_params.category and not current_params.province and not current_params.price_min and not current_params.price_max %}hidden{% else %}block{% endif %} pt-4 mt-3 border-t border-neutral-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
+                    
+                    <!-- 1. Category -->
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 mb-1 flex items-center gap-1">
+                            <i data-lucide="store" class="w-3.5 h-3.5 text-brand-500"></i>
+                            <span>หมวดหมู่ธุรกิจ</span>
+                        </label>
+                        <div class="relative">
+                            <select name="category"
+                                    id="filter-category"
+                                    class="w-full rounded-xl border border-neutral-200 bg-neutral-50/60 px-3 py-2 text-xs sm:text-sm text-neutral-900 outline-none transition appearance-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                                <option value="">ทุกหมวดหมู่ธุรกิจ</option>
+                                <option value="massage_spa" {% if current_params.category == 'massage_spa' %}selected{% endif %}>นวด/สปา</option>
+                                <option value="bar_pub_karaoke" {% if current_params.category == 'bar_pub_karaoke' %}selected{% endif %}>ผับ/บาร์/คาราโอเกะ</option>
+                                <option value="beauty_salon_nails" {% if current_params.category == 'beauty_salon_nails' %}selected{% endif %}>ตัดผม/เสริมสวย/ทำเล็บ</option>
+                                <option value="restaurant_shabu" {% if current_params.category == 'restaurant_shabu' %}selected{% endif %}>หมูกระทะ/ชาบู/ร้านอาหาร</option>
+                                <option value="building_land_condo" {% if current_params.category == 'building_land_condo' %}selected{% endif %}>ตึก/บ้าน/คอนโด/ที่ดิน</option>
+                                <option value="cafe_beverage" {% if current_params.category == 'cafe_beverage' %}selected{% endif %}>คาเฟ่/กาแฟ/ร้านน้ำปั่น</option>
+                                <option value="rental_booth_space" {% if current_params.category == 'rental_booth_space' %}selected{% endif %}>ล็อค/พื้นที่ให้เช่า</option>
+                                <option value="other" {% if current_params.category == 'other' %}selected{% endif %}>อื่นๆ</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- 2. Province -->
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 mb-1 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-500"></i>
+                            <span>ทำเล / จังหวัด</span>
+                        </label>
+                        <div class="relative">
+                            <select name="province"
+                                    id="filter-province"
+                                    class="w-full rounded-xl border border-neutral-200 bg-neutral-50/60 px-3 py-2 text-xs sm:text-sm text-neutral-900 outline-none transition appearance-none focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500">
+                                <option value="">ทุกจังหวัด</option>
+                                <option value="กรุงเทพมหานคร" {% if current_params.province == 'กรุงเทพมหานคร' %}selected{% endif %}>กรุงเทพมหานคร</option>
+                                <option value="ชลบุรี" {% if current_params.province == 'ชลบุรี' %}selected{% endif %}>ชลบุรี (พัทยา)</option>
+                                <option value="เชียงใหม่" {% if current_params.province == 'เชียงใหม่' %}selected{% endif %}>เชียงใหม่ (นิมมานฯ)</option>
+                                <option value="นนทบุรี" {% if current_params.province == 'นนทบุรี' %}selected{% endif %}>นนทบุรี</option>
+                                <option value="ภูเก็ต" {% if current_params.province == 'ภูเก็ต' %}selected{% endif %}>ภูเก็ต</option>
+                                <option value="สมุทรปราการ" {% if current_params.province == 'สมุทรปราการ' %}selected{% endif %}>สมุทรปราการ</option>
+                                <option value="ปทุมธานี" {% if current_params.province == 'ปทุมธานี' %}selected{% endif %}>ปทุมธานี</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- 3. Price Range (2 inputs in 1 cell) -->
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 mb-1 flex items-center gap-1">
+                            <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-500"></i>
+                            <span>ช่วงราคาเซ้ง (บาท)</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number"
+                                   step="10000"
+                                   name="price_min"
+                                   id="filter-price-min"
+                                   value="{{ current_params.price_min|default:'' }}"
+                                   placeholder="ต่ำสุด (฿)"
+                                   class="w-full rounded-xl border border-neutral-200 bg-neutral-50/60 px-2.5 py-2 text-xs text-neutral-900 outline-none transition focus:border-brand-500 focus:bg-white">
+                            <input type="number"
+                                   step="10000"
+                                   name="price_max"
+                                   id="filter-price-max"
+                                   value="{{ current_params.price_max|default:'' }}"
+                                   placeholder="สูงสุด (฿)"
+                                   class="w-full rounded-xl border border-neutral-200 bg-neutral-50/60 px-2.5 py-2 text-xs text-neutral-900 outline-none transition focus:border-brand-500 focus:bg-white">
+                        </div>
+                    </div>
+
+                    <!-- 4. Sort & Reset -->
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-neutral-600 mb-1 flex items-center gap-1">
+                                <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 text-neutral-400"></i>
+                                <span>จัดเรียงตาม</span>
+                            </label>
+                            <select name="sort"
+                                    id="filter-sort"
+                                    class="w-full rounded-xl border border-neutral-200 bg-neutral-50/60 px-2.5 py-2 text-xs text-neutral-800 outline-none focus:border-brand-500">
+                                <option value="latest" {% if current_params.sort == 'latest' or not current_params.sort %}selected{% endif %}>ประกาศล่าสุด</option>
+                                <option value="price_asc" {% if current_params.sort == 'price_asc' %}selected{% endif %}>ราคา: ต่ำไปสูง</option>
+                                <option value="price_desc" {% if current_params.sort == 'price_desc' %}selected{% endif %}>ราคา: สูงไปต่ำ</option>
+                                <option value="rent_asc" {% if current_params.sort == 'rent_asc' %}selected{% endif %}>ค่าเช่า: ต่ำไปสูง</option>
+                            </select>
+                        </div>
+                        <div class="pt-4 sm:pt-5">
+                            <a href="{% url 'listings:marketplace' %}"
+                               id="btn-clear-filters"
+                               title="ล้างการค้นหาและตัวกรองทั้งหมด"
+                               class="inline-flex items-center justify-center rounded-xl border border-neutral-200 hover:bg-neutral-100 p-2 text-neutral-500 hover:text-neutral-700 transition">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <!-- 3. Results Header Bar & 4-Column Listings Container -->
+        <div class="relative">
+            <!-- HTMX Loading Spinner -->
+            <div id="loading-spinner" class="htmx-indicator absolute inset-0 bg-white/70 backdrop-blur-xs z-20 flex items-center justify-center rounded-2xl">
+                <div class="inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-5 py-2.5 text-xs font-bold text-white shadow-xl">
+                    <svg class="animate-spin h-4 w-4 text-brand-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>กำลังค้นหาร้านค้าแบบเรียลไทม์...</span>
+                </div>
+            </div>
+
+            {% include "listings/partials/listings_grid.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script nonce="{{ request.csp_nonce }}">
+    function initMarketplaceFilterEvents() {
+        const typeButtons = document.querySelectorAll('.deal-type-btn');
+        const typeInput = document.getElementById('filter-type-input');
+        const filterForm = document.getElementById('marketplace-filter-form');
+        const toggleDrawerBtn = document.getElementById('toggle-filter-drawer-btn');
+        const filterPanel = document.getElementById('advanced-filters-panel');
+        const filterChevron = document.getElementById('filter-chevron');
+
+        if (toggleDrawerBtn && filterPanel) {
+            toggleDrawerBtn.addEventListener('click', function () {
+                filterPanel.classList.toggle('hidden');
+                if (filterChevron) {
+                    filterChevron.classList.toggle('rotate-180');
+                }
+            });
+        }
+
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const val = this.getAttribute('data-type-val');
+                if (typeInput) {
+                    typeInput.value = val;
+                }
+                typeButtons.forEach(b => {
+                    b.classList.remove('bg-brand-600', 'text-white', 'shadow-xs');
+                    b.classList.add('bg-neutral-100', 'text-neutral-600', 'hover:bg-neutral-200');
+                });
+                this.classList.add('bg-brand-600', 'text-white', 'shadow-xs');
+                this.classList.remove('bg-neutral-100', 'text-neutral-600', 'hover:bg-neutral-200');
+
+                if (filterForm) {
+                    if (typeof htmx !== 'undefined') {
+                        htmx.trigger(filterForm, 'submit');
+                    } else {
+                        filterForm.submit();
+                    }
+                }
+            });
+        });
+
+        const sortSelect = document.getElementById('filter-sort');
+        if (sortSelect && filterForm) {
+            sortSelect.addEventListener('change', function () {
+                if (typeof htmx !== 'undefined') {
+                    htmx.trigger(filterForm, 'submit');
+                } else {
+                    filterForm.submit();
+                }
+            });
+        }
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMarketplaceFilterEvents);
+    } else {
+        initMarketplaceFilterEvents();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- 1. Homepage -->
+    <url>
+        <loc>{{ site_url }}/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- 2. Marketplace Search -->
+    <url>
+        <loc>{{ site_url }}/listings/</loc>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- 3. About & Mission -->
+    <url>
+        <loc>{{ site_url }}/about/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- 4. Contact Us -->
+    <url>
+        <loc>{{ site_url }}/contact/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- 5. Privacy Policy (PDPA) -->
+    <url>
+        <loc>{{ site_url }}/privacy-policy/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <!-- 6. Terms of Service -->
+    <url>
+        <loc>{{ site_url }}/terms-of-service/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <!-- 7. Active Published Listings -->
+    {% for item in listings %}
+    <url>
+        <loc>{{ site_url }}/listings/{{ item.id }}/</loc>
+        <lastmod>{{ item.updated_at|date:"Y-m-d" }}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    {% endfor %}
+</urlset>

@@ -1,0 +1,190 @@
+<div id="listings-container">
+    <!-- Results Header -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-200/80">
+        <div>
+            <h2 class="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                <span>ร้านเซ้งและธุรกิจทำเลทอง</span>
+            </h2>
+            <p class="mt-0.5 text-xs text-neutral-500">
+                พบ <strong class="text-brand-600 font-bold">{{ total_count }}</strong> รายการที่พร้อมส่งต่อและเริ่มดำเนินกิจการได้ทันที
+            </p>
+        </div>
+
+        <a href="/#map-section" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+            <i data-lucide="map" class="w-4 h-4 text-brand-600"></i>
+            <span>ดูบนแผนที่ร้านค้า</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+
+    <!-- 4-Column Grid (สไตล์ Findinghouse) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {% for listing in listings %}
+        <div class="group bg-white rounded-2xl border border-neutral-200/80 shadow-2xs hover:shadow-xl hover:border-brand-300 transition-all duration-300 flex flex-col overflow-hidden">
+            <!-- Property Cover Image -->
+            <div class="relative h-52 bg-neutral-100 overflow-hidden">
+                <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block w-full h-full">
+                    {% if listing.property.cover_image %}
+                    <img src="{{ listing.property.cover_image.image.url }}"
+                         alt="{{ listing.property.title }}"
+                         loading="lazy"
+                         decoding="async"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-neutral-400 bg-neutral-100">
+                        <i data-lucide="store" class="w-10 h-10 text-neutral-300"></i>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <!-- Top Left Badges: Ref code & Deal Type & VIP & Verified -->
+                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
+                    {% if listing.is_admin_verified %}
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-6 object-contain drop-shadow" title="ร้านนี้ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                    {% endif %}
+                    {% if listing.property.owner.membership_tier == 'SUPER_VIP' and listing.property.owner.is_vip_active %}
+                    <span class="rounded-lg bg-gradient-to-r from-amber-400 via-rose-400 to-brand-500 px-2 py-0.5 text-[10px] font-black text-white shadow-sm flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3 h-3 text-white"></i>
+                        <span>SUPER VIP</span>
+                    </span>
+                    {% elif listing.property.owner.is_vip_active %}
+                    <span class="rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-2 py-0.5 text-[10px] font-black text-neutral-900 shadow-sm flex items-center gap-1 pulse-badge">
+                        <i data-lucide="crown" class="w-3 h-3 text-neutral-900"></i>
+                        <span>VIP</span>
+                    </span>
+                    {% endif %}
+                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                        {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-lg bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                        {{ listing.get_type_display }}
+                    </span>
+                </div>
+
+                <!-- Favorite Heart Button (Top Right) -->
+                <button type="button"
+                        class="card-fav-btn absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md hover:bg-white text-neutral-400 hover:text-brand-600 flex items-center justify-center shadow-xs transition z-10"
+                        data-id="{{ listing.id }}" title="บันทึกร้านที่ถูกใจ">
+                    <i data-lucide="heart" class="w-4 h-4 transition-colors"></i>
+                </button>
+
+                <!-- Monthly Profit Pill (Bottom Left) -->
+                {% if listing.avg_profit_3m %}
+                <div class="absolute bottom-2.5 left-2.5 rounded-lg bg-emerald-600/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-white shadow flex items-center gap-1">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    <span>กำไร ฿{{ listing.avg_profit_3m|floatformat:0 }}/ด.</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1">
+                    <!-- Price -->
+                    <div class="text-xl sm:text-2xl font-black text-brand-600 tracking-tight font-sans">
+                        ฿{{ listing.price|floatformat:0 }}
+                    </div>
+
+                    <!-- Location with MapPin -->
+                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-400 flex-shrink-0"></i>
+                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    </p>
+
+                    <!-- Title -->
+                    <h3 class="text-sm font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 pt-1 leading-snug">
+                        <a href="{% url 'listings:listing_detail' pk=listing.pk %}">
+                            {{ listing.property.title }}
+                        </a>
+                    </h3>
+                </div>
+
+                <!-- Financial Specs Strip -->
+                <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">ค่าเช่า</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
+                        <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
+                    </div>
+                </div>
+
+                <!-- Bottom CTA: Compare + Details Link -->
+                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
+                    <button type="button"
+                            class="card-compare-btn text-[11px] font-bold text-neutral-500 hover:text-brand-600 inline-flex items-center gap-1 transition"
+                            data-id="{{ listing.id }}">
+                        <i data-lucide="columns-3" class="w-3.5 h-3.5"></i>
+                        <span class="compare-label">เปรียบเทียบ</span>
+                    </button>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                       class="text-xs font-extrabold text-neutral-900 group-hover:text-brand-600 inline-flex items-center gap-1 transition">
+                        <span>ดูรายละเอียด</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-16 px-4 text-center bg-white rounded-3xl border border-neutral-200/80 shadow-2xs">
+            <div class="w-16 h-16 rounded-3xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="store" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-black text-neutral-900 mb-1">ยังไม่มีรายการประกาศเซ้งร้านในขณะนี้</h3>
+            <p class="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto mb-6">
+                กำลังรอเจ้าของร้านลงประกาศ หรือคุณสามารถเป็นคนแรกที่ลงประกาศเซ้งร้านทำเลทองได้ทันที!
+            </p>
+            <div class="flex items-center justify-center gap-3">
+                <a href="{% url 'listings:marketplace' %}" class="rounded-xl border border-neutral-300 hover:bg-neutral-50 px-4 py-2 text-xs font-bold text-neutral-700 transition">
+                    ล้างการค้นหา
+                </a>
+                <a href="{% url 'listings:listing_create' %}" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 text-xs font-bold shadow transition">
+                    + ลงประกาศร้านของคุณฟรี
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Numbered Pagination (สไตล์ Findinghouse) -->
+    {% if page_obj.has_other_pages %}
+    <div class="mt-12 flex items-center justify-center gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+           hx-get="{% url 'listings:marketplace' %}?page={{ page_obj.previous_page_number }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+           hx-target="#listings-container"
+           class="rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition inline-flex items-center gap-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>ก่อนหน้า</span>
+        </a>
+        {% endif %}
+
+        {% for p in page_obj.paginator.page_range %}
+            {% if p == page_obj.number %}
+            <span class="rounded-xl bg-brand-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs">
+                {{ p }}
+            </span>
+            {% elif p >= page_obj.number|add:'-2' and p <= page_obj.number|add:'2' %}
+            <a href="?page={{ p }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-get="{% url 'listings:marketplace' %}?page={{ p }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="#listings-container"
+               class="rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition">
+                {{ p }}
+            </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+           hx-get="{% url 'listings:marketplace' %}?page={{ page_obj.next_page_number }}{% for key, value in current_params.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+           hx-target="#listings-container"
+           class="rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition inline-flex items-center gap-1">
+            <span>ถัดไป</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-neutral-50 text-neutral-900">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    <meta name="theme-color" content="#e11d74">
+    <meta name="description" content="{% block meta_description %}เซ้งร้านด่วน.com — แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองอันดับ 1 ของไทย พร้อมข้อมูลการเงินและกำไรเฉลี่ย 3 เดือนโปร่งใส ปักหมุดแผนที่จริง{% endblock %}">
+    <title>{% block title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}</title>
+
+    <!-- OpenGraph & Social Sharing Meta Tags (SEO / AEO) -->
+    <meta property="og:site_name" content="เซ้งร้านด่วน.com">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองอันดับ 1 ของไทย ข้อมูลการเงินโปร่งใส ตรวจสอบสัญญาสิทธิ ปักหมุดพิกัดแผนที่จริง{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ site_url }}/static/images/og-cover.png{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:locale" content="th_TH">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- AI / LLM Reference Discovery Tags (AEO / GEO Standard) -->
+    <link rel="help" type="text/plain" href="/llms.txt" title="LLM Context">
+    <link rel="author" type="text/plain" href="/llms-full.txt" title="Full LLM Knowledge Base">
+
+    <!-- Core Web Vitals: Preconnect & Font Display Swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/x-icon" href="/static/logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/logo.ico">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/logo.ico">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="เซ้งร้านด่วน.com">
+
+    <!-- Structured Data: Organization & WebSite with SearchAction (Google Rich Snippets & AI Knowledge Graph) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "{{ site_url }}/#organization",
+          "name": "เซ้งร้านด่วน.com",
+          "url": "{{ site_url }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ site_url }}/static/images/logo.png",
+            "caption": "เซ้งร้านด่วน.com"
+          },
+          "description": "แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า เซ้งกิจการ และปล่อยเช่าทำเลทองอันดับ 1 ของประเทศไทย ตรวจสอบสัญญาสิทธิและงบการเงินโปร่งใส",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+66-81-234-5678",
+            "contactType": "customer service",
+            "areaServed": "TH",
+            "availableLanguage": ["Thai", "English"]
+          },
+          "sameAs": [
+            "https://www.facebook.com/sengranduan",
+            "https://line.me/ti/p/@salebiz"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ site_url }}/#website",
+          "url": "{{ site_url }}",
+          "name": "เซ้งร้านด่วน.com",
+          "publisher": { "@id": "{{ site_url }}/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "{{ site_url }}/listings/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          },
+          "inLanguage": "th-TH"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Tailwind CSS with Custom Config -->
+    <script src="https://cdn.tailwindcss.com" nonce="{{ request.csp_nonce }}"></script>
+    <script nonce="{{ request.csp_nonce }}">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["'Plus Jakarta Sans'", "'Noto Sans Thai'", '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f4',
+                            100: '#ffe4e8',
+                            200: '#fecdd6',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d74', // Client Hot Pink
+                            700: '#be125a',
+                        },
+                        sunset: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        midnight: {
+                            950: '#060911',
+                            900: '#090D16',
+                            800: '#111827',
+                            700: '#1E293B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons & Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script defer src="https://unpkg.com/lucide@latest" nonce="{{ request.csp_nonce }}"></script>
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" nonce="{{ request.csp_nonce }}"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #fcfcfa;
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.05); }
+        }
+        .pulse-badge {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+        [data-lucide] {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased pb-16 sm:pb-0 bg-[#fcfcfa]" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <!-- Main Header Navbar (Clean White สไตล์ เซ้งร้าน.com) -->
+    <header class="sticky top-0 z-40 w-full border-b border-neutral-200/80 bg-white shadow-xs">
+        <div class="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-3 sm:px-6">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center gap-2">
+                <img src="/static/images/logo.png" alt="เซ้งร้านด่วน" width="144" height="36" class="h-8 sm:h-9 w-auto rounded-lg object-contain border border-pink-200/50 shadow-xs">
+                <span class="text-base sm:text-xl font-black tracking-tight text-brand-600">เซ้งร้านด่วน.com</span>
+            </a>
+
+            <!-- Desktop Nav Menu -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-neutral-700">
+                <a href="/" class="text-brand-600 font-bold transition hover:text-brand-700">หน้าแรก</a>
+                <a href="{% url 'core:about' %}" class="hover:text-brand-600 transition">เกี่ยวกับเรา</a>
+                <a href="{% url 'core:contact' %}" class="hover:text-brand-600 transition">ติดต่อเรา</a>
+
+                {% if user.is_authenticated and user.role in 'admin,staff' %}
+                <a href="{% url 'accounts:admin_dashboard' %}" class="inline-flex items-center gap-1.5 font-bold text-white transition px-3 py-1 bg-neutral-900 hover:bg-brand-600 rounded-xl border border-neutral-700 shadow-xs text-xs">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-400"></i>
+                    <span>Admin Dashboard</span>
+                </a>
+                {% elif user.is_authenticated and user.role == 'agent' %}
+                <a href="{% url 'contracts:deal_pipeline' %}" class="inline-flex items-center gap-1 font-bold text-brand-600 hover:text-brand-700 transition px-2 py-0.5 bg-brand-50 rounded-lg border border-brand-200 text-xs">
+                    <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-brand-600"></i>
+                    <span>ดีล CRM</span>
+                </a>
+                {% endif %}
+            </nav>
+
+            <!-- Right Action CTAs (สไตล์ เซ้งร้าน.com: Green Button + Mobile Menu) -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                {% if user.is_authenticated %}
+                    <div class="hidden sm:flex items-center gap-2 text-xs">
+                        {% if user.is_vip_active %}
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-[10px] font-black border border-amber-300 shadow-2xs">
+                                <i data-lucide="crown" class="w-3 h-3 text-amber-600"></i>
+                                <span>VIP</span>
+                            </span>
+                        {% endif %}
+                        <a href="{% url 'properties:property_list' %}" class="inline-flex items-center gap-1 font-semibold text-neutral-600 hover:text-brand-600 transition">
+                            <i data-lucide="store" class="w-3.5 h-3.5"></i>
+                            <span>ร้านของฉัน</span>
+                        </a>
+                        <span class="text-neutral-300">|</span>
+                        <a href="{% url 'accounts:logout' %}" class="text-neutral-500 hover:text-red-600">ออก</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="hidden sm:inline-flex text-xs sm:text-sm font-semibold text-neutral-700 hover:text-brand-600 transition px-2 py-1">
+                        เข้าสู่ระบบ
+                    </a>
+                {% endif %}
+
+                <!-- Signature Green Button: + ลงประกาศ ฟรี! -->
+                <a href="{% url 'listings:listing_create' %}"
+                   class="inline-flex items-center gap-1.5 rounded-full bg-[#00C274] hover:bg-[#00ad68] px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:shadow transition-all">
+                    <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
+                    <span>ลงประกาศ</span>
+                    <span class="rounded bg-yellow-400 px-1 py-0.2 text-[10px] font-black text-neutral-900 shadow-xs leading-none">ฟรี!</span>
+                </a>
+
+                <!-- Mobile Hamburger Icon -->
+                <a href="{% url 'listings:marketplace' %}" class="lg:hidden p-1.5 rounded-lg text-neutral-700 hover:bg-neutral-100 transition">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Sub-Bar (สไตล์ เซ้งร้าน.com: Facebook Ads, Notification, VIP Pill) -->
+    <div class="bg-white border-b border-neutral-200/70 py-2 px-3 sm:px-6 shadow-2xs">
+        <div class="mx-auto max-w-7xl flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-2 flex-nowrap">
+                <!-- Home Icon Tab -->
+                <a href="/" class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-xl border border-neutral-200 text-brand-600 hover:bg-brand-50 transition shadow-2xs">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                </a>
+
+                <!-- VIP Upgrade Pill -->
+                <a href="{% url 'accounts:vip_membership' %}"
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-xs transition">
+                    <i data-lucide="crown" class="w-3.5 h-3.5"></i>
+                    <span>👑 สิทธิพิเศษ VIP (1,000 บ.)</span>
+                </a>
+
+                <!-- Saved Favorites Pill -->
+                <a href="{% url 'listings:listing_favorites' %}"
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 hover:bg-pink-100 text-brand-700 border border-pink-200 text-xs font-bold shadow-xs transition">
+                    <i data-lucide="heart" class="w-3.5 h-3.5 fill-brand-600 text-brand-600"></i>
+                    <span>ร้านที่ถูกใจ</span>
+                </a>
+
+                <!-- Buy Facebook Ads Pill -->
+                <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs transition">
+                    <i data-lucide="megaphone" class="w-3.5 h-3.5"></i>
+                    <span>ซื้อโฆษณา Facebook</span>
+                </a>
+
+                <!-- New Listing Alert Pill -->
+                <a href="{% url 'listings:marketplace' %}"
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FF6B00] hover:bg-[#e66000] text-white text-xs font-bold shadow-xs transition">
+                    <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                    <span>เตือนร้านใหม่</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6">
+        {% for message in messages %}
+        <div class="rounded-xl p-4 mb-3 text-sm font-medium shadow-sm {% if message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border border-amber-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar (PWA Native App Feel) -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-white/95 backdrop-blur-md flex items-center justify-around py-2.5 text-[10px] font-medium text-neutral-600 shadow-lg">
+        <a href="/" class="flex flex-col items-center gap-1 hover:text-brand-600">
+            <i data-lucide="home" class="w-5 h-5 text-neutral-700"></i>
+            <span>หน้าแรก</span>
+        </a>
+        <a href="{% url 'listings:marketplace' %}" class="flex flex-col items-center gap-1 hover:text-brand-600">
+            <i data-lucide="search" class="w-5 h-5 text-neutral-700"></i>
+            <span>ค้นหา</span>
+        </a>
+        <a href="{% if user.is_authenticated %}{% url 'properties:property_create' %}{% else %}{% url 'accounts:register' %}{% endif %}"
+           class="flex flex-col items-center gap-1 text-emerald-600 font-bold -mt-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
+                <i data-lucide="plus" class="w-5 h-5 stroke-[3]"></i>
+            </span>
+            <span class="text-emerald-700">ลงประกาศ</span>
+        </a>
+        {% if user.is_authenticated and user.role in 'admin,staff,agent' %}
+        <a href="{% url 'contracts:deal_pipeline' %}" class="flex flex-col items-center gap-1 text-brand-600 font-semibold">
+            <i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-600"></i>
+            <span>ดีล CRM</span>
+        </a>
+        {% elif user.is_authenticated %}
+        <a href="{% url 'properties:property_list' %}" class="flex flex-col items-center gap-1 hover:text-brand-600">
+            <i data-lucide="store" class="w-5 h-5 text-neutral-700"></i>
+            <span>ร้านฉัน</span>
+        </a>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="flex flex-col items-center gap-1 hover:text-brand-600">
+            <i data-lucide="user" class="w-5 h-5 text-neutral-700"></i>
+            <span>เข้าสู่ระบบ</span>
+        </a>
+        {% endif %}
+    </nav>
+
+    <!-- Footer (สไตล์ เซ้งร้าน.com) -->
+    <footer class="mt-auto border-t bg-neutral-900 text-neutral-300">
+        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Col 1: About & Logo -->
+                <div class="space-y-4">
+                    <a href="/" class="flex items-center gap-2.5">
+                        <img src="/static/images/logo.png" alt="เซ้งร้านด่วน" class="h-10 w-auto rounded-xl object-contain border border-pink-200/40">
+                        <span class="text-xl font-black text-brand-400">เซ้งร้านด่วน.com</span>
+                    </a>
+                    <p class="text-xs leading-relaxed text-neutral-400">
+                        แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า ธุรกิจ และให้เช่าพื้นที่ทำเลทองทั่วประเทศไทย พร้อมเปิดเผยตัวเลขทางการเงินและกำไรเฉลี่ย 3 เดือนอย่างโปร่งใส มีระบบนายหน้าและสัญญาความปลอดภัยครบวงจร
+                    </p>
+                </div>
+
+                <!-- Col 2: Categories -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">หมวดหมู่ยอดนิยม</h3>
+                    <ul class="space-y-2 text-xs text-neutral-400">
+                        <li><a href="{% url 'listings:marketplace' %}?category=restaurant_shabu" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="utensils" class="w-3.5 h-3.5 text-sunset-400"></i>หมูกระทะ/ชาบู/ร้านอาหาร</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?category=cafe_beverage" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="coffee" class="w-3.5 h-3.5 text-amber-400"></i>คาเฟ่/กาแฟ/ร้านน้ำปั่น</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?category=massage_spa" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-rose-400"></i>นวด/สปา</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?category=bar_pub_karaoke" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="wine" class="w-3.5 h-3.5 text-purple-400"></i>ผับ/บาร์/คาราโอเกะ</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?category=beauty_salon_nails" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="scissors" class="w-3.5 h-3.5 text-pink-400"></i>ตัดผม/เสริมสวย/ทำเล็บ</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?category=rental_booth_space" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="store" class="w-3.5 h-3.5 text-emerald-400"></i>ล็อค/พื้นที่ให้เช่า</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Popular Locations -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">ทำเลทองยอดฮิต</h3>
+                    <ul class="space-y-2 text-xs text-neutral-400">
+                        <li><a href="{% url 'listings:marketplace' %}?province=ชลบุรี" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>เซ้งร้าน พัทยา - ชลบุรี</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?province=กรุงเทพมหานคร" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>เซ้งร้าน กรุงเทพมหานคร (สุขุมวิท / เอกมัย)</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?province=เชียงใหม่" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>เซ้งร้าน นิมมานฯ - เชียงใหม่</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?q=ทองหล่อ" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>เซ้งร้าน ทองหล่อ - พร้อมพงษ์</a></li>
+                        <li><a href="{% url 'listings:marketplace' %}?q=ม.เกษตร" class="hover:text-brand-400 transition flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>เซ้งร้าน โซนมหาวิทยาลัย</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Contact & Social -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">ติดต่อเรา</h3>
+                    <p class="text-xs text-neutral-400">ติดต่อฝากเซ้งร้าน โฆษณา หรือบริการนายหน้ามืออาชีพ</p>
+                    <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
+                       class="inline-flex items-center gap-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] px-4 py-2.5 text-xs font-bold text-white transition shadow">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span>Add LINE: @salebiz</span>
+                    </a>
+                    <div class="text-[11px] text-neutral-400 pt-2 space-y-1.5">
+                        <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-400"></i><span>Hotline: 081-234-5678</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i><span>เวลาทำการ: 09:00 - 20:00 น. (ทุกวัน)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 border-t border-neutral-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
+                <div>
+                    © 2026 เซ้งร้าน.com — แพลตฟอร์มเซ้งร้านและธุรกิจอันดับ 1 ของไทย สงวนลิขสิทธิ์
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'core:about' %}" class="hover:underline">เกี่ยวกับเรา</a>
+                    <span>•</span>
+                    <a href="{% url 'core:contact' %}" class="hover:underline">ติดต่อเรา</a>
+                    <span>•</span>
+                    <a href="{% url 'core:privacy_policy' %}" class="hover:underline">นโยบายความเป็นส่วนตัว</a>
+                    <span>•</span>
+                    <a href="{% url 'core:terms_of_service' %}" class="hover:underline">ข้อกำหนดการใช้งาน</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Bottom Comparison Bar -->
+    <div id="floating-compare-bar" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4 transition-all duration-300">
+        <div class="rounded-2xl bg-neutral-900/95 backdrop-blur-md text-white p-3.5 shadow-2xl border border-neutral-700 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-brand-600 text-white flex items-center justify-center font-black text-xs flex-shrink-0">
+                    <i data-lucide="columns-3" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                        <span>เปรียบเทียบร้านเซ้ง</span>
+                        <span id="compare-bar-count" class="rounded bg-brand-500/80 px-1.5 py-0.2 text-[10px] font-black">0/4</span>
+                    </div>
+                    <div class="text-[10px] text-neutral-400">เลือกได้สูงสุด 4 ทรัพย์เพื่อเทียบข้อมูล</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a id="compare-bar-cta" href="/listings/compare/"
+                   class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+                    <span>ดูตารางเปรียบเทียบ</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
+                <button type="button" id="compare-bar-clear" class="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition" title="ล้างรายการ">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lucide, Service Worker, Compare & Favorites System -->
+    <script nonce="{{ request.csp_nonce }}">
+        function refreshLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Compare & Favorites Manager
+        function initCompareAndFavorites() {
+            var compareBar = document.getElementById('floating-compare-bar');
+            var compareCount = document.getElementById('compare-bar-count');
+            var compareCta = document.getElementById('compare-bar-cta');
+            var compareClear = document.getElementById('compare-bar-clear');
+
+            function getCompareList() {
+                try { return JSON.parse(localStorage.getItem('sengran_compare_ids') || '[]'); }
+                catch (e) { return []; }
+            }
+
+            function setCompareList(list) {
+                localStorage.setItem('sengran_compare_ids', JSON.stringify(list));
+                updateUI();
+            }
+
+            function getFavList() {
+                try { return JSON.parse(localStorage.getItem('sengran_fav_ids') || '[]'); }
+                catch (e) { return []; }
+            }
+
+            function setFavList(list) {
+                localStorage.setItem('sengran_fav_ids', JSON.stringify(list));
+                updateUI();
+            }
+
+            function updateUI() {
+                var compList = getCompareList();
+                var favList = getFavList();
+
+                // Update compare bar
+                if (compareBar && compareCount && compareCta) {
+                    if (compList.length > 0) {
+                        compareBar.classList.remove('hidden');
+                        compareCount.innerText = compList.length + '/4';
+                        compareCta.href = '/listings/compare/?ids=' + compList.join(',');
+                    } else {
+                        compareBar.classList.add('hidden');
+                    }
+                }
+
+                // Update card compare buttons
+                document.querySelectorAll('.card-compare-btn').forEach(function(btn) {
+                    var id = parseInt(btn.getAttribute('data-id'), 10);
+                    var label = btn.querySelector('.compare-label');
+                    if (compList.indexOf(id) !== -1) {
+                        btn.classList.add('text-brand-600', 'font-black');
+                        btn.classList.remove('text-neutral-500');
+                        if (label) label.innerText = 'เปรียบเทียบแล้ว (✓)';
+                    } else {
+                        btn.classList.remove('text-brand-600', 'font-black');
+                        btn.classList.add('text-neutral-500');
+                        if (label) label.innerText = 'เปรียบเทียบ';
+                    }
+                });
+
+                // Update card fav buttons
+                document.querySelectorAll('.card-fav-btn').forEach(function(btn) {
+                    var id = parseInt(btn.getAttribute('data-id'), 10);
+                    var icon = btn.querySelector('i');
+                    if (favList.indexOf(id) !== -1) {
+                        btn.classList.add('text-brand-600');
+                        btn.classList.remove('text-neutral-400');
+                        if (icon) {
+                            icon.classList.add('fill-brand-600', 'text-brand-600');
+                        }
+                    } else {
+                        btn.classList.remove('text-brand-600');
+                        btn.classList.add('text-neutral-400');
+                        if (icon) {
+                            icon.classList.remove('fill-brand-600', 'text-brand-600');
+                        }
+                    }
+                });
+
+                refreshLucideIcons();
+            }
+
+            // Click delegator for Compare
+            document.body.addEventListener('click', function(e) {
+                var compBtn = e.target.closest('.card-compare-btn');
+                if (compBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var id = parseInt(compBtn.getAttribute('data-id'), 10);
+                    var compList = getCompareList();
+                    var idx = compList.indexOf(id);
+                    if (idx !== -1) {
+                        compList.splice(idx, 1);
+                    } else {
+                        if (compList.length >= 4) {
+                            alert('สามารถเลือกเปรียบเทียบได้สูงสุด 4 รายการ');
+                            return;
+                        }
+                        compList.push(id);
+                    }
+                    setCompareList(compList);
+                    return;
+                }
+
+                var favBtn = e.target.closest('.card-fav-btn');
+                if (favBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var fid = parseInt(favBtn.getAttribute('data-id'), 10);
+                    var favList = getFavList();
+                    var fidx = favList.indexOf(fid);
+                    if (fidx !== -1) {
+                        favList.splice(fidx, 1);
+                    } else {
+                        favList.push(fid);
+                    }
+                    setFavList(favList);
+                    return;
+                }
+            });
+
+            if (compareClear) {
+                compareClear.addEventListener('click', function() {
+                    setCompareList([]);
+                });
+            }
+
+            updateUI();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshLucideIcons();
+            initCompareAndFavorites();
+        });
+        document.body.addEventListener('htmx:afterSwap', function() {
+            refreshLucideIcons();
+            initCompareAndFavorites();
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('PWA ServiceWorker registered:', reg.scope))
+                    .catch(err => console.log('ServiceWorker error:', err));
+            });
+        }
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

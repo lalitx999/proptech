@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}จัดการสลิปและสิทธิ์สมาชิก VIP — เซ้งร้านด่วน.com{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfa] py-8 sm:py-10 px-3 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl space-y-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
+            <div>
+                <div class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>ระบบตรวจสอบสิทธิ์เจ้าหน้าที่ (Staff & Admin)</span>
+                </div>
+                <h1 class="mt-2 text-2xl font-black text-neutral-900">
+                    รายการแจ้งโอนค่าสมาชิก VIP (1,000 บาท)
+                </h1>
+                <p class="text-xs text-neutral-500 mt-1">
+                    ตรวจสอบความถูกต้องของสลิป ยอดเงิน 1,000 บาท และอนุมัติสิทธิ์ VIP 30 วัน
+                </p>
+            </div>
+            
+            <a href="{% url 'accounts:vip_membership' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                <span>ดูหน้า VIP ฝั่งลูกค้า</span>
+            </a>
+        </div>
+
+        <!-- Pending Section -->
+        <div class="space-y-4">
+            <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span>รายการรอตรวจสอบ ({{ pending_transactions|length }} รายการ)</span>
+            </h2>
+
+            {% if pending_transactions %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for tx in pending_transactions %}
+                <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="rounded-lg bg-neutral-900 text-white font-mono text-xs font-bold px-2 py-0.5">
+                                {{ tx.ref_number }}
+                            </span>
+                            <span class="text-[11px] text-neutral-400">
+                                {{ tx.created_at|date:"d/m/Y H:i" }}
+                            </span>
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="rounded-xl bg-neutral-50 p-3 text-xs space-y-1">
+                            <div class="font-bold text-neutral-800">
+                                ผู้ใช้งาน: <span class="text-brand-600">{{ tx.user.username }}</span>
+                            </div>
+                            <div class="text-neutral-500">
+                                อีเมล: {{ tx.user.email|default:"-" }} | โทร: {{ tx.user.phone|default:"-" }}
+                            </div>
+                            <div class="text-neutral-500">
+                                ยอดชำระ: <strong class="text-brand-600 text-sm">฿{{ tx.amount|floatformat:2 }}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Slip Thumbnail -->
+                        {% if tx.slip_image %}
+                        <div class="rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 max-h-64 flex items-center justify-center">
+                            <a href="{{ tx.slip_image.url }}" target="_blank" title="คลิกดูสลิปขนาดเต็ม">
+                                <img src="{{ tx.slip_image.url }}" alt="Slip" class="w-full h-auto object-contain hover:scale-105 transition-transform duration-200">
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <div class="text-[10px] font-mono text-neutral-400 truncate" title="{{ tx.slip_hash }}">
+                            SHA-256: {{ tx.slip_hash|truncatechars:28 }}
+                        </div>
+                    </div>
+
+                    <!-- Action Forms -->
+                    <div class="pt-3 border-t border-neutral-100 flex items-center gap-2">
+                        <form method="post" action="{% url 'accounts:vip_approve' pk=tx.pk %}" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                <span>อนุมัติ VIP (30 วัน)</span>
+                            </button>
+                        </form>
+
+                        <form method="post" action="{% url 'accounts:vip_approve' pk=tx.pk %}" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reject">
+                            <input type="hidden" name="reason" value="สลิปไม่ถูกต้อง หรือยอดเงินไม่ตรง">
+                            <button type="submit" class="w-full rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2 text-xs font-bold transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                                <span>ปฏิเสธ</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-xs text-neutral-400">
+                <i data-lucide="check-circle" class="w-8 h-8 mx-auto text-emerald-500 mb-2"></i>
+                <div class="font-bold text-neutral-700">ไม่มีรายการรอตรวจสอบในขณะนี้</div>
+                <div>รายการใหม่จะปรากฏที่นี่ทันทีที่ผู้ใช้แนบสลิป</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Past Transactions Log -->
+        {% if past_transactions %}
+        <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+            <h3 class="text-base font-black text-neutral-900">
+                ประวัติรายการที่ดำเนินการแล้ว (ล่าสุด 30 รายการ)
+            </h3>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-neutral-600">
+                    <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                        <tr>
+                            <th class="py-3 px-4">รหัสอ้างอิง</th>
+                            <th class="py-3 px-4">ผู้ใช้งาน</th>
+                            <th class="py-3 px-4">วันที่แจ้ง</th>
+                            <th class="py-3 px-4">ยอดเงิน</th>
+                            <th class="py-3 px-4">สถานะ</th>
+                            <th class="py-3 px-4">ผู้ตรวจสอบ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100">
+                        {% for tx in past_transactions %}
+                        <tr>
+                            <td class="py-3 px-4 font-mono font-bold text-neutral-900">{{ tx.ref_number }}</td>
+                            <td class="py-3 px-4 font-semibold text-neutral-800">{{ tx.user.username }}</td>
+                            <td class="py-3 px-4">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="py-3 px-4 font-bold text-neutral-900">฿{{ tx.amount|floatformat:2 }}</td>
+                            <td class="py-3 px-4">
+                                {% if tx.status == 'MANUAL_APPROVED' or tx.status == 'AUTO_VERIFIED' %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-bold">
+                                        อนุมัติเรียบร้อย
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 text-red-700 px-2 py-0.5 text-[11px] font-bold" title="{{ tx.rejection_reason }}">
+                                        ปฏิเสธ: {{ tx.rejection_reason|truncatechars:20 }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-neutral-500">{{ tx.reviewed_by.username|default:"ระบบอัตโนมัติ" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script nonce="{{ request.csp_nonce }}">
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

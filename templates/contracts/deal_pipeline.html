@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Deal Pipeline & Broker CRM — เซ้งร้านด่วน{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <!-- Page Header & Action Bar -->
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+                ระบบติดตามดีล & CRM นายหน้า
+            </h1>
+            <p class="mt-1 text-sm text-neutral-500">
+                จัดการสถานะการเจรจาเซ้งร้าน ติดตามขั้นตอนสัญญา และสรุปรายได้ค่าคอมมิชชั่นแบบ Real-time
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm hover:bg-neutral-50">
+                <i data-lucide="search" class="w-4 h-4 text-neutral-500"></i>
+                <span>ตลาดร้านเซ้ง</span>
+            </a>
+            <a href="{% url 'listings:listing_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>เพิ่มประกาศใหม่</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Pipeline KPI Metric Cards -->
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Active Deals -->
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-neutral-500">ดีลที่กำลังดำเนินการ</span>
+                <span class="rounded-full bg-blue-50 p-2 text-blue-600">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold tracking-tight text-neutral-900">{{ active_deals_count }}</span>
+                <span class="text-xs text-neutral-400">จากทั้งหมด {{ total_deals }} ดีล</span>
+            </div>
+        </div>
+
+        <!-- Pipeline Value -->
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-neutral-500">มูลค่าไปป์ไลน์รวม</span>
+                <span class="rounded-full bg-amber-50 p-2 text-amber-600">
+                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold tracking-tight text-neutral-900">฿{{ pipeline_value|intcomma }}</span>
+            </div>
+        </div>
+
+        <!-- Closed Won -->
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-neutral-500">ปิดดีลสำเร็จ (Won)</span>
+                <span class="rounded-full bg-emerald-50 p-2 text-emerald-600">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold tracking-tight text-emerald-600">{{ won_deals }}</span>
+                <span class="text-xs text-neutral-400">เคสที่ปิดแล้ว</span>
+            </div>
+        </div>
+
+        <!-- Commission Earned -->
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-neutral-500">
+                    {% if user.role == 'agent' %}ค่าคอมมิชชั่นสุทธิ (Agent){% else %}ค่าคอมมิชชั่นรวม (Gross){% endif %}
+                </span>
+                <span class="rounded-full bg-brand-50 p-2 text-brand-600">
+                    <i data-lucide="banknote" class="w-5 h-5"></i>
+                </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold tracking-tight text-brand-600">฿{{ total_commission|intcomma }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban Board Grid -->
+    <div class="relative">
+        <div class="flex gap-4 overflow-x-auto pb-8 pt-2 snap-x">
+            {% for col in pipeline_columns %}
+            <div class="min-w-[300px] w-[300px] flex-shrink-0 snap-start flex flex-col rounded-xl bg-neutral-100/80 border border-neutral-200/80 p-3 max-h-[calc(100vh-280px)]">
+                <!-- Column Header -->
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-neutral-800">{{ col.label }}</span>
+                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full {{ col.badge }}">
+                            {{ col.count }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Cards Container -->
+                <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+                    {% for deal in col.deals %}
+                        {% include 'contracts/partials/deal_card.html' with deal=deal %}
+                    {% empty %}
+                        <div class="flex flex-col items-center justify-center py-8 text-center text-xs text-neutral-400 border-2 border-dashed border-neutral-200 rounded-lg">
+                            <span>ยังไม่มีดีลในขั้นตอนนี้</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

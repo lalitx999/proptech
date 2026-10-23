@@ -1,0 +1,705 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}แพ็กเกจการลงประกาศเซ้งร้าน & สมาชิก VIP / Super VIP — เซ้งร้านด่วน.com{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfa] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-5xl space-y-8">
+
+        <!-- VIP Premium Hero Banner -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-pink-950 p-6 sm:p-10 text-white shadow-xl border border-pink-900/30">
+            <div class="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-brand-500/20 blur-3xl"></div>
+            <div class="absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="space-y-3">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-300">
+                        <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
+                        <span>แพ็กเกจลงประกาศพรีเมียม VIP & SUPER VIP</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white">
+                        เซ้งร้านไวขึ้น 5-10 เท่า กับสิทธิ์ <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-pink-400 to-pink-200">👑 VIP & SUPER VIP</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-neutral-300 max-w-xl leading-relaxed">
+                        เลือกแพ็กเกจที่ตอบโจทย์คุณ: โพสต์ฟรี 1 ครั้ง/เดือน, VIP โพสต์ 4 ครั้ง/เดือน + กลุ่มไม่จำกัด, หรือ Super VIP โพสต์ไม่จำกัดจนกว่าจะเซ้งได้ พร้อมแอดมินดันคลิป TikTok, เพจ และ YouTube!
+                    </p>
+                </div>
+
+                <!-- Status Card in Hero -->
+                <div class="flex-shrink-0 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5 text-center min-w-[220px]">
+                    <div class="text-xs font-semibold text-neutral-300">สถานะปัจจุบันของคุณ</div>
+                    <div class="mt-1 flex items-center justify-center gap-1.5 text-lg font-black {% if user.is_super_vip_active %}text-amber-300{% elif user.is_vip_active %}text-amber-400{% else %}text-white{% endif %}">
+                        {% if user.is_super_vip_active %}
+                            <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
+                            <span>สมาชิก Super VIP 👑</span>
+                        {% elif user.is_vip_active %}
+                            <i data-lucide="crown" class="w-5 h-5 text-amber-400"></i>
+                            <span>สมาชิก VIP 👑</span>
+                        {% else %}
+                            <i data-lucide="user" class="w-5 h-5 text-neutral-400"></i>
+                            <span>สมาชิกทั่วไป (Free)</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-2 text-xs text-neutral-300">
+                        โควตาเดือนนี้: 
+                        <span class="font-bold text-white">
+                            {% if user.is_super_vip_active %}
+                                ไม่จำกัด (Unlimited)
+                            {% else %}
+                                {{ posted_count }}/{{ monthly_quota }} ประกาศ
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if user.is_super_vip_active %}
+                    <div class="mt-1 text-[11px] text-amber-300 font-bold">
+                        สถานะ: ตลอดชีพจนกว่าจะเซ้งได้
+                    </div>
+                    {% elif user.is_vip_active and user.vip_expires_at %}
+                    <div class="mt-1 text-[11px] text-amber-300/80">
+                        หมดอายุ: {{ user.vip_expires_at|date:"d M Y" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Header -->
+        <div class="text-center space-y-2">
+            <h2 class="text-xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+                เลือกแพ็กเกจการลงประกาศที่เหมาะกับคุณ
+            </h2>
+            <p class="text-xs sm:text-sm text-neutral-500 max-w-2xl mx-auto">
+                เพิ่มโอกาสปิดดีลเซ้งร้านรวดเร็ว ผู้ซื้อติดต่อตรง ไม่มีบวกค่านายหน้าแอบแฝง
+            </p>
+        </div>
+
+        <!-- 3-Tier Packages Matrix -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+            
+            <!-- Tier 1: โพสต์ฟรี (Free) -->
+            <div class="rounded-3xl border border-neutral-200 bg-white p-6 sm:p-7 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-neutral-400 tracking-wider">เริ่มต้นฟรี</span>
+                            <h3 class="text-xl font-black text-neutral-900">โพสต์ฟรี</h3>
+                        </div>
+                        <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-600">฿0</span>
+                    </div>
+                    
+                    <div class="mt-4 mb-5 border-t border-neutral-100"></div>
+
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-600">
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ <strong>1 ครั้งต่อเดือน</strong> ที่เว็บไซต์</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+                            <span>แสดงในผลการค้นหาหน้า Marketplace ทั่วไป</span>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-neutral-400">
+                            <i data-lucide="x" class="w-4 h-4 text-neutral-300 shrink-0 mt-0.5"></i>
+                            <span>ไม่มีป้าย VIP ดันประกาศ</span>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-neutral-400">
+                            <i data-lucide="x" class="w-4 h-4 text-neutral-300 shrink-0 mt-0.5"></i>
+                            <span>ไม่รวมการโพสต์ในกลุ่ม Facebook</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-neutral-100">
+                    <a href="{% url 'listings:listing_create' %}"
+                       class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl border-2 border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white py-3 text-xs font-black transition">
+                        <span>เริ่มลงประกาศฟรี [คลิก]</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tier 2: โพสต์ VIP (1,000 บ.) -->
+            <div class="relative rounded-3xl border-2 border-brand-500 bg-gradient-to-b from-brand-50/40 via-white to-white p-6 sm:p-7 shadow-md flex flex-col justify-between hover:shadow-xl transition">
+                <div class="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-brand-600 to-pink-500 px-3 py-0.5 text-[11px] font-black text-white shadow-xs">
+                    ยอดนิยม 🔥
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-brand-600 tracking-wider">แพ็กเกจยอดฮิต</span>
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="crown" class="w-5 h-5 text-amber-500"></i>
+                                <h3 class="text-xl font-black text-neutral-900">โพสต์ VIP</h3>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-brand-600 font-mono">฿1,000</div>
+                            <div class="text-[10px] text-neutral-400 font-semibold">ต่อเดือน (30 วัน)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 mb-5 border-t border-brand-100"></div>
+
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-700">
+                        <li class="flex items-start gap-2.5 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ <strong>4 ครั้งต่อเดือน</strong> ที่เว็บไซต์</span>
+                        </li>
+                        <li class="flex items-start gap-2.5 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ที่กลุ่ม <strong>"เซ้งร้านด่วน" ได้ไม่จำกัด</strong> ใน 1 เดือน</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ติดป้าย <strong>👑 VIP</strong> สีทองเด่นชัดสะดุดตา</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>ดันประกาศขึ้น <strong>อันดับต้นๆ ในการค้นหา</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
+                            <span>แสดงในกล่องร้านแนะนำประจำวัน</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-brand-100">
+                    <button type="button" id="btn-select-vip"
+                            class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3 text-xs font-black shadow-md hover:shadow-lg transition">
+                        <span>เลือกแพ็กเกจ VIP ฿1,000 [คลิก]</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tier 3: โพสต์ Super VIP (5,000 บ.) -->
+            <div class="relative rounded-3xl border-2 border-amber-400 bg-gradient-to-b from-amber-50/50 via-white to-amber-50/20 p-6 sm:p-7 shadow-lg flex flex-col justify-between hover:shadow-xl transition ring-2 ring-amber-400/30">
+                <div class="absolute -top-3.5 right-6 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-3.5 py-0.5 text-[11px] font-black text-white shadow-md flex items-center gap-1">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>คุ้มค่าสูงสุด ครบวงจร 👑</span>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-amber-600 tracking-wider">ดูแลจนกว่าจะเซ้งได้</span>
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+                                <h3 class="text-xl font-black text-neutral-900">โพสต์ Super VIP</h3>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-amber-600 font-mono">฿5,000</div>
+                            <div class="text-[10px] text-neutral-500 font-semibold">ครั้งเดียวจนเซ้งได้!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 mb-5 border-t border-amber-200"></div>
+
+                    <ul class="space-y-3 text-xs sm:text-sm text-neutral-800">
+                        <li class="flex items-start gap-2.5 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ <strong>ไม่จำกัดจำนวน ไม่จำกัดระยะเวลา จนกว่าจะเซ้งได้</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2.5 font-bold text-neutral-900">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>โพสต์ได้ทั้ง <strong>ที่เว็บไซต์ และที่กลุ่มเซ้งร้านด่วน</strong> ไม่จำกัด</span>
+                        </li>
+                        <li class="flex items-start gap-2.5 font-black text-amber-700 bg-amber-100/70 p-2.5 rounded-xl border border-amber-200">
+                            <i data-lucide="gift" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                            <span>แถมฟรี! แอดมินช่วยโพสต์โปรโมทที่ <strong>TikTok, เพจ Facebook, และ YouTube</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ติดป้ายพิเศษ <strong>Super VIP</strong> สีทองพรีเมียม</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <span>ทีมงานช่วยดันประกาศทุกสัปดาห์</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-amber-200">
+                    <button type="button" id="btn-select-super-vip"
+                            class="inline-flex items-center justify-center gap-1.5 w-full rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white py-3 text-xs font-black shadow-md hover:shadow-lg transition">
+                        <span>เลือกแพ็กเกจ Super VIP ฿5,000 [คลิก]</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Callout 1: บริการนายหน้าดูแลครบวงจร (Brokerage Agent) -->
+        <div class="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-50/80 via-white to-indigo-50/60 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <i data-lucide="handshake" class="w-6 h-6"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base sm:text-lg font-black text-neutral-900">
+                        หากต้องการให้แอดมินช่วยเป็นนายหน้า ดูแลแบบมืออาชีพ
+                    </h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed max-w-2xl">
+                        ทีมงานนายหน้ามืออาชีพช่วยลงพื้นที่ตรวจร้านจริง, ถ่ายทำสื่อโปรโมท, คัดกรองผู้สนใจเซ้งที่มีงบจริง, เจรจาต่อรองราคา และร่างสัญญาจะซื้อจะขายให้ถูกต้องตามกฎหมายจนปิดดีลสำเร็จ
+                    </p>
+                </div>
+            </div>
+            <div class="shrink-0">
+                <a href="{% url 'core:contact' %}?topic=agent_broker"
+                   class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 text-xs font-black transition shadow-xs">
+                    <i data-lucide="phone-call" class="w-4 h-4"></i>
+                    <span>ติดต่อแอดมินให้ช่วยเป็นนายหน้า [คลิก]</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Callout 2: หมายเหตุ ป้าย เวอร์ริไฟร์ (Admin Verified Badge) -->
+        <div class="rounded-3xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-white to-emerald-50/50 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <!-- Admin Verified Badge Image Preview -->
+                <div class="w-28 sm:w-36 shrink-0 filter drop-shadow-sm">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified Badge ตราแอดมิน เวอร์ริไฟร์" class="w-full object-contain">
+                </div>
+                <div class="space-y-1">
+                    <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-0.5 text-[11px] font-black text-emerald-800">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span>เครื่องหมายการันตีความน่าเชื่อถือ</span>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-black text-neutral-900">
+                        หมายเหตุ: ทุกร้านมีสิทธิ์รับป้าย "เวอร์ริไฟร์ (Admin Verified)"
+                    </h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed max-w-xl">
+                        เป็นเครื่องการันตีว่าร้านนี้ได้รับการตรวจสอบจากแอดมินแล้ว ทั้งสัญญาเช่าเดิม, มีหน้าร้านจริง, เจ้าของมีตัวตนถูกต้อง ช่วยเพิ่มความมั่นใจให้ผู้ซื้อตัดสินใจเซ้งเร็วขึ้นเป็นเท่าตัว!
+                    </p>
+                </div>
+            </div>
+            <div class="shrink-0">
+                <a href="{% url 'core:contact' %}?topic=request_verified_badge"
+                   class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 text-xs font-black transition shadow-xs">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                    <span>ขอรับการตรวจสอบป้ายเวอร์ริไฟร์ [คลิก]</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Payment Gateway Section (Interactive VIP / Super VIP Switcher) -->
+        <div id="payment-section" class="rounded-3xl border border-neutral-200 bg-white p-6 sm:p-10 shadow-sm space-y-8 scroll-mt-10">
+            
+            <div class="border-b border-neutral-100 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
+                        <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                        <span>ช่องทางชำระเงินทางการ (EasySlip ตรวจสลิป 24 ชม.)</span>
+                    </div>
+                    <h2 class="mt-2 text-xl sm:text-2xl font-black text-neutral-900">
+                        ชำระเงินค่าแพ็กเกจสมาชิก <span id="payment-tier-title" class="text-brand-600">VIP (1,000.00 บาท)</span>
+                    </h2>
+                    <p class="text-xs text-neutral-500 mt-1">
+                        สแกน QR PromptPay ล็อกยอดตามแพ็กเกจ หรือโอนเงินผ่านบัญชีกสิกรไทย แล้วแนบสลิปเพื่อเปิดสิทธิ์อัตโนมัติ
+                    </p>
+                </div>
+
+                <!-- Plan Switcher Toggle Buttons -->
+                <div class="flex items-center gap-2 bg-neutral-100 p-1.5 rounded-2xl shrink-0">
+                    <button type="button" id="tab-vip-btn"
+                            class="px-4 py-2 rounded-xl text-xs font-black transition shadow-xs bg-brand-600 text-white">
+                        👑 VIP (฿1,000)
+                    </button>
+                    <button type="button" id="tab-super-vip-btn"
+                            class="px-4 py-2 rounded-xl text-xs font-black transition text-neutral-600 hover:text-neutral-900">
+                        👑 Super VIP (฿5,000)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                
+                <!-- Option 1: Official Thai QR Payment PromptPay -->
+                <div class="rounded-2xl border-2 border-dashed border-brand-200 bg-gradient-to-b from-brand-50/20 via-white to-white p-6 text-center space-y-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <span id="qr-badge-tier" class="rounded-full bg-brand-100 text-brand-700 px-3 py-1 text-xs font-bold border border-brand-200 shadow-2xs">
+                            👑 สแกนชำระแพ็กเกจ VIP (฿1,000)
+                        </span>
+                    </div>
+                    
+                    <!-- Branded Thai QR Payment Card -->
+                    <div class="mx-auto max-w-[240px] sm:max-w-[260px] rounded-2xl bg-white p-2.5 shadow-md border border-neutral-200 flex flex-col items-center justify-center relative">
+                        <img id="qr-display-img"
+                             src="{% static 'images/qr-promptpay.png' %}"
+                             alt="พร้อมเพย์ เซ้งร้านด่วน Thai QR Payment"
+                             class="w-full h-auto object-contain rounded-xl">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="text-xs font-bold text-neutral-500">ยอดเงินที่ต้องชำระ</div>
+                        <div id="qr-display-amount" class="text-2xl sm:text-3xl font-black text-brand-600 font-mono">฿1,000.00</div>
+                        <div class="text-[11px] text-neutral-400">สแกนจ่ายได้ด้วยทุกแอปพลิเคชันธนาคาร (PromptPay)</div>
+                    </div>
+
+                    <div class="pt-1">
+                        <a href="{% static 'images/qr-promptpay.png' %}" download="promptpay-sengranduan.png"
+                           class="inline-flex items-center gap-1.5 text-[11px] font-bold text-neutral-600 hover:text-brand-600 transition bg-neutral-100 hover:bg-brand-50 px-3 py-1.5 rounded-xl border border-neutral-200">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>บันทึกรูป QR Code เพื่อสแกน</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Option 2: Bank Account Details with Copy Button & Slip Form -->
+                <div class="space-y-5">
+                    <div class="rounded-2xl border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-50/60 via-white to-emerald-50/20 p-5 space-y-4 shadow-2xs">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-[#00A950] text-white flex items-center justify-center font-black text-sm shadow-sm tracking-tighter">
+                                    K+
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-emerald-800 font-bold uppercase tracking-wider">ธนาคารกสิกรไทย (KBANK)</div>
+                                    <div class="text-sm font-black text-neutral-900">แอป K PLUS / โอนเงินทุกธนาคาร</div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-[10px] font-black text-emerald-800 border border-emerald-300">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                                <span>EasySlip Auto-Verify ⚡</span>
+                            </span>
+                        </div>
+
+                        <!-- Account Number with Copy Button -->
+                        <div class="rounded-xl bg-white p-3.5 border border-emerald-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                            <div>
+                                <div class="text-[11px] font-semibold text-neutral-400">เลขที่บัญชีรับโอน</div>
+                                <div id="bank-acc-text" class="text-xl font-black tracking-wider text-neutral-900 font-mono">
+                                    {{ bank_account_no }}
+                                </div>
+                            </div>
+                            <button type="button" id="copy-bank-btn"
+                                    class="inline-flex items-center gap-1.5 rounded-xl bg-[#00A950] hover:bg-[#008f44] text-white px-3.5 py-2 text-xs font-bold transition shadow-xs">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span id="copy-btn-label">คัดลอกเลขบัญชี</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1 text-xs">
+                            <div>
+                                <div class="text-[11px] font-semibold text-neutral-400">ชื่อบัญชี</div>
+                                <div class="text-sm font-black text-neutral-800">{{ bank_account_name }}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[11px] font-semibold text-neutral-400">ยอดเงินที่ต้องโอน</div>
+                                <div id="bank-card-amount" class="text-sm font-black text-brand-600 font-mono">฿1,000.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slip Upload Form -->
+                    <form method="post" enctype="multipart/form-data" class="space-y-4" id="vip-slip-form">
+                        {% csrf_token %}
+                        <!-- Selected Tier Hidden Input -->
+                        <input type="hidden" name="tier" id="form-tier-input" value="vip">
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-neutral-800 flex items-center justify-between">
+                                <span>แนบสลิปหลักฐานการโอนเงิน (EasySlip API v2 ตรวจทันที)</span>
+                                <span id="form-tier-badge" class="text-[11px] text-brand-600 font-mono font-bold">ยอด ฿1,000.00</span>
+                            </label>
+                            
+                            <div id="drop-area" class="relative rounded-2xl border-2 border-dashed border-neutral-300 hover:border-brand-500 bg-white p-6 text-center cursor-pointer transition">
+                                <input type="file" name="slip_image" id="slip-file-input" accept="image/jpeg,image/png,image/webp" required class="sr-only">
+                                
+                                <div id="upload-prompt" class="space-y-2">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-brand-50 text-brand-600 flex items-center justify-center">
+                                        <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-neutral-700">
+                                        คลิกเพื่ออัปโหลดสลิป หรือลากไฟล์มาวางที่นี่
+                                    </div>
+                                    <div class="text-[11px] text-neutral-400">
+                                        รองรับ JPG, PNG, WEBP ขนาดไม่เกิน 10MB
+                                    </div>
+                                </div>
+
+                                <!-- Slip Preview -->
+                                <div id="slip-preview-container" class="hidden space-y-3">
+                                    <img id="slip-preview-img" src="" alt="Slip Preview" class="mx-auto max-h-48 rounded-xl border border-neutral-200 shadow-sm object-contain">
+                                    <div id="slip-file-name" class="text-xs font-bold text-neutral-700 truncate max-w-xs mx-auto"></div>
+                                    <button type="button" id="change-slip-btn" class="text-xs font-bold text-brand-600 hover:underline">
+                                        เปลี่ยนรูปสลิป
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submit-slip-btn"
+                                class="w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            <span id="submit-btn-text">ยืนยันการชำระเงินและส่งสลิปตรวจ ฿1,000</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- User VIP Transactions History -->
+        {% if my_transactions %}
+        <div class="rounded-3xl border border-neutral-200 bg-white p-6 sm:p-8 shadow-xs space-y-4">
+            <h3 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                <i data-lucide="history" class="w-4 h-4 text-neutral-500"></i>
+                <span>ประวัติการทำรายการแพ็กเกจของคุณ</span>
+            </h3>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-neutral-600">
+                    <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                        <tr>
+                            <th class="py-3 px-4">รหัสอ้างอิง</th>
+                            <th class="py-3 px-4">แพ็กเกจ</th>
+                            <th class="py-3 px-4">วันที่ทำรายการ</th>
+                            <th class="py-3 px-4">ยอดเงิน</th>
+                            <th class="py-3 px-4">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100">
+                        {% for tx in my_transactions %}
+                        <tr>
+                            <td class="py-3 px-4 font-mono font-bold text-neutral-900">{{ tx.ref_number }}</td>
+                            <td class="py-3 px-4 font-bold">
+                                {% if tx.tier == 'super_vip' %}
+                                    <span class="text-amber-600 font-black">👑 Super VIP</span>
+                                {% else %}
+                                    <span class="text-brand-600 font-black">VIP</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="py-3 px-4 font-bold text-brand-600">฿{{ tx.amount|floatformat:2 }}</td>
+                            <td class="py-3 px-4">
+                                {% if tx.status == 'PENDING' %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">
+                                        <i data-lucide="clock" class="w-3 h-3"></i>
+                                        <span>รอตรวจสอบ</span>
+                                    </span>
+                                {% elif tx.status == 'MANUAL_APPROVED' or tx.status == 'AUTO_VERIFIED' %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
+                                        <i data-lucide="check" class="w-3 h-3"></i>
+                                        <span>อนุมัติแล้ว</span>
+                                    </span>
+                                {% elif tx.status == 'REJECTED' %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 text-[11px] font-bold text-red-700" title="{{ tx.rejection_reason }}">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                        <span>ปฏิเสธ: {{ tx.rejection_reason|default:"สลิปไม่ถูกต้อง" }}</span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Nonce-protected JavaScript for Interactive Plan Switcher, Copy & Drag-and-drop -->
+<script nonce="{{ request.csp_nonce }}">
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Tier Switcher Elements
+        var tabVipBtn = document.getElementById('tab-vip-btn');
+        var tabSuperVipBtn = document.getElementById('tab-super-vip-btn');
+        var btnSelectVip = document.getElementById('btn-select-vip');
+        var btnSelectSuperVip = document.getElementById('btn-select-super-vip');
+
+        var qrDisplayImg = document.getElementById('qr-display-img');
+        var qrBadgeTier = document.getElementById('qr-badge-tier');
+        var qrDisplayAmount = document.getElementById('qr-display-amount');
+        var paymentTierTitle = document.getElementById('payment-tier-title');
+        var bankCardAmount = document.getElementById('bank-card-amount');
+        var formTierInput = document.getElementById('form-tier-input');
+        var formTierBadge = document.getElementById('form-tier-badge');
+        var submitBtnText = document.getElementById('submit-btn-text');
+        var submitBtn = document.getElementById('submit-slip-btn');
+        var paymentSection = document.getElementById('payment-section');
+
+        function switchTier(tier) {
+            if (tier === 'super_vip') {
+                // Tab styling
+                tabSuperVipBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition shadow-xs bg-amber-500 text-white';
+                tabVipBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition text-neutral-600 hover:text-neutral-900';
+                
+                // Content update
+                if (qrBadgeTier) {
+                    qrBadgeTier.className = 'rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-xs font-bold border border-amber-300 shadow-2xs';
+                    qrBadgeTier.innerText = '👑 สแกนชำระแพ็กเกจ Super VIP (฿5,000)';
+                }
+                if (qrDisplayAmount) {
+                    qrDisplayAmount.className = 'text-2xl sm:text-3xl font-black text-amber-600 font-mono';
+                    qrDisplayAmount.innerText = '฿5,000.00';
+                }
+                if (paymentTierTitle) {
+                    paymentTierTitle.className = 'text-amber-600';
+                    paymentTierTitle.innerText = 'Super VIP (5,000.00 บาท)';
+                }
+                if (bankCardAmount) {
+                    bankCardAmount.className = 'text-sm font-black text-amber-600 font-mono';
+                    bankCardAmount.innerText = '฿5,000.00';
+                }
+                if (formTierInput) formTierInput.value = 'super_vip';
+                if (formTierBadge) {
+                    formTierBadge.className = 'text-[11px] text-amber-600 font-mono font-bold';
+                    formTierBadge.innerText = 'ยอด ฿5,000.00 (Super VIP)';
+                }
+                if (submitBtnText) submitBtnText.innerText = 'ยืนยันการชำระเงินและส่งสลิปตรวจ ฿5,000';
+                if (submitBtn) {
+                    submitBtn.className = 'w-full rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2';
+                }
+            } else {
+                // VIP Tab styling
+                tabVipBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition shadow-xs bg-brand-600 text-white';
+                tabSuperVipBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition text-neutral-600 hover:text-neutral-900';
+                
+                // Content update
+                if (qrBadgeTier) {
+                    qrBadgeTier.className = 'rounded-full bg-brand-100 text-brand-700 px-3 py-1 text-xs font-bold border border-brand-200 shadow-2xs';
+                    qrBadgeTier.innerText = '👑 สแกนชำระแพ็กเกจ VIP (฿1,000)';
+                }
+                if (qrDisplayAmount) {
+                    qrDisplayAmount.className = 'text-2xl sm:text-3xl font-black text-brand-600 font-mono';
+                    qrDisplayAmount.innerText = '฿1,000.00';
+                }
+                if (paymentTierTitle) {
+                    paymentTierTitle.className = 'text-brand-600';
+                    paymentTierTitle.innerText = 'VIP (1,000.00 บาท)';
+                }
+                if (bankCardAmount) {
+                    bankCardAmount.className = 'text-sm font-black text-brand-600 font-mono';
+                    bankCardAmount.innerText = '฿1,000.00';
+                }
+                if (formTierInput) formTierInput.value = 'vip';
+                if (formTierBadge) {
+                    formTierBadge.className = 'text-[11px] text-brand-600 font-mono font-bold';
+                    formTierBadge.innerText = 'ยอด ฿1,000.00 (VIP)';
+                }
+                if (submitBtnText) submitBtnText.innerText = 'ยืนยันการชำระเงินและส่งสลิปตรวจ ฿1,000';
+                if (submitBtn) {
+                    submitBtn.className = 'w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3.5 text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2';
+                }
+            }
+        }
+
+        if (tabVipBtn) tabVipBtn.addEventListener('click', function() { switchTier('vip'); });
+        if (tabSuperVipBtn) tabSuperVipBtn.addEventListener('click', function() { switchTier('super_vip'); });
+
+        if (btnSelectVip) {
+            btnSelectVip.addEventListener('click', function() {
+                switchTier('vip');
+                paymentSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+        if (btnSelectSuperVip) {
+            btnSelectSuperVip.addEventListener('click', function() {
+                switchTier('super_vip');
+                paymentSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        // Copy Bank Account Number
+        var copyBtn = document.getElementById('copy-bank-btn');
+        var bankText = document.getElementById('bank-acc-text');
+        var copyLabel = document.getElementById('copy-btn-label');
+
+        if (copyBtn && bankText) {
+            copyBtn.addEventListener('click', function() {
+                var cleanNumber = bankText.innerText.replace(/-/g, '').trim();
+                navigator.clipboard.writeText(cleanNumber).then(function() {
+                    copyLabel.innerText = 'คัดลอกแล้ว!';
+                    copyBtn.classList.remove('bg-[#00A950]');
+                    copyBtn.classList.add('bg-neutral-900');
+                    setTimeout(function() {
+                        copyLabel.innerText = 'คัดลอกเลขบัญชี';
+                        copyBtn.classList.remove('bg-neutral-900');
+                        copyBtn.classList.add('bg-[#00A950]');
+                    }, 2500);
+                }).catch(function(err) {
+                    console.error('Failed to copy', err);
+                });
+            });
+        }
+
+        // Drag & Drop / File Input
+        var dropArea = document.getElementById('drop-area');
+        var fileInput = document.getElementById('slip-file-input');
+        var uploadPrompt = document.getElementById('upload-prompt');
+        var previewContainer = document.getElementById('slip-preview-container');
+        var previewImg = document.getElementById('slip-preview-img');
+        var fileNameElem = document.getElementById('slip-file-name');
+        var changeBtn = document.getElementById('change-slip-btn');
+
+        if (dropArea && fileInput) {
+            dropArea.addEventListener('click', function(e) {
+                if (e.target !== changeBtn) {
+                    fileInput.click();
+                }
+            });
+
+            if (changeBtn) {
+                changeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
+
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files && fileInput.files[0]) {
+                    var file = fileInput.files[0];
+                    fileNameElem.innerText = file.name;
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        uploadPrompt.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            ['dragenter', 'dragover'].forEach(function(eventName) {
+                dropArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropArea.classList.add('border-brand-500', 'bg-brand-50/40');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function(eventName) {
+                dropArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropArea.classList.remove('border-brand-500', 'bg-brand-50/40');
+                });
+            });
+
+            dropArea.addEventListener('drop', function(e) {
+                var dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length) {
+                    fileInput.files = dt.files;
+                    var file = dt.files[0];
+                    fileNameElem.innerText = file.name;
+                    var reader = new FileReader();
+                    reader.onload = function(evt) {
+                        previewImg.src = evt.target.result;
+                        uploadPrompt.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

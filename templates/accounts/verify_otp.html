@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}ยืนยันรหัส OTP — เซ้งร้านด่วน.com{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#fcfcfa]">
+    <div class="max-w-md w-full space-y-6">
+
+        <!-- Main Card -->
+        <div class="rounded-3xl border border-neutral-200 bg-white p-8 sm:p-10 shadow-lg relative overflow-hidden">
+            <!-- Decorative Background Glow -->
+            <div class="absolute -right-12 -top-12 w-40 h-40 bg-brand-500/10 rounded-full blur-2xl"></div>
+            <div class="absolute -left-12 -bottom-12 w-40 h-40 bg-pink-500/10 rounded-full blur-2xl"></div>
+
+            <div class="relative z-10 text-center space-y-3">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-brand-600 to-pink-500 text-white flex items-center justify-center shadow-md">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                </div>
+
+                <div class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-200 px-3 py-1 text-xs font-bold text-brand-700">
+                    <i data-lucide="mail-check" class="w-3.5 h-3.5"></i>
+                    <span>ระบบยืนยันตัวตนความปลอดภัย 2 ชั้น</span>
+                </div>
+
+                <h1 class="text-2xl font-black text-neutral-900 tracking-tight">
+                    กรอกรหัสยืนยัน OTP (6 หลัก)
+                </h1>
+
+                <p class="text-xs sm:text-sm text-neutral-500 leading-relaxed max-w-xs mx-auto">
+                    เราได้ส่งรหัสความปลอดภัยไปยังอีเมลของคุณแล้ว<br>
+                    <span class="inline-flex items-center gap-1 mt-1 font-mono font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-lg text-xs">
+                        <i data-lucide="mail" class="w-3 h-3 text-neutral-500"></i>
+                        <span>{{ masked_email }}</span>
+                    </span>
+                </p>
+            </div>
+
+            <!-- OTP Input Form -->
+            <form method="post" action="{% url 'accounts:verify_otp' %}" id="otp-form" class="mt-8 space-y-6 relative z-10">
+                {% csrf_token %}
+                <input type="hidden" name="otp_code" id="otp_code_hidden" value="">
+
+                <div>
+                    <label class="block text-center text-xs font-bold text-neutral-600 mb-3">
+                        กรอกตัวเลข 6 หลักที่ได้รับในอีเมล
+                    </label>
+
+                    <!-- 6 Digit Input Boxes -->
+                    <div class="flex items-center justify-center gap-2 sm:gap-3" id="otp-inputs-container">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" data-index="1"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="2"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="3"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                        <span class="text-neutral-300 font-bold text-lg select-none">-</span>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="4"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="5"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-index="6"
+                               class="otp-digit w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 border-neutral-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 focus:outline-hidden transition bg-neutral-50/50 shadow-2xs text-neutral-900">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn"
+                        class="w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3.5 text-sm font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    <span>ยืนยันรหัสและเข้าสู่ระบบ</span>
+                </button>
+            </form>
+
+            <!-- Expiration & Resend Section -->
+            <div class="mt-6 pt-5 border-t border-neutral-100 text-center space-y-3 relative z-10">
+                <div class="flex items-center justify-center gap-1.5 text-xs text-neutral-500">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i>
+                    <span>รหัส OTP จะหมดอายุใน:</span>
+                    <span id="countdown-timer" class="font-mono font-bold text-neutral-800">15:00</span>
+                    <span>นาที</span>
+                </div>
+
+                <!-- Resend Form -->
+                <form method="post" action="{% url 'accounts:resend_otp' %}" id="resend-form">
+                    {% csrf_token %}
+                    <p class="text-xs text-neutral-500">
+                        ไม่ได้รับอีเมล? 
+                        <button type="submit" id="resend-btn" disabled
+                                class="font-bold text-neutral-400 cursor-not-allowed hover:underline inline-flex items-center gap-1 transition">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                            <span id="resend-label">ขอรหัสใหม่ได้ใน (<span id="cooldown-sec">60</span>s)</span>
+                        </button>
+                    </p>
+                </form>
+
+                <p class="text-[11px] text-neutral-400 max-w-xs mx-auto">
+                    * กรุณาตรวจเช็กในกล่อง <strong>"จดหมายขยะ (Spam / Junk)"</strong> หรือแท็บ <strong>"โปรโมชัน (Promotions)"</strong> หากไม่พบในกล่องข้อความหลัก
+                </p>
+            </div>
+        </div>
+
+        <!-- Secondary Navigation -->
+        <div class="text-center">
+            <a href="{% url 'accounts:login' %}"
+               class="inline-flex items-center gap-1 text-xs font-semibold text-neutral-500 hover:text-neutral-800 transition">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>กลับไปหน้าเข้าสู่ระบบ</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Nonce-protected JavaScript for Auto-Advance, Paste, and Timers -->
+<script nonce="{{ request.csp_nonce }}">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    var digits = Array.from(document.querySelectorAll('.otp-digit'));
+    var hiddenInput = document.getElementById('otp_code_hidden');
+    var form = document.getElementById('otp-form');
+
+    // Auto-focus first input
+    if (digits.length > 0) {
+        digits[0].focus();
+    }
+
+    function syncHiddenInput() {
+        var code = digits.map(function(d) { return d.value; }).join('');
+        if (hiddenInput) {
+            hiddenInput.value = code;
+        }
+        return code;
+    }
+
+    // Input handlers
+    digits.forEach(function(digit, idx) {
+        // Typing handler
+        digit.addEventListener('input', function(e) {
+            var val = digit.value.replace(/[^0-9]/g, '');
+            digit.value = val ? val[val.length - 1] : '';
+
+            var currentCode = syncHiddenInput();
+
+            if (digit.value && idx < digits.length - 1) {
+                digits[idx + 1].focus();
+                digits[idx + 1].select();
+            }
+
+            // If all 6 filled, auto submit
+            if (currentCode.length === 6) {
+                setTimeout(function() {
+                    form.submit();
+                }, 200);
+            }
+        });
+
+        // Keydown handler (Backspace & Arrows)
+        digit.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !digit.value && idx > 0) {
+                digits[idx - 1].focus();
+                digits[idx - 1].value = '';
+                syncHiddenInput();
+            } else if (e.key === 'ArrowLeft' && idx > 0) {
+                digits[idx - 1].focus();
+            } else if (e.key === 'ArrowRight' && idx < digits.length - 1) {
+                digits[idx + 1].focus();
+            }
+        });
+
+        // Paste handler (Supports pasting full 6-digit code)
+        digit.addEventListener('paste', function(e) {
+            e.preventDefault();
+            var pasteData = (e.clipboardData || window.clipboardData).getData('text') || '';
+            var cleanDigits = pasteData.replace(/[^0-9]/g, '').slice(0, 6);
+
+            for (var i = 0; i < cleanDigits.length; i++) {
+                if (digits[i]) {
+                    digits[i].value = cleanDigits[i];
+                }
+            }
+
+            var nextFocusIdx = Math.min(cleanDigits.length, digits.length - 1);
+            digits[nextFocusIdx].focus();
+            var currentCode = syncHiddenInput();
+
+            if (currentCode.length === 6) {
+                setTimeout(function() {
+                    form.submit();
+                }, 200);
+            }
+        });
+    });
+
+    // Form submit validation
+    form.addEventListener('submit', function(e) {
+        var code = syncHiddenInput();
+        if (code.length !== 6) {
+            e.preventDefault();
+            alert('กรุณากรอกรหัส OTP ให้ครบ 6 หลัก');
+            var firstEmpty = digits.find(function(d) { return !d.value; });
+            if (firstEmpty) firstEmpty.focus();
+        }
+    });
+
+    // 15-Minute Expiration Countdown
+    var totalSeconds = 15 * 60;
+    var timerElem = document.getElementById('countdown-timer');
+    if (timerElem) {
+        var interval = setInterval(function() {
+            totalSeconds--;
+            if (totalSeconds <= 0) {
+                clearInterval(interval);
+                timerElem.innerText = '00:00 (หมดอายุ)';
+                timerElem.classList.add('text-red-600');
+            } else {
+                var mins = Math.floor(totalSeconds / 60);
+                var secs = totalSeconds % 60;
+                timerElem.innerText = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+        }, 1000);
+    }
+
+    // 60-Second Cooldown for Resend Button
+    var cooldownSec = 60;
+    var resendBtn = document.getElementById('resend-btn');
+    var cooldownSecElem = document.getElementById('cooldown-sec');
+    var resendLabel = document.getElementById('resend-label');
+
+    if (resendBtn && cooldownSecElem && resendLabel) {
+        var cooldownInterval = setInterval(function() {
+            cooldownSec--;
+            if (cooldownSec <= 0) {
+                clearInterval(cooldownInterval);
+                resendBtn.disabled = false;
+                resendBtn.className = 'font-bold text-brand-600 hover:text-brand-700 cursor-pointer hover:underline inline-flex items-center gap-1 transition';
+                resendLabel.innerText = 'ขอรหัส OTP ใหม่อีกครั้ง';
+            } else {
+                cooldownSecElem.innerText = cooldownSec;
+            }
+        }, 1000);
+    }
+});
+</script>
+{% endblock %}

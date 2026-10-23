@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}ติดต่อเรา — เซ้งร้านด่วน.com ช่องทางติดต่อทีมงานและสำนักงาน{% endblock %}
+
+{% block content %}
+<div class="bg-[#fcfcfa] py-12 sm:py-16">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        <!-- Header -->
+        <div class="text-center space-y-3">
+            <div class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-200 px-3 py-1 text-xs font-bold text-brand-700">
+                <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
+                <span>ฝ่ายบริการลูกค้าและปรึกษานายหน้า</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+                พร้อมช่วยเหลือและตอบทุกคำถามเรื่อง<span class="text-brand-600">การเซ้งร้าน</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-neutral-500 max-w-xl mx-auto">
+                ไม่ว่าคุณต้องการฝากเซ้งร้านด่วน สอบถามข้อมูลร้านค้า หรือปรึกษาเรื่องการประเมินราคา ทีมงานของเราพร้อมให้บริการทุกวัน
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Contact Cards (5 cols) -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- LINE Official Card -->
+                <div class="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-6 space-y-3 shadow-2xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-[#06C755] text-white flex items-center justify-center font-bold shadow-xs">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-emerald-800">ติดต่อผ่าน LINE (รวดเร็วที่สุด)</div>
+                            <div class="text-base font-black text-neutral-900 font-mono">@salebiz</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-neutral-600">
+                        แอดไลน์คุยกับเจ้าหน้าที่ผู้เชี่ยวชาญได้โดยตรง ส่งรูปหน้าร้านและปรึกษาประเมินราคาเบื้องต้นได้ทันที
+                    </p>
+                    <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
+                       class="inline-flex items-center justify-center gap-2 w-full rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white py-2.5 text-xs font-bold transition shadow-xs">
+                        <span>เพิ่มเพื่อนบน LINE: @salebiz</span>
+                    </a>
+                </div>
+
+                <!-- Hotline & Channels -->
+                <div class="rounded-3xl border border-neutral-200 bg-white p-6 space-y-4 shadow-xs">
+                    <h3 class="text-sm font-black text-neutral-900">ช่องทางการติดต่ออื่นๆ</h3>
+                    
+                    <div class="space-y-3 text-xs text-neutral-600">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-neutral-900">โทรศัพท์สายด่วน (Hotline)</div>
+                                <div class="font-mono text-sm font-bold text-brand-600">081-234-5678</div>
+                                <div class="text-[11px] text-neutral-400">เวลาทำการ 09:00 - 20:00 น. (เปิดทำการทุกวัน)</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-neutral-100 text-neutral-700 flex items-center justify-center shrink-0">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-neutral-900">อีเมลติดต่อ</div>
+                                <div class="font-mono text-xs text-neutral-700">contact@sengranduan.com</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-neutral-100 text-neutral-700 flex items-center justify-center shrink-0">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-neutral-900">ที่ตั้งสำนักงานใหญ่</div>
+                                <div class="text-[11px] text-neutral-500 leading-relaxed">
+                                    บริษัท เซ้งร้าน พร็อพเทค จำกัด<br>
+                                    อาคารทาวเวอร์ ชั้น 18 ถนนสุขุมวิท แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพฯ 10110
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Official Bank Account Info -->
+                        <div class="pt-3 border-t border-neutral-100 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-[#00A950]/10 text-[#00A950] flex items-center justify-center shrink-0">
+                                <i data-lucide="building-2" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-neutral-900">บัญชีทางการสำหรับชำระค่าบริการ / มัดจำ</div>
+                                <div class="font-mono text-xs font-bold text-[#00A950] mt-0.5">ธนาคารกสิกรไทย: 054-1-27630-0</div>
+                                <div class="text-[11px] text-neutral-500">ชื่อบัญชี: คุณดวงฤทัย ช้างน้อย</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Contact Form (7 cols) -->
+            <div class="lg:col-span-7">
+                <div class="rounded-3xl border border-neutral-200 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+                    <div>
+                        <h2 class="text-lg font-black text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5 text-brand-600"></i>
+                            <span>ส่งข้อความติดต่อทีมงาน</span>
+                        </h2>
+                        <p class="text-xs text-neutral-500 mt-1">
+                            กรอกรายละเอียดด้านล่าง เจ้าหน้าที่จะติดต่อกลับอย่างรวดเร็วที่สุด
+                        </p>
+                    </div>
+
+                    <form method="post" action="{% url 'core:contact' %}" class="space-y-4">
+                        {% csrf_token %}
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-neutral-700">
+                                    ชื่อ-นามสกุล <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="name" required placeholder="เช่น คุณธนพล ใจดี"
+                                       value="{{ form_data.name|default:'' }}"
+                                       class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-neutral-700">
+                                    เบอร์โทรศัพท์ <span class="text-red-500">*</span>
+                                </label>
+                                <input type="tel" name="phone" required placeholder="เช่น 089-123-4567"
+                                       value="{{ form_data.phone|default:'' }}"
+                                       class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-neutral-700">
+                                    อีเมล (ถ้ามี)
+                                </label>
+                                <input type="email" name="email" placeholder="email@example.com"
+                                       value="{{ form_data.email|default:'' }}"
+                                       class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-neutral-700">
+                                    หัวข้อติดต่อ
+                                </label>
+                                <select name="subject"
+                                        class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                                    <option value="สนใจลงประกาศเซ้งร้าน">สนใจลงประกาศเซ้งร้าน</option>
+                                    <option value="สนใจหาเซ้งร้าน / นัดดูสถานที่">สนใจหาเซ้งร้าน / นัดดูสถานที่</option>
+                                    <option value="ปรึกษาการประเมินราคาร้านค้า">ปรึกษาการประเมินราคาร้านค้า</option>
+                                    <option value="สอบถามการสมัครสมาชิก VIP">สอบถามการสมัครสมาชิก VIP</option>
+                                    <option value="ติดต่อโฆษณา / นายหน้า">ติดต่อโฆษณา / เป็นนายหน้า</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-neutral-700">
+                                ข้อความรายละเอียด <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="message" rows="4" required placeholder="ระบุประเภทธุรกิจ ทำเลที่สนใจ หรือคำถามที่ต้องการให้เราช่วย..."
+                                      class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">{{ form_data.message|default:'' }}</textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 w-full rounded-2xl bg-brand-600 hover:bg-brand-700 text-white py-3 text-sm font-bold shadow-md hover:shadow-lg transition">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>ส่งข้อความหาเรา</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

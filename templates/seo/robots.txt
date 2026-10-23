@@ -1,0 +1,54 @@
+# ==============================================================================
+# เซ้งร้านด่วน.com (sengranduan.com) — Modern Robots.txt for Search & AI Crawlers
+# ==============================================================================
+
+# 1. General Search Engines
+User-agent: *
+Allow: /
+Allow: /listings/
+Allow: /about/
+Allow: /contact/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin-dashboard/
+Disallow: /dev-admin-only/
+Disallow: /accounts/
+Disallow: /properties/
+Disallow: /contracts/
+
+# 2. AI / LLM Search & Citation Bots (Welcome to crawl & index for Answer Engines)
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+# Sitemap & AI Reference Declarations
+Sitemap: {{ site_url }}/sitemap.xml
+Llms-Txt: {{ site_url }}/llms.txt

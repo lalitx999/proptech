@@ -1,0 +1,26 @@
+{
+  "name": "เซ้งร้านด่วน — ตลาดซื้อขายและเซ้งธุรกิจ",
+  "short_name": "เซ้งร้านด่วน",
+  "description": "แพลตฟอร์มซื้อขายร้านค้า เซ้งกิจการ และเช่าทำเลทองทั่วไทย",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "categories": ["business", "real estate", "shopping"],
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

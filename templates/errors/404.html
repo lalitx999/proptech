@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}404 — ไม่พบหน้าที่ต้องการ | เซ้งร้านด่วน{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 py-20 text-center">
+    <p class="text-6xl font-bold text-brand-500">404</p>
+    <h1 class="mt-4 text-2xl font-bold tracking-tight text-neutral-900">ไม่พบหน้าที่คุณกำลังค้นหา</h1>
+    <p class="mt-2 text-sm text-neutral-600">ประกาศร้านค้านี้อาจถูกเซ้งไปแล้ว ถูกลบ หรือ URL ไม่ถูกต้อง</p>
+    <div class="mt-6">
+        <a href="/" class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition">
+            กลับสู่หน้าแรก
+        </a>
+    </div>
+</div>
+{% endblock %}
