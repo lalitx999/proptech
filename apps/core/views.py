@@ -39,39 +39,11 @@ def home_view(request):
 
     total_listings = Listing.objects.filter(status=ListingStatus.PUBLISHED).count()
 
-    # 4. แผนที่ประกาศเซ้ง (Map Listings GeoJSON/JSON for Leaflet)
-    map_listings = []
-    for l in base_qs:
-        if l.property.lat and l.property.lng:
-            cover_img = l.property.cover_image
-            cover_url = cover_img.image.url if cover_img and hasattr(cover_img, 'image') and cover_img.image else ''
-            map_listings.append({
-                'id': l.id,
-                'ref_code': l.ref_code,
-                'title': l.property.title,
-                'price': float(l.price),
-                'monthly_rent': float(l.monthly_rent),
-                'lat': float(l.property.lat),
-                'lng': float(l.property.lng),
-                'province': l.property.province,
-                'district': l.property.district,
-                'type_display': l.get_type_display(),
-                'category_display': l.property.get_type_display(),
-                'cover_url': cover_url,
-                'detail_url': f"/listings/{l.id}/",
-                'google_maps_url': l.property.google_maps_url or f"https://www.google.com/maps/search/?api=1&query={l.property.lat},{l.property.lng}",
-                'avg_profit': float(l.avg_profit_3m) if l.avg_profit_3m else None,
-                'is_free_transfer': l.lease_transfer_fee_payer == FeePayer.FREE,
-            })
-
     context = {
         'verified_listings': verified_listings,
         'promo_listings': promo_listings,
         'recent_listings': recent_listings,
         'total_listings': total_listings,
-        # WHY SECURE: Rendered via |json_script in template, which escapes
-        # <, >, & so user-controlled titles cannot break out of <script> (Stored XSS).
-        'map_listings': map_listings,
     }
     return render(request, 'core/home.html', context)
 

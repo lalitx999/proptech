@@ -133,11 +133,11 @@ class MarketplaceSearchSecurityTestCase(TestCase):
         self.assertEqual(data.get('start_url'), '/')
         self.assertEqual(data.get('scope'), '/')
 
-    def test_stored_xss_protection_in_map_script(self):
+    def test_stored_xss_protection_in_listing_display(self):
         """
         Verify that listing titles containing script breakout tags
-        (e.g. </script><script>alert(1)</script>) are safely serialized
-        via Django's json_script filter, preventing Stored XSS.
+        (e.g. </script><script>alert("xss")</script>) are safely escaped in HTML
+        and do not execute arbitrary script tags.
         """
         prop_xss = Property.objects.create(
             owner=self.owner,
@@ -150,7 +150,7 @@ class MarketplaceSearchSecurityTestCase(TestCase):
             lat=Decimal('13.736717'),
             lng=Decimal('100.523186')
         )
-        Listing.objects.create(
+        listing = Listing.objects.create(
             property=prop_xss,
             price=Decimal('100000.00'),
             status=ListingStatus.PUBLISHED
@@ -159,13 +159,16 @@ class MarketplaceSearchSecurityTestCase(TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
-        # 1. json_script container must exist
-        self.assertContains(response, '<script id="map-listings-data" type="application/json">')
-
-        # 2. Raw unescaped script tag must NOT be present in response
+        # Raw unescaped script tag must NOT be present in response
         content = response.content.decode('utf-8')
         self.assertNotIn('</script><script>alert("xss")</script>', content)
 
-        # 3. Escaped unicode representation must be inside the json_script block
-        self.assertIn('\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"xss\\")', content)
+        # HTML-escaped representation must be safely rendered
+        self.assertIn('&lt;/script&gt;&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;', content)
+
+        # Verify on listing detail view as well
+        detail_response = self.client.get(f'/listings/{listing.id}/')
+        self.assertEqual(detail_response.status_code, 200)
+        detail_content = detail_response.content.decode('utf-8')
+        self.assertNotIn('</script><script>alert("xss")</script>', detail_content)
 
