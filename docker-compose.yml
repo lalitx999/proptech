@@ -64,21 +64,6 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: proptech_cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
-    depends_on:
-      - nginx
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
 volumes:
   postgres_data:
   static_volume:
