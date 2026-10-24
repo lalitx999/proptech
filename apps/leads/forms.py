@@ -1,7 +1,7 @@
 import re
 from django import forms
 from django.core.exceptions import ValidationError
-from apps.leads.models import Lead
+from apps.leads.models import Lead, LeadUrgency
 
 class LeadInquiryForm(forms.ModelForm):
     """
@@ -10,6 +10,11 @@ class LeadInquiryForm(forms.ModelForm):
     - Phone number regex verification.
     """
     website = forms.CharField(required=False, widget=forms.HiddenInput)
+    urgency = forms.ChoiceField(
+        choices=LeadUrgency.choices,
+        required=False,
+        initial=LeadUrgency.IMMEDIATE
+    )
 
     class Meta:
         model = Lead
@@ -25,3 +30,6 @@ class LeadInquiryForm(forms.ModelForm):
         if not re.match(r'^0\d{8,9}$', phone):
             raise ValidationError("กรุณาระบุหมายเลขโทรศัพท์ที่ถูกต้อง (เช่น 0812345678)")
         return phone
+
+    def clean_urgency(self):
+        return self.cleaned_data.get('urgency') or LeadUrgency.IMMEDIATE

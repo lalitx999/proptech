@@ -49,18 +49,23 @@ def submit_inquiry_view(request, listing_pk):
         )
 
         # Telegram Alert
+        budget_text = f"฿{lead.budget_max:,.0f}" if lead.budget_max else "ตามราคาเซ้งของร้าน"
         TelegramAlertService.send_alert(
             f"🏪 ร้าน: *[{listing.ref_code}]* {listing.property.title}\n"
             f"👤 ผู้สนใจ: {lead.full_name}\n"
             f"📞 เบอร์โทร: `{lead.phone}`\n"
             f"💬 LINE: {lead.line_id or '—'}\n"
-            f"💰 งบประมาณ: ฿{lead.budget_max:,.0f} (เร่งด่วน: {lead.get_urgency_display()})\n"
+            f"💰 งบประมาณ: {budget_text} (เร่งด่วน: {lead.get_urgency_display()})\n"
             f"🤝 นายหน้าผู้ดูแล: {listing.agent.first_name if listing.agent else 'รอจัดสรร'}",
             event_title="🔥 มีลูกค้าสนใจร้านใหม่ (New Lead)"
         )
 
         messages.success(request, 'ส่งข้อมูลความสนใจเรียบร้อยแล้ว! เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด')
     else:
-        messages.error(request, 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบเบอร์โทรศัพท์อีกครั้ง')
+        err_msg = 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบข้อมูลอีกครั้ง'
+        if form.errors:
+            first_err = next(iter(form.errors.values()))[0]
+            err_msg = f"ข้อมูลไม่ถูกต้อง: {first_err}"
+        messages.error(request, err_msg)
 
     return redirect('listings:listing_detail', pk=listing.pk)
