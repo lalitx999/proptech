@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
     <meta name="theme-color" content="#e11d74">
-    <meta name="description" content="{% block meta_description %}เซ้งร้านด่วน.com — แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองอันดับ 1 ของไทย พร้อมข้อมูลการเงินและกำไรเฉลี่ย 3 เดือนโปร่งใส ปักหมุดแผนที่จริง{% endblock %}">
+    <meta name="description" content="{% block meta_description %}เซ้งร้านด่วน.com — แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองระดับแนวหน้าของไทย พร้อมข้อมูลการเงินและกำไรเฉลี่ย 3 เดือนโปร่งใส ปักหมุดแผนที่จริง{% endblock %}">
     <title>{% block title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}</title>
 
     <!-- OpenGraph & Social Sharing Meta Tags (SEO / AEO) -->
     <meta property="og:site_name" content="เซ้งร้านด่วน.com">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{% block og_title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองอันดับ 1 ของไทย ข้อมูลการเงินโปร่งใส ตรวจสอบสัญญาสิทธิ ปักหมุดพิกัดแผนที่จริง{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองระดับแนวหน้าของไทย ข้อมูลการเงินโปร่งใส ตรวจสอบสัญญาสิทธิ ปักหมุดพิกัดแผนที่จริง{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{{ site_url }}/static/images/og-cover.png{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:locale" content="th_TH">
@@ -51,13 +51,21 @@
             "url": "{{ site_url }}/static/images/logo.png",
             "caption": "เซ้งร้านด่วน.com"
           },
-          "description": "แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า เซ้งกิจการ และปล่อยเช่าทำเลทองอันดับ 1 ของประเทศไทย ตรวจสอบสัญญาสิทธิและงบการเงินโปร่งใส",
+          "description": "แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า เซ้งกิจการ และปล่อยเช่าทำเลทองระดับแนวหน้าของประเทศไทย ตรวจสอบสัญญาสิทธิและงบการเงินโปร่งใส",
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+66-87-666-1778",
             "contactType": "customer service",
             "areaServed": "TH",
             "availableLanguage": ["Thai", "English"]
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "พัทยา บางละมุง",
+            "addressLocality": "บางละมุง",
+            "addressRegion": "ชลบุรี",
+            "postalCode": "20150",
+            "addressCountry": "TH"
           },
           "sameAs": [
             "https://www.facebook.com/sengranduan",
@@ -386,16 +394,18 @@
                         <i data-lucide="message-circle" class="w-4 h-4"></i>
                         <span>Add LINE: @shopforsale</span>
                     </a>
-                    <div class="text-[11px] text-neutral-400 pt-2 space-y-1.5">
+                    <div class="text-[11px] text-neutral-400 pt-1 space-y-1.5">
                         <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-400"></i><a href="tel:0876661778" class="hover:text-white transition">โทร: 087-666-1778</a></div>
-                        <div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i><span>เวลาทำการ: 08:00 - 21:00 น. (ทุกวัน)</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i><span>เวลาทำการ: 08:00 - 21:00 น.</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-400"></i><a href="https://www.facebook.com/sengranduan" target="_blank" class="hover:text-white transition">เพจ เซ้งร้านด่วน</a></div>
+                        <div class="flex items-start gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400 shrink-0 mt-0.5"></i><span>พัทยา บางละมุง ชลบุรี 20150</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="mt-12 border-t border-neutral-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
                 <div>
-                    © 2026 เซ้งร้าน.com — แพลตฟอร์มเซ้งร้านและธุรกิจอันดับ 1 ของไทย สงวนลิขสิทธิ์
+                    © 2026 เซ้งร้านด่วน.com — แพลตฟอร์มเซ้งร้านและธุรกิจระดับแนวหน้าของไทย สงวนลิขสิทธิ์
                 </div>
                 <div class="flex items-center gap-4">
                     <a href="{% url 'core:about' %}" class="hover:underline">เกี่ยวกับเรา</a>
@@ -453,9 +463,12 @@
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
-            <!-- App Logo + Header -->
+            <!-- App Logo + Header (ตรงโลโก้มีคำว่า เซ้งร้านด่วน ตรงลิ้งแสดง เซ้งร้านด่วน.com) -->
             <div class="flex items-center gap-3.5 mb-4">
-                <img src="/static/icons/icon-192.png" alt="เซ้งร้านด่วน" class="w-14 h-14 rounded-2xl shadow-md border border-pink-100 object-contain bg-[#eb34aa] p-1 flex-shrink-0">
+                <div class="w-14 h-14 rounded-2xl shadow-md bg-[#e11d74] border border-pink-200/60 flex flex-col items-center justify-center text-center p-1 flex-shrink-0 select-none">
+                    <span class="text-[12px] font-black text-white leading-tight drop-shadow-xs">เซ้ง</span>
+                    <span class="text-[10px] font-black text-yellow-300 leading-tight drop-shadow-xs">ร้านด่วน</span>
+                </div>
                 <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <h3 class="text-base font-extrabold text-neutral-900 leading-tight">เซ้งร้านด่วน</h3>
@@ -463,7 +476,7 @@
                             <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> เว็บแอปทางการ
                         </span>
                     </div>
-                    <p class="text-xs text-neutral-500 font-medium">sengranduan.com • ติดตั้งง่าย ไม่เปลืองพื้นที่</p>
+                    <p class="text-xs font-bold text-brand-600">เซ้งร้านด่วน.com</p>
                 </div>
             </div>
 
