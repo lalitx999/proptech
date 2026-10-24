@@ -1,10 +1,13 @@
 from django.urls import path
 from . import views
+from apps.accounts import views as accounts_views
 
 app_name = 'core'
 
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('packages/', accounts_views.vip_membership_view, name='packages'),
+    path('pricing/', accounts_views.vip_membership_view, name='pricing'),
     path('about/', views.about_view, name='about'),
     path('contact/', views.contact_view, name='contact'),
     path('privacy-policy/', views.privacy_policy_view, name='privacy_policy'),

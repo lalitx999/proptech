@@ -47,6 +47,28 @@ class VIPMembershipAndQuotaTests(TestCase):
             email_verified=True,
         )
 
+    def test_unauthenticated_user_can_view_vip_and_packages_page(self):
+        """Unauthenticated guests can view VIP membership and packages page without login."""
+        url = reverse("accounts:vip_membership")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "โพสต์ VIP")
+        self.assertContains(response, "Super VIP")
+        self.assertContains(response, "ผู้เข้าชมทั่วไป")
+
+        # Core package alias
+        packages_url = reverse("core:packages")
+        res_pkg = self.client.get(packages_url)
+        self.assertEqual(res_pkg.status_code, 200)
+
+    def test_unauthenticated_user_post_slip_redirects_to_login(self):
+        """Unauthenticated guests attempting to submit a payment slip are redirected to login."""
+        url = reverse("accounts:vip_membership")
+        slip_image = create_test_image("guest_slip.jpg", "blue")
+        response = self.client.post(url, {"slip_image": slip_image})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
     def test_free_member_quota(self):
         """Free members get 1 post per calendar month."""
         self.assertFalse(self.owner.is_vip_active)

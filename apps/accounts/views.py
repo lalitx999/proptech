@@ -413,7 +413,6 @@ def logout_view(request):
 # ==============================================================================
 # VIP MEMBERSHIP & PAYMENT GATEWAY (PROMPTPAY & SLIP VERIFICATION)
 # ==============================================================================
-@login_required
 @require_http_methods(["GET", "POST"])
 def vip_membership_view(request):
     """
@@ -444,6 +443,10 @@ def vip_membership_view(request):
     qr_super_vip_url = generate_promptpay_qr_base64(promptpay_target, super_vip_price)
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.warning(request, 'กรุณาเข้าสู่ระบบ หรือสมัครสมาชิก ก่อนดำเนินการแจ้งชำระเงิน')
+            return redirect(f"{reverse('accounts:login')}?next={reverse('accounts:vip_membership')}")
+
         slip_file = request.FILES.get('slip_image')
         selected_tier_str = request.POST.get('tier', 'vip').lower()
         if selected_tier_str == 'super_vip':
@@ -578,8 +581,17 @@ def vip_membership_view(request):
             messages.error(request, f'เกิดข้อผิดพลาดในการตรวจสอบไฟล์: {str(e)}')
             return redirect('accounts:vip_membership')
 
-    # Transactions history for current user
-    my_transactions = VIPPaymentTransaction.objects.filter(user=request.user).order_by('-created_at')[:10]
+    # Transactions history & quota for user
+    if request.user.is_authenticated:
+        my_transactions = VIPPaymentTransaction.objects.filter(user=request.user).order_by('-created_at')[:10]
+        remaining_quota = request.user.get_remaining_quota()
+        monthly_quota = request.user.get_monthly_quota()
+        posted_count = request.user.get_current_month_posts_count()
+    else:
+        my_transactions = []
+        remaining_quota = 1
+        monthly_quota = 1
+        posted_count = 0
 
     context = {
         'bank_name': bank_name,
@@ -592,9 +604,9 @@ def vip_membership_view(request):
         'qr_super_vip_url': qr_super_vip_url,
         'qr_data_url': qr_vip_url, # default
         'my_transactions': my_transactions,
-        'remaining_quota': request.user.get_remaining_quota(),
-        'monthly_quota': request.user.get_monthly_quota(),
-        'posted_count': request.user.get_current_month_posts_count(),
+        'remaining_quota': remaining_quota,
+        'monthly_quota': monthly_quota,
+        'posted_count': posted_count,
     }
     return render(request, 'accounts/vip_membership.html', context)
 

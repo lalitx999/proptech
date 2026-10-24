@@ -238,6 +238,10 @@
             <!-- Desktop Nav Menu -->
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-neutral-700">
                 <a href="/" class="text-brand-600 font-bold transition hover:text-brand-700">หน้าแรก</a>
+                <a href="{% url 'accounts:vip_membership' %}" class="hover:text-brand-600 transition flex items-center gap-1.5 font-semibold text-neutral-800">
+                    <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>
+                    <span>แพ็กเกจ & VIP</span>
+                </a>
                 <a href="{% url 'core:about' %}" class="hover:text-brand-600 transition">เกี่ยวกับเรา</a>
                 <a href="{% url 'core:contact' %}" class="hover:text-brand-600 transition">ติดต่อเรา</a>
 

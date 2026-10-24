@@ -38,7 +38,7 @@
                 </a>
 
                 <!-- Top Left Badges: Ref code & Deal Type & VIP & Verified -->
-                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
+                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none">
                     {% if listing.is_admin_verified %}
                     <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-6 object-contain drop-shadow" title="ร้านนี้ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
                     {% endif %}
@@ -70,7 +70,7 @@
 
                 <!-- Monthly Profit Pill (Bottom Left) -->
                 {% if listing.avg_profit_3m %}
-                <div class="absolute bottom-2.5 left-2.5 rounded-lg bg-emerald-600/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-white shadow flex items-center gap-1">
+                <div class="absolute bottom-2.5 left-2.5 rounded-lg bg-emerald-600/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-white shadow flex items-center gap-1 pointer-events-none">
                     <i data-lucide="trending-up" class="w-3 h-3"></i>
                     <span>กำไร ฿{{ listing.avg_profit_3m|floatformat:0 }}/ด.</span>
                 </div>
