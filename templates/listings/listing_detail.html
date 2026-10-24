@@ -453,13 +453,13 @@
 
                     <!-- Action Buttons: Phone & LINE -->
                     <div class="space-y-2.5 pt-2 border-t border-neutral-100">
-                        <a href="tel:{% if listing.agent and listing.agent.phone %}{{ listing.agent.phone }}{% else %}0812345678{% endif %}"
+                        <a href="tel:{% if listing.agent and listing.agent.phone %}{{ listing.agent.phone }}{% else %}0876661778{% endif %}"
                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 py-3.5 text-sm font-bold text-white shadow-md transition hover:scale-[1.01]">
                             <i data-lucide="phone" class="w-4 h-4 text-brand-400"></i>
                             <span>โทรนัดหมายดูสถานที่จริง</span>
                         </a>
 
-                        <a href="https://line.me/R/ti/p/@salebiz"
+                        <a href="https://line.me/R/ti/p/@shopforsale"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] py-3.5 text-sm font-bold text-white shadow-md transition hover:scale-[1.01]">
@@ -476,7 +476,7 @@
                         <div class="min-w-0 flex-1">
                             <span class="text-[10px] text-neutral-400 block font-medium">นายหน้าผู้ดูแลเคส</span>
                             <span class="text-xs font-bold text-neutral-900 truncate block">
-                                {% if listing.agent %}{{ listing.agent.get_full_name|default:listing.agent.email }}{% else %}ทีมงานเซ้งร้านด่วน (LINE: @salebiz){% endif %}
+                                {% if listing.agent %}{{ listing.agent.get_full_name|default:listing.agent.email }}{% else %}ทีมงานเซ้งร้านด่วน (LINE: @shopforsale){% endif %}
                             </span>
                             <span class="text-[10px] text-brand-600 font-semibold block">รหัสเคส: {{ listing.ref_code }}</span>
                         </div>

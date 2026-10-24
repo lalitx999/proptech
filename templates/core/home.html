@@ -74,18 +74,19 @@
 <!-- ============================================================================== -->
 <section class="mx-auto max-w-6xl px-3 sm:px-6 my-2 sm:my-6">
     <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[175px] sm:min-h-[380px] shadow-sm flex items-center justify-center text-center p-3.5 sm:p-8 bg-neutral-900">
-        <!-- Background Storefront Photo (Centered) - LCP optimized -->
+        <!-- Background Storefront Photo (Centered) - LCP optimized with brighter, vibrant treatment -->
         <img src="/static/images/hero_banner.jpg"
              alt="ค้นหาร้านเซ้ง ร้านให้เช่า"
              fetchpriority="high"
              decoding="async"
-             class="absolute inset-0 w-full h-full object-cover object-center">
-        <!-- Dark Vignette Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/40"></div>
+             class="absolute inset-0 w-full h-full object-cover object-center brightness-110 contrast-105 saturate-125">
+        <!-- Sunlit & Warm Vibrant Overlay (สว่าง สดใส มีมิติ) -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/30 to-black/15"></div>
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-600/15 via-transparent to-amber-300/20 mix-blend-overlay"></div>
 
         <!-- Hero Content (Centered) -->
         <div class="relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center justify-center text-center space-y-2 sm:space-y-4">
-            <h1 class="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
+            <h1 class="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                 ค้นหาร้านเซ้ง ร้านให้เช่า
             </h1>
 
@@ -345,32 +346,37 @@
 <!-- 3. BANNER ฝากเซ้ง ค่านายหน้าเพียง 5% (Brand Pink/Rose Palette) -->
 <!-- ============================================================================== -->
 <section class="mx-auto max-w-6xl px-3 sm:px-6 my-2 sm:my-4">
-    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-brand-600 via-rose-500 to-brand-700 p-4 sm:p-6 text-white shadow-md">
-        <!-- Background Decorative Circles -->
-        <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl banner-animated-flow p-4 sm:p-6 text-white shadow-lg border border-white/10">
+        <!-- Background Decorative Moving Circles -->
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/15 blur-2xl pointer-events-none animate-pulse"></div>
+        <div class="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-yellow-400/10 blur-xl pointer-events-none"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="space-y-1 sm:space-y-2">
+            <div class="space-y-1.5 sm:space-y-2">
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-yellow-200">
+                    <span class="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 shadow-xs">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-300 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
+                        </span>
                         <i data-lucide="clock" class="w-3 h-3"></i> เริ่มได้ภายใน 24 ชั่วโมง
                     </span>
                     <span class="text-xs font-bold text-white/90">ขายไว ได้จริง</span>
                 </div>
-                <h3 class="text-xl sm:text-3xl font-black tracking-tight leading-tight">
+                <h3 class="text-xl sm:text-3xl font-black tracking-tight leading-tight drop-shadow-sm">
                     ฝากเซ้ง ค่านายหน้าเพียง <span class="text-yellow-300 underline decoration-yellow-300 underline-offset-4">5%</span>
                 </h3>
-                <p class="text-xs sm:text-sm text-white/95 font-medium flex items-center gap-2 flex-wrap">
-                    <span>ลงโฆษณาครบทุกช่องทาง: Facebook, Kaidee, LivingInsider, TikTok และกว่า 50 เว็บไซต์</span>
+                <p class="text-xs sm:text-sm text-white font-medium flex items-center gap-2 flex-wrap drop-shadow-xs">
+                    <span>ลงโฆษณาทุกช่องทาง Facebook เพจ YouTube TikTok เว็บไซต์</span>
                 </p>
             </div>
 
             <!-- Action Button -->
             <div class="flex items-center gap-2 flex-shrink-0">
-                <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
-                   class="inline-flex items-center gap-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-black px-5 py-3 text-xs sm:text-sm shadow-lg hover:scale-105 transition-all">
+                <a href="https://line.me/R/ti/p/@shopforsale" target="_blank"
+                   class="group inline-flex items-center gap-2 rounded-xl bg-neutral-900 hover:bg-black text-white font-black px-5 py-3 text-xs sm:text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">
                     <span>ฝากเซ้งเลย!</span>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-yellow-400"></i>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-yellow-400 group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
         </div>

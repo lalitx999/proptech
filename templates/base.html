@@ -53,14 +53,14 @@
           "description": "แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า เซ้งกิจการ และปล่อยเช่าทำเลทองอันดับ 1 ของประเทศไทย ตรวจสอบสัญญาสิทธิและงบการเงินโปร่งใส",
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+66-81-234-5678",
+            "telephone": "+66-87-666-1778",
             "contactType": "customer service",
             "areaServed": "TH",
             "availableLanguage": ["Thai", "English"]
           },
           "sameAs": [
             "https://www.facebook.com/sengranduan",
-            "https://line.me/ti/p/@salebiz"
+            "https://line.me/ti/p/@shopforsale"
           ]
         },
         {
@@ -145,6 +145,41 @@
             display: inline-block;
             vertical-align: middle;
         }
+        @keyframes wiggle-action {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            15% { transform: scale(1.05) rotate(-3deg); }
+            30% { transform: scale(1.05) rotate(3deg); }
+            45% { transform: scale(1.02) rotate(-2deg); }
+            60% { transform: scale(1.02) rotate(2deg); }
+            75% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(0, 194, 116, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(0, 194, 116, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 194, 116, 0); }
+        }
+        .animate-wiggle-btn {
+            animation: wiggle-action 3.5s ease-in-out infinite, pulse-ring 3.5s ease-in-out infinite;
+        }
+        @keyframes vip-wiggle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-2px) scale(1.03) rotate(-1.5deg); }
+            40% { transform: translateY(-2px) scale(1.03) rotate(1.5deg); }
+            60% { transform: translateY(0) scale(1); }
+        }
+        .animate-vip-btn {
+            animation: vip-wiggle 4s ease-in-out infinite;
+        }
+        @keyframes banner-gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .banner-animated-flow {
+            background: linear-gradient(135deg, #e11d48, #db2777, #f43f5e, #be123c, #fb7185, #e11d48);
+            background-size: 300% 300%;
+            animation: banner-gradient-flow 7s ease infinite;
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -201,9 +236,9 @@
                     </a>
                 {% endif %}
 
-                <!-- Signature Green Button: + ลงประกาศ ฟรี! -->
+                <!-- Signature Green Button: + ลงประกาศ ฟรี! (กระดุกกระดิกเรียกสายตา) -->
                 <a href="{% url 'listings:listing_create' %}"
-                   class="inline-flex items-center gap-1.5 rounded-full bg-[#00C274] hover:bg-[#00ad68] px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:shadow transition-all">
+                   class="inline-flex items-center gap-1.5 rounded-full bg-[#00C274] hover:bg-[#00ad68] px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:shadow transition-all animate-wiggle-btn">
                     <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
                     <span>ลงประกาศ</span>
                     <span class="rounded bg-yellow-400 px-1 py-0.2 text-[10px] font-black text-neutral-900 shadow-xs leading-none">ฟรี!</span>
@@ -226,9 +261,9 @@
                     <i data-lucide="home" class="w-4 h-4"></i>
                 </a>
 
-                <!-- VIP Upgrade Pill -->
+                <!-- VIP Upgrade Pill (กระดุกกระดิกเรียกสายตา) -->
                 <a href="{% url 'accounts:vip_membership' %}"
-                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-xs transition">
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-xs transition animate-vip-btn">
                     <i data-lucide="crown" class="w-3.5 h-3.5"></i>
                     <span>👑 สิทธิพิเศษ VIP (1,000 บ.)</span>
                 </a>
@@ -345,14 +380,14 @@
                 <div class="space-y-3">
                     <h3 class="text-sm font-bold text-white uppercase tracking-wider">ติดต่อเรา</h3>
                     <p class="text-xs text-neutral-400">ติดต่อฝากเซ้งร้าน โฆษณา หรือบริการนายหน้ามืออาชีพ</p>
-                    <a href="https://line.me/R/ti/p/@salebiz" target="_blank"
+                    <a href="https://line.me/R/ti/p/@shopforsale" target="_blank"
                        class="inline-flex items-center gap-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] px-4 py-2.5 text-xs font-bold text-white transition shadow">
                         <i data-lucide="message-circle" class="w-4 h-4"></i>
-                        <span>Add LINE: @salebiz</span>
+                        <span>Add LINE: @shopforsale</span>
                     </a>
                     <div class="text-[11px] text-neutral-400 pt-2 space-y-1.5">
-                        <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-400"></i><span>Hotline: 081-234-5678</span></div>
-                        <div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i><span>เวลาทำการ: 09:00 - 20:00 น. (ทุกวัน)</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-400"></i><a href="tel:0876661778" class="hover:text-white transition">โทร: 087-666-1778</a></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i><span>เวลาทำการ: 08:00 - 21:00 น. (ทุกวัน)</span></div>
                     </div>
                 </div>
             </div>
