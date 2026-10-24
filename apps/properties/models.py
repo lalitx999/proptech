@@ -66,6 +66,7 @@ class Property(models.Model):
         max_digits=8,
         decimal_places=2,
         default=0.00,
+        blank=True,
         help_text=_('พื้นที่ใช้สอย (ตารางเมตร)')
     )
     floors = models.PositiveIntegerField(default=1, help_text=_('จำนวนชั้น'))
