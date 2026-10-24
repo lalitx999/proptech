@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.db import connection
@@ -199,6 +201,40 @@ def healthz_view(request):
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return JsonResponse({"status": "unhealthy", "error": "Database connectivity failed"}, status=503)
+
+
+@require_GET
+def manifest_json_view(request):
+    """
+    Serves the PWA Web App Manifest with correct MIME type.
+    """
+    manifest_path = os.path.join(settings.BASE_DIR, 'static', 'manifest.json')
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        response = HttpResponse(content, content_type='application/manifest+json')
+        response['Cache-Control'] = 'public, max-age=86400'
+        return response
+    except FileNotFoundError:
+        return HttpResponse("{}", content_type='application/manifest+json', status=404)
+
+
+@require_GET
+def service_worker_view(request):
+    """
+    Serves the root Service Worker (sw.js) with Service-Worker-Allowed: / header.
+    Allows the Service Worker to control the entire origin scope.
+    """
+    sw_path = os.path.join(settings.BASE_DIR, 'static', 'sw.js')
+    try:
+        with open(sw_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        response = HttpResponse(content, content_type='application/javascript; charset=utf-8')
+        response['Service-Worker-Allowed'] = '/'
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return response
+    except FileNotFoundError:
+        return HttpResponse("// SW not found", content_type='application/javascript', status=404)
 
 
 def permission_denied_view(request, exception=None):

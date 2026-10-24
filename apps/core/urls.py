@@ -15,4 +15,6 @@ urlpatterns = [
     path('llms-full.txt', views.llms_full_txt_view, name='llms_full_txt'),
     path('healthz', views.healthz_view, name='healthz'),
     path('healthz/', views.healthz_view, name='healthz_slash'),
+    path('manifest.json', views.manifest_json_view, name='manifest_json'),
+    path('sw.js', views.service_worker_view, name='service_worker'),
 ]
