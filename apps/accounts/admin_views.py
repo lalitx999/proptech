@@ -233,6 +233,25 @@ def admin_shop_action_view(request, pk):
         status_txt = "ติดป้าย Admin Verified (เวอร์ริไฟร์) ✅" if listing.is_admin_verified else "ปลดป้าย Verified"
         messages.success(request, f'{status_txt} ให้ร้าน "{listing.property.title}" สำเร็จ')
 
+    elif action == 'edit_ref_code':
+        new_code = request.POST.get('ref_code', '').strip().upper()
+        if not new_code:
+            messages.error(request, 'กรุณาระบุรหัสประกาศ')
+        elif Listing.objects.filter(ref_code=new_code).exclude(pk=listing.pk).exists():
+            messages.error(request, f'❌ รหัส "{new_code}" ซ้ำกับร้านอื่นในระบบ กรุณาใช้รหัสอื่น')
+        else:
+            old_code = listing.ref_code
+            listing.ref_code = new_code
+            listing.save(update_fields=['ref_code'])
+            AuditService.log(
+                action='UPDATE',
+                model_name='Listing',
+                object_id=listing.pk,
+                changes={'ref_code': new_code, 'old_ref_code': old_code},
+                request=request
+            )
+            messages.success(request, f'✅ อัปเดตรหัสประกาศเป็น "{new_code}" สำเร็จ')
+
     elif action == 'delete':
         title = listing.property.title
         listing.delete()
@@ -281,6 +300,27 @@ def admin_fast_create_shop_view(request):
     if not lat or not lng:
         lat, lng = get_default_coordinates_for_location(province, district)
 
+    custom_ref_code = request.POST.get('ref_code', '').strip().upper()
+    listing_plan = request.POST.get('listing_plan', 'broker').strip().lower()
+
+    if custom_ref_code:
+        if Listing.objects.filter(ref_code=custom_ref_code).exists():
+            messages.error(request, f'❌ รหัส "{custom_ref_code}" ซ้ำกับร้านอื่นในระบบ กรุณาระบุรหัสใหม่')
+            return redirect('/admin-dashboard/?tab=shops')
+        target_ref_code = custom_ref_code
+    else:
+        from apps.listings.models import generate_ref_code
+        if listing_plan == 'broker':
+            target_ref_code = generate_ref_code('N')
+        elif listing_plan == 'super_vip':
+            target_ref_code = generate_ref_code('S')
+        elif listing_plan == 'vip':
+            target_ref_code = generate_ref_code('V')
+        else:
+            target_ref_code = generate_ref_code('F')
+
+    assigned_agent = request.user if listing_plan == 'broker' or request.user.role == UserRole.AGENT else None
+
     owner = User.objects.filter(pk=owner_id).first() if owner_id else request.user
 
     try:
@@ -303,7 +343,8 @@ def admin_fast_create_shop_view(request):
         # 2. Create Listing
         listing = Listing.objects.create(
             property=prop,
-            agent=request.user if request.user.role == UserRole.AGENT else None,
+            agent=assigned_agent,
+            ref_code=target_ref_code,
             price=Decimal(price),
             monthly_rent=Decimal(monthly_rent or '0'),
             security_deposit=Decimal(deposit_amount or '0'),

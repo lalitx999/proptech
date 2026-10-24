@@ -365,3 +365,142 @@ class ConsignmentWizardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Favorite Cafe 1")
         self.assertContains(response, "250,000")
+
+
+class ListingRefCodeGenerationTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.free_owner = User.objects.create_user(
+            username="freeuser",
+            email="free@example.com",
+            password="Password123!",
+            role=UserRole.OWNER,
+            is_vip=False,
+        )
+        self.vip_owner = User.objects.create_user(
+            username="vipuser",
+            email="vip@example.com",
+            password="Password123!",
+            role=UserRole.OWNER,
+            is_vip=True,
+            vip_expires_at=timezone.now() + datetime.timedelta(days=30),
+        )
+        self.admin = User.objects.create_user(
+            username="adminuser",
+            email="admin@example.com",
+            password="Password123!",
+            role=UserRole.ADMIN,
+            is_staff=True,
+        )
+
+    def test_free_listings_sequential_f_codes(self):
+        """Free listings auto-generate sequential F001, F002..."""
+        p1 = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="Free Shop 1",
+            district="ปทุมวัน",
+            province="กรุงเทพมหานคร",
+        )
+        l1 = Listing.objects.create(property=p1, price=Decimal("100000"))
+        self.assertEqual(l1.ref_code, "F001")
+
+        p2 = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.RESTAURANT_SHABU,
+            title="Free Shop 2",
+            district="บางรัก",
+            province="กรุงเทพมหานคร",
+        )
+        l2 = Listing.objects.create(property=p2, price=Decimal("200000"))
+        self.assertEqual(l2.ref_code, "F002")
+
+    def test_vip_listings_sequential_v_codes(self):
+        """VIP listings (1,000 THB) auto-generate sequential V001, V002..."""
+        p1 = Property.objects.create(
+            owner=self.vip_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="VIP Shop 1",
+            district="วัฒนา",
+            province="กรุงเทพมหานคร",
+        )
+        l1 = Listing.objects.create(property=p1, price=Decimal("350000"))
+        self.assertEqual(l1.ref_code, "V001")
+
+        p2 = Property.objects.create(
+            owner=self.vip_owner,
+            type=PropertyType.RESTAURANT_SHABU,
+            title="VIP Shop 2",
+            district="คลองเตย",
+            province="กรุงเทพมหานคร",
+        )
+        l2 = Listing.objects.create(property=p2, price=Decimal("500000"))
+        self.assertEqual(l2.ref_code, "V002")
+
+    def test_admin_manual_n_and_s_codes(self):
+        """Admin can assign custom ref codes such as N001 (agent) or S001 (super vip)"""
+        p_agent = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.RETAIL_SHOP,
+            title="Broker Managed Shop",
+            district="สาทร",
+            province="กรุงเทพมหานคร",
+        )
+        l_agent = Listing.objects.create(
+            property=p_agent,
+            ref_code="N001",
+            price=Decimal("800000"),
+        )
+        self.assertEqual(l_agent.ref_code, "N001")
+
+        p_super = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.RETAIL_SHOP,
+            title="Super VIP Shop",
+            district="ทองหล่อ",
+            province="กรุงเทพมหานคร",
+        )
+        l_super = Listing.objects.create(
+            property=p_super,
+            ref_code="S001",
+            price=Decimal("1200000"),
+        )
+        self.assertEqual(l_super.ref_code, "S001")
+
+    def test_admin_edit_ref_code_action(self):
+        """Admin can edit listing ref_code via shop action with duplicate protection"""
+        self.client.force_login(self.admin)
+        p = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="Editable Ref Shop",
+            district="พญาไท",
+            province="กรุงเทพมหานคร",
+        )
+        l = Listing.objects.create(property=p, price=Decimal("150000"))
+        self.assertEqual(l.ref_code, "F001")
+
+        # Edit to N001
+        url = reverse("accounts:admin_shop_action", kwargs={"pk": l.pk})
+        resp = self.client.post(url, {"action": "edit_ref_code", "ref_code": "N001"})
+        self.assertEqual(resp.status_code, 302)
+        l.refresh_from_db()
+        self.assertEqual(l.ref_code, "N001")
+
+        # Test duplicate code rejection
+        p2 = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.RETAIL_SHOP,
+            title="Another Shop",
+            district="จตุจักร",
+            province="กรุงเทพมหานคร",
+        )
+        l2 = Listing.objects.create(property=p2, price=Decimal("300000"))
+        resp_dup = self.client.post(
+            reverse("accounts:admin_shop_action", kwargs={"pk": l2.pk}),
+            {"action": "edit_ref_code", "ref_code": "N001"},
+        )
+        self.assertEqual(resp_dup.status_code, 302)
+        l2.refresh_from_db()
+        self.assertNotEqual(l2.ref_code, "N001")
+

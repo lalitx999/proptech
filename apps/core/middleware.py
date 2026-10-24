@@ -37,7 +37,10 @@ class LegacyWordpressRedirectMiddleware:
             if '-' not in normalized_code and len(normalized_code) >= 2:
                 normalized_code = f"{normalized_code[0]}-{normalized_code[1:]}"
 
-            listing = Listing.objects.filter(ref_code__iexact=normalized_code).first()
+            listing = (
+                Listing.objects.filter(ref_code__iexact=normalized_code).first() or
+                Listing.objects.filter(ref_code__iexact=normalized_code.replace('-', '')).first()
+            )
             if listing:
                 logger.info(f"SEO 301 Redirect: Legacy Ref {raw_code} -> {listing.get_absolute_url()}")
                 return HttpResponsePermanentRedirect(listing.get_absolute_url())

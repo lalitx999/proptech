@@ -1,4 +1,4 @@
-import random
+import re
 import string
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -27,12 +27,40 @@ class FeePayer(models.TextChoices):
     BUYER = 'buyer', _('ผู้เซ้งใหม่ออกเอง')
     HALF_HALF = 'half_half', _('คนละครึ่ง')
 
-def generate_ref_code(prefix='N'):
+def generate_ref_code(prefix='F'):
     """
-    Generate unique human-readable tracking code (preserving legacy convention: N-032, S-228).
+    Generate unique sequential human-readable tracking code:
+    - โพสต์ฟรี: รหัส F รันอัตโนมัติ เริ่มต้น F001, F002, ...
+    - โพสต์ VIP (1,000 บาท): รหัส V รันอัตโนมัติ เริ่มต้น V001, V002, ...
+    - แอดมินเป็นนายหน้า: รหัส N รันเองหรืออัตโนมัติ เริ่มต้น N001, N002, ...
+    - โพสต์ Super VIP (5,000 บาท): รหัส S รันเองหรืออัตโนมัติ เริ่มต้น S001, S002, ...
     """
-    random_num = ''.join(random.choices(string.digits, k=3))
-    return f"{prefix}-{random_num}"
+    prefix = prefix.upper().strip() if prefix else 'F'
+    existing_codes = Listing.objects.filter(
+        ref_code__istartswith=prefix
+    ).values_list('ref_code', flat=True)
+
+    max_num = 0
+    pattern = re.compile(rf'^{re.escape(prefix)}[-\s]?(\d+)$', re.IGNORECASE)
+    for code in existing_codes:
+        if code:
+            match = pattern.match(code.strip())
+            if match:
+                try:
+                    num = int(match.group(1))
+                    if num > max_num:
+                        max_num = num
+                except ValueError:
+                    pass
+
+    next_num = max_num + 1
+    candidate = f"{prefix}{next_num:03d}"
+
+    while Listing.objects.filter(ref_code=candidate).exists():
+        next_num += 1
+        candidate = f"{prefix}{next_num:03d}"
+
+    return candidate
 
 class Listing(models.Model):
     """
@@ -157,12 +185,21 @@ class Listing(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.ref_code:
-            # Auto-generate unique ref code
-            while True:
-                candidate = generate_ref_code()
-                if not Listing.objects.filter(ref_code=candidate).exists():
-                    self.ref_code = candidate
-                    break
+            # Auto-generate unique sequential ref code
+            prefix = 'F'
+            if self.agent_id:
+                prefix = 'N'
+            elif hasattr(self, 'property') and self.property and self.property.owner:
+                owner = self.property.owner
+                if getattr(owner, 'membership_tier', '') == 'SUPER_VIP' or getattr(owner, 'is_super_vip_active', False):
+                    prefix = 'S'
+                elif getattr(owner, 'is_vip_active', False) or getattr(owner, 'is_vip', False) or getattr(owner, 'membership_tier', '') == 'VIP':
+                    prefix = 'V'
+                else:
+                    prefix = 'F'
+            self.ref_code = generate_ref_code(prefix)
+        else:
+            self.ref_code = self.ref_code.strip().upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
