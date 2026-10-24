@@ -12,6 +12,10 @@ def role_required(*allowed_roles):
     2. Verifies user role strictly against whitelist.
     3. Records PERMISSION_DENIED to AuditLog on unauthorized attempt.
     """
+    # Defensive programming: flatten if passed as a list or tuple: @role_required([a, b])
+    if len(allowed_roles) == 1 and isinstance(allowed_roles[0], (list, tuple, set)):
+        allowed_roles = tuple(allowed_roles[0])
+
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):

@@ -47,7 +47,7 @@ def can_manage_deal(user, deal):
     return deal.agent == user
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT])
+@role_required(UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT)
 @require_http_methods(["GET"])
 def deal_pipeline_view(request):
     """
@@ -116,7 +116,7 @@ def deal_pipeline_view(request):
     return render(request, 'contracts/deal_pipeline.html', context)
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT])
+@role_required(UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT)
 @require_http_methods(["GET"])
 def deal_detail_view(request, pk):
     """
@@ -144,7 +144,7 @@ def deal_detail_view(request, pk):
     return render(request, 'contracts/deal_detail.html', context)
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT])
+@role_required(UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT)
 @require_http_methods(["POST"])
 def deal_advance_stage_view(request, pk):
     """
@@ -186,7 +186,7 @@ def deal_advance_stage_view(request, pk):
     return redirect('contracts:deal_detail', pk=deal.pk)
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT])
+@role_required(UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT)
 @require_http_methods(["POST"])
 def deal_upload_document_view(request, pk):
     """
