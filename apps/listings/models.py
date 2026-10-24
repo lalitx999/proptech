@@ -95,6 +95,16 @@ class Listing(models.Model):
         default=ListingType.TAKEOVER,
         db_index=True
     )
+    contact_phone = models.CharField(
+        max_length=30,
+        blank=True,
+        help_text=_('เบอร์โทรศัพท์ติดต่อสำหรับประกาศนี้')
+    )
+    contact_line_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text=_('LINE ID สำหรับติดต่อประกาศนี้')
+    )
     
     # Financial Metrics (จุดขายของแพลตฟอร์มเซ้งร้าน)
     price = models.DecimalField(

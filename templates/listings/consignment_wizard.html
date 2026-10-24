@@ -207,6 +207,36 @@
                                class="mt-1 block w-full rounded-xl border border-neutral-300 p-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-2xs">
                         <p class="mt-1 text-[11px] text-neutral-400">คัดลอกลิงก์แชร์จากแอป Google Maps แล้วนำมาวางได้ทันที เพื่อให้แสดงตำแหน่งในแผนที่แบบจริงๆ และนำทางได้</p>
                     </div>
+
+                    <!-- Owner Contact Info (Required for Buyer and Admin Contact) -->
+                    <div class="rounded-2xl border-2 border-brand-200/90 bg-gradient-to-r from-pink-50/60 via-white to-pink-50/40 p-4 sm:p-5 space-y-3">
+                        <div class="flex items-center gap-2 text-xs font-black text-brand-900">
+                            <i data-lucide="phone-call" class="w-4 h-4 text-brand-600"></i>
+                            <span>ข้อมูลติดต่อเจ้าของร้าน / ผู้ลงประกาศ (จำเป็นสำหรับการติดต่อของแอดมินและผู้ซื้อ)</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-800">
+                                    เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span>
+                                </label>
+                                <input type="tel" name="contact_phone" id="f-contact-phone" required
+                                       value="{{ user.phone|default:'' }}"
+                                       placeholder="เช่น 0891234567"
+                                       class="mt-1 block w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm font-semibold text-neutral-800 focus:border-brand-500 focus:ring-brand-500 shadow-2xs">
+                                <span class="text-[11px] text-neutral-400 mt-0.5 block">สำหรับให้ผู้สนใจเซ้งหรือแอดมินโทรติดต่อ</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-800">
+                                    LINE ID สำหรับติดต่อ <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="contact_line_id" id="f-contact-line" required
+                                       value="{{ user.line_id|default:'' }}"
+                                       placeholder="เช่น somchai_line หรือ @shopid"
+                                       class="mt-1 block w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm font-semibold text-neutral-800 focus:border-brand-500 focus:ring-brand-500 shadow-2xs">
+                                <span class="text-[11px] text-neutral-400 mt-0.5 block">สำหรับส่งรายละเอียด รูปเพิ่มเติม และคุยงาน</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-neutral-100 flex justify-end">
@@ -332,9 +362,9 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-neutral-800">
-                                พื้นที่ใช้สอย (ตารางเมตร) <span class="text-red-500">*</span>
+                                พื้นที่ใช้สอย (ตารางเมตร)
                             </label>
-                            <input type="number" step="0.5" name="area_sqm" id="f-area" required placeholder="เช่น 45"
+                            <input type="number" step="0.5" name="area_sqm" id="f-area" placeholder="เช่น 45 (ไม่ระบุก็ได้)"
                                    class="mt-1 block w-full rounded-xl border border-neutral-300 p-3 text-sm focus:border-brand-500 focus:ring-brand-500 shadow-2xs">
                         </div>
                         <div>
@@ -566,6 +596,16 @@
                 }
                 if (!province || !district || !address) {
                     showError('กรุณากรอกข้อมูลทำเลที่ตั้ง (จังหวัด อำเภอ/เขต และที่อยู่) ให้ครบถ้วน');
+                    return;
+                }
+                var contactPhone = document.getElementById('f-contact-phone') ? document.getElementById('f-contact-phone').value.trim() : '';
+                var contactLine = document.getElementById('f-contact-line') ? document.getElementById('f-contact-line').value.trim() : '';
+                if (!contactPhone) {
+                    showError('กรุณากรอกเบอร์โทรศัพท์ติดต่อของเจ้าของร้าน/ผู้ลงประกาศ');
+                    return;
+                }
+                if (!contactLine) {
+                    showError('กรุณากรอก LINE ID สำหรับติดต่อ');
                     return;
                 }
                 updateCardPreview();

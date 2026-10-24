@@ -32,6 +32,11 @@ class User(AbstractUser):
         blank=True,
         help_text=_('Contact telephone number')
     )
+    line_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text=_('LINE ID สำหรับติดต่อ')
+    )
     avatar = models.ImageField(
         upload_to='media/avatars/%Y/%m/',
         blank=True,

@@ -77,6 +77,7 @@ def contact_view(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
         phone = request.POST.get('phone', '').strip()
+        line_id = request.POST.get('line_id', '').strip()
         email = request.POST.get('email', '').strip()
         subject = request.POST.get('subject', '').strip()
         message = request.POST.get('message', '').strip()
@@ -93,6 +94,7 @@ def contact_view(request):
         msg_obj = ContactMessage.objects.create(
             name=name,
             phone=phone,
+            line_id=line_id,
             email=email,
             subject=subject or 'ติดต่อสอบถามทั่วไป',
             message=message,
@@ -104,6 +106,7 @@ def contact_view(request):
             contact_name=name,
             contact_phone=phone,
             contact_email=email,
+            line_id=line_id,
             subject=subject or 'ติดต่อสอบถามทั่วไป',
             message=message
         )

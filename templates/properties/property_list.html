@@ -9,11 +9,40 @@
             <h1 class="text-2xl font-bold text-neutral-900">ทรัพย์สินและร้านค้าของฉัน</h1>
             <p class="text-xs text-neutral-500">จัดการข้อมูลสถานที่และเตรียมลงประกาศเซ้ง</p>
         </div>
+        {% if user.can_post_listing or user.role in 'admin,staff,agent' %}
         <a href="{% url 'properties:property_create' %}"
            class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
             + เพิ่มร้านค้าใหม่
         </a>
+        {% else %}
+        <a href="{% url 'accounts:vip_membership' %}"
+           class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:from-amber-600 hover:to-amber-700 transition"
+           title="โควต้าฟรีเดือนนี้เต็มแล้ว คลิกเพื่ออัปเกรด VIP">
+            <i data-lucide="crown" class="w-4 h-4"></i>
+            <span>โควต้าเต็ม (อัปเกรด VIP)</span>
+        </a>
+        {% endif %}
     </div>
+
+    {% if not user.can_post_listing and user.role not in 'admin,staff,agent' %}
+    <!-- Quota Exceeded Callout Banner -->
+    <div class="mb-6 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-white to-amber-50 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm shrink-0">
+                <i data-lucide="crown" class="w-6 h-6"></i>
+            </span>
+            <div>
+                <h3 class="text-sm font-black text-neutral-900">คุณใช้โควต้าลงประกาศฟรีประจำเดือนนี้ครบแล้ว (จำกัด 1 ร้านค้า/เดือน)</h3>
+                <p class="text-xs text-neutral-500 mt-0.5">ต้องการลงประกาศเพิ่ม หรือดันประกาศให้อยู่หน้าแรก? อัปเกรดเป็นสมาชิก VIP เพื่อรับสิทธิ์เพิ่มทันที</p>
+            </div>
+        </div>
+        <a href="{% url 'accounts:vip_membership' %}"
+           class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-black text-white shadow-md hover:from-amber-600 hover:to-amber-700 transition shrink-0">
+            <span>👑 สมัคร VIP 1,000 บ. (ได้ 4 ประกาศ)</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+    {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for prop in properties %}

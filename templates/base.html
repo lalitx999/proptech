@@ -356,7 +356,7 @@
             <i data-lucide="search" class="w-5 h-5 text-neutral-700"></i>
             <span>ค้นหา</span>
         </a>
-        <a href="{% if user.is_authenticated %}{% url 'properties:property_create' %}{% else %}{% url 'accounts:register' %}{% endif %}"
+        <a href="{% if not user.is_authenticated %}{% url 'accounts:register' %}{% elif user.can_post_listing or user.role in 'admin,staff,agent' %}{% url 'properties:property_create' %}{% else %}{% url 'accounts:vip_membership' %}{% endif %}"
            class="flex flex-col items-center gap-1 text-emerald-600 font-bold -mt-3">
             <span class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
                 <i data-lucide="plus" class="w-5 h-5 stroke-[3]"></i>

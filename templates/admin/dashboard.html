@@ -443,6 +443,12 @@
                                                             <i data-lucide="edit-3" class="w-3 h-3"></i>
                                                         </button>
                                                         <span>• เจ้าของ: {{ shop.property.owner.username }}</span>
+                                                        {% if shop.contact_phone or shop.property.owner.phone %}
+                                                        <span class="text-neutral-700 font-sans font-semibold">📞 {{ shop.contact_phone|default:shop.property.owner.phone }}</span>
+                                                        {% endif %}
+                                                        {% if shop.contact_line_id or shop.property.owner.line_id %}
+                                                        <span class="text-emerald-700 font-sans font-semibold">💬 {{ shop.contact_line_id|default:shop.property.owner.line_id }}</span>
+                                                        {% endif %}
                                                         {% if shop.property.owner.membership_tier == 'SUPER_VIP' and shop.property.owner.is_vip_active %}
                                                         <span class="text-rose-500 font-bold">✨ SUPER VIP</span>
                                                         {% elif shop.property.owner.is_vip %}

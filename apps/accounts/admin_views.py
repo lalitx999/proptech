@@ -352,6 +352,8 @@ def admin_fast_create_shop_view(request):
             avg_profit_3m=Decimal(avg_profit_3m) if avg_profit_3m else None,
             avg_revenue_3m=Decimal(avg_revenue_3m) if avg_revenue_3m else None,
             includes_equipment=equipment_included,
+            contact_phone=owner.phone if owner else '',
+            contact_line_id=getattr(owner, 'line_id', '') if owner else '',
             status=ListingStatus.PUBLISHED if is_immediate_publish else ListingStatus.PENDING,
             type=ListingType.TAKEOVER,
             lease_transfer_fee_payer=FeePayer.HALF_HALF
@@ -375,6 +377,10 @@ def admin_fast_create_shop_view(request):
             changes={'title': title, 'price': price, 'owner': owner.username},
             request=request
         )
+
+        # Dispatch Telegram Alert for New Listing!
+        from apps.core.services.telegram import TelegramAlertService
+        TelegramAlertService.send_new_listing_alert(listing)
 
         messages.success(request, f'🎉 สร้างและลงประกาศร้าน "{title}" (รหัส {listing.ref_code}) สำเร็จแล้ว!')
     except Exception as e:

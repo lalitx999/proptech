@@ -150,11 +150,12 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1">
-                                <label class="block text-xs font-bold text-neutral-700">
-                                    อีเมล (ถ้ามี)
+                                <label class="block text-xs font-bold text-neutral-700 flex items-center justify-between">
+                                    <span>LINE ID (ไลน์ไอดี)</span>
+                                    <span class="text-[10px] text-emerald-600 font-semibold">สำหรับติดต่อกลับ</span>
                                 </label>
-                                <input type="email" name="email" placeholder="email@example.com"
-                                       value="{{ form_data.email|default:'' }}"
+                                <input type="text" name="line_id" placeholder="เช่น somchai_line หรือ @sengran"
+                                       value="{{ form_data.line_id|default:'' }}"
                                        class="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
                             </div>
 

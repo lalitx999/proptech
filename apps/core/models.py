@@ -7,6 +7,7 @@ class ContactMessage(models.Model):
     """
     name = models.CharField(max_length=150, help_text=_('ชื่อผู้ติดต่อ'))
     phone = models.CharField(max_length=30, help_text=_('เบอร์โทรศัพท์'))
+    line_id = models.CharField(max_length=100, blank=True, help_text=_('LINE ID (ไลน์ไอดี)'))
     email = models.EmailField(blank=True, help_text=_('อีเมล (ถ้ามี)'))
     subject = models.CharField(max_length=200, help_text=_('หัวข้อติดต่อ'))
     message = models.TextField(help_text=_('ข้อความรายละเอียด'))

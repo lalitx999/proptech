@@ -83,6 +83,16 @@ def consignment_wizard_view(request):
     monthly_quota = user.get_monthly_quota()
     posted_count = user.get_current_month_posts_count()
 
+    # Block free users who exceeded their quota
+    if user.role not in [UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT]:
+        if not can_post:
+            messages.warning(
+                request,
+                '⚠️ คุณได้ใช้สิทธิ์ลงประกาศฟรีประจำเดือนนี้ครบแล้ว (จำกัด 1 ร้านค้าต่อเดือน) '
+                'กรุณาอัปเกรดเป็นสมาชิก VIP เพื่อลงประกาศเพิ่มได้ทันที'
+            )
+            return redirect('accounts:vip_membership')
+
     if request.method == 'POST':
         if not can_post:
             messages.error(request, 'คุณได้ใช้สิทธิ์ลงประกาศประจำเดือนนี้ครบแล้ว กรุณาอัปเกรดเป็นสมาชิก VIP เพื่อรับสิทธิ์เพิ่ม')
@@ -218,7 +228,26 @@ def consignment_wizard_view(request):
             except Exception as e:
                 logger.warning(f"Failed to process image {img_file.name}: {e}")
 
-        # 3. Create Listing
+        # 3. Contact Info
+        contact_phone = request.POST.get('contact_phone', '').strip()
+        contact_line_id = request.POST.get('contact_line_id', '').strip()
+        if not contact_phone:
+            contact_phone = user.phone or ''
+        if not contact_line_id:
+            contact_line_id = getattr(user, 'line_id', '') or ''
+
+        # Auto-update user phone and line_id if empty
+        user_updated_fields = []
+        if contact_phone and not user.phone:
+            user.phone = contact_phone
+            user_updated_fields.append('phone')
+        if contact_line_id and not getattr(user, 'line_id', ''):
+            user.line_id = contact_line_id
+            user_updated_fields.append('line_id')
+        if user_updated_fields:
+            user.save(update_fields=user_updated_fields)
+
+        # 4. Create Listing
         listing = Listing.objects.create(
             property=property_obj,
             type=ListingType.TAKEOVER,
@@ -232,6 +261,8 @@ def consignment_wizard_view(request):
             avg_profit_3m=avg_profit,
             includes_equipment=includes_equipment,
             includes_staff=includes_staff,
+            contact_phone=contact_phone,
+            contact_line_id=contact_line_id,
             status=ListingStatus.PUBLISHED,
             published_at=timezone.now()
         )
@@ -244,6 +275,10 @@ def consignment_wizard_view(request):
             changes={'ref_code': listing.ref_code, 'price': str(price), 'title': property_obj.title},
             request=request
         )
+
+        # Dispatch Telegram Alert for New Listing!
+        from apps.core.services.telegram import TelegramAlertService
+        TelegramAlertService.send_new_listing_alert(listing)
 
         messages.success(request, f'🎉 สร้างประกาศเซ้งร้านรหัส {listing.ref_code} สำเร็จแล้ว!')
         return redirect('listings:listing_detail', pk=listing.pk)
@@ -271,6 +306,15 @@ def listing_create_view(request, property_pk):
     property_obj = get_object_or_404(Property, pk=property_pk)
     if not (request.user.is_admin() or request.user.is_staff_member() or property_obj.owner == request.user):
         raise PermissionDenied("คุณสามารถสร้างประกาศได้เฉพาะทรัพย์สินที่คุณเป็นเจ้าของเท่านั้น")
+
+    if request.user.role not in [UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT]:
+        if not request.user.can_post_listing():
+            messages.warning(
+                request,
+                '⚠️ คุณได้ใช้สิทธิ์ลงประกาศฟรีประจำเดือนนี้ครบแล้ว (จำกัด 1 ร้านค้าต่อเดือน) '
+                'กรุณาอัปเกรดเป็นสมาชิก VIP เพื่อลงประกาศเพิ่มได้ทันที'
+            )
+            return redirect('accounts:vip_membership')
 
     if request.method == 'POST':
         form = ListingForm(request.POST)
@@ -308,6 +352,11 @@ def listing_create_view(request, property_pk):
                 changes={'ref_code': listing.ref_code, 'price': str(listing.price)},
                 request=request
             )
+
+            # Dispatch Telegram Alert
+            from apps.core.services.telegram import TelegramAlertService
+            TelegramAlertService.send_new_listing_alert(listing)
+
             messages.success(request, f'🎉 ประกาศเซ้งร้านรหัส {listing.ref_code} เผยแพร่ขึ้นหน้าเว็บไซต์เรียบร้อยแล้ว!')
             return redirect('listings:listing_detail', pk=listing.pk)
     else:

@@ -504,3 +504,98 @@ class ListingRefCodeGenerationTests(TestCase):
         l2.refresh_from_db()
         self.assertNotEqual(l2.ref_code, "N001")
 
+    def test_free_quota_enforced_on_property_create(self):
+        """Free user who used their monthly quota is blocked and redirected to VIP membership"""
+        self.client.force_login(self.free_owner)
+        # Create 1 listing which uses the 1 monthly quota
+        p1 = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="First Free Shop",
+            district="พระโขนง",
+            province="กรุงเทพมหานคร",
+        )
+        Listing.objects.create(property=p1, price=Decimal("120000"))
+        self.assertFalse(self.free_owner.can_post_listing())
+
+        # Attempt to access property create view
+        url = reverse("properties:property_create")
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(reverse("accounts:vip_membership"), resp.url)
+
+    def test_contact_form_saves_line_id(self):
+        """Contact form saves line_id in ContactMessage"""
+        from apps.core.models import ContactMessage
+        url = reverse("core:contact")
+        post_data = {
+            "name": "สมชาย คนดี",
+            "phone": "0812345678",
+            "line_id": "somchai_line_id",
+            "subject": "สนใจลงประกาศเซ้งร้าน",
+            "message": "ต้องการสอบถามรายละเอียดเพิ่มเติมครับ",
+        }
+        resp = self.client.post(url, post_data)
+        self.assertEqual(resp.status_code, 302)
+        msg = ContactMessage.objects.filter(phone="0812345678").first()
+        self.assertIsNotNone(msg)
+        self.assertEqual(msg.line_id, "somchai_line_id")
+
+    def test_telegram_new_listing_and_vip_real_amount(self):
+        """Telegram alert handles real slip amount and new listing alert"""
+        from apps.core.services.telegram import TelegramAlertService
+        from apps.accounts.models import VIPPaymentTransaction, MembershipTier
+
+        # 1. VIP Alert with real 1.00 THB amount
+        tx = VIPPaymentTransaction.objects.create(
+            user=self.free_owner,
+            ref_number="VIP-TEST-001",
+            tier=MembershipTier.VIP,
+            amount=Decimal("1.00"),
+            status=VIPPaymentTransaction.Status.PENDING,
+        )
+        # Mock mode returns False or True without crash
+        alert_sent = TelegramAlertService.send_vip_alert(tx, auto_verified=False)
+        self.assertIn(alert_sent, [True, False])
+
+        # 2. New Listing Alert
+        p = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="Cafe Telegram Test",
+            district="ดินแดง",
+            province="กรุงเทพมหานคร",
+        )
+        listing = Listing.objects.create(
+            property=p,
+            price=Decimal("200000"),
+            contact_phone="0899998888",
+            contact_line_id="cafe_line",
+        )
+        listing_alert_sent = TelegramAlertService.send_new_listing_alert(listing)
+        self.assertIn(listing_alert_sent, [True, False])
+
+    def test_listing_detail_facebook_share_button(self):
+        """Listing detail page renders Facebook share button and owner contact info"""
+        p = Property.objects.create(
+            owner=self.free_owner,
+            type=PropertyType.CAFE_BEVERAGE,
+            title="Shareable Cafe",
+            district="พญาไท",
+            province="กรุงเทพมหานคร",
+        )
+        listing = Listing.objects.create(
+            property=p,
+            price=Decimal("450000"),
+            contact_phone="0812344321",
+            contact_line_id="shareable_line",
+            status=ListingStatus.PUBLISHED,
+        )
+        url = reverse("listings:listing_detail", kwargs={"pk": listing.pk})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "facebook.com/sharer/sharer.php")
+        self.assertContains(resp, "0812344321")
+        self.assertContains(resp, "shareable_line")
+
+

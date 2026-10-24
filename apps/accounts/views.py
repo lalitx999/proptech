@@ -506,11 +506,18 @@ def vip_membership_view(request):
                 else VIPPaymentTransaction.Status.PENDING
             )
 
+            # Extract actual amount from slip if detected by EasySlip, otherwise fallback to expected amount
+            amount_in_slip = easyslip_res.get('amount_in_slip')
+            if amount_in_slip is not None and float(amount_in_slip) > 0:
+                actual_amount = Decimal(str(amount_in_slip))
+            else:
+                actual_amount = expected_amount
+
             transaction = VIPPaymentTransaction.objects.create(
                 user=request.user,
                 ref_number=ref_number,
                 tier=chosen_tier,
-                amount=expected_amount,
+                amount=actual_amount,
                 slip_image=sanitized_slip,
                 slip_hash=slip_hash,
                 bank_trans_ref=easyslip_res.get('trans_ref', ''),

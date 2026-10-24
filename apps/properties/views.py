@@ -27,7 +27,17 @@ def property_create_view(request):
     """
     WHY SECURE:
     Owner is firmly bound from request.user (cannot be spoofed from POST data).
+    Enforces monthly listing quota so free users cannot bypass via property creation.
     """
+    if request.user.role not in [UserRole.ADMIN, UserRole.STAFF, UserRole.AGENT]:
+        if not request.user.can_post_listing():
+            messages.warning(
+                request,
+                '⚠️ คุณได้ใช้สิทธิ์ลงประกาศฟรีประจำเดือนนี้ครบแล้ว (จำกัด 1 ร้านค้าต่อเดือน) '
+                'กรุณาอัปเกรดเป็นสมาชิก VIP เพื่อลงประกาศเพิ่มได้ทันที'
+            )
+            return redirect('accounts:vip_membership')
+
     if request.method == 'POST':
         form = PropertyForm(request.POST)
         if form.is_valid():
