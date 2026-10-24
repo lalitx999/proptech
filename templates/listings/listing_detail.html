@@ -487,10 +487,10 @@
                         </a>
 
                         <!-- Copy Link -->
-                        <button type="button" onclick="copyListingLink()"
+                        <button type="button"
                                 id="copy-link-btn"
-                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 py-2.5 text-xs font-bold text-neutral-700 shadow-2xs transition cursor-pointer">
-                            <i data-lucide="share-2" class="w-3.5 h-3.5 text-neutral-500"></i>
+                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 py-2.5 text-xs font-bold text-neutral-700 shadow-2xs transition active:scale-95 cursor-pointer">
+                            <i data-lucide="share-2" id="copy-link-icon" class="w-3.5 h-3.5 text-neutral-500"></i>
                             <span id="copy-link-text">คัดลอกลิงก์ประกาศ</span>
                         </button>
                     </div>
@@ -739,26 +739,79 @@
         initGalleryAndDetailMap();
     }
 
-    function copyListingLink() {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(window.location.href).then(function() {
-                var btnText = document.getElementById('copy-link-text');
-                if (btnText) {
-                    btnText.textContent = '✅ คัดลอกลิงก์สำเร็จแล้ว!';
-                    setTimeout(function() {
-                        btnText.textContent = 'คัดลอกลิงก์ประกาศ';
-                    }, 2500);
+    // CSP-compliant & multi-device Copy Link Logic
+    function setupCopyListingLink() {
+        var copyBtn = document.getElementById('copy-link-btn');
+        var copyText = document.getElementById('copy-link-text');
+        if (!copyBtn) return;
+
+        copyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var url = window.location.href;
+
+            function showCopiedFeedback() {
+                if (copyText) copyText.textContent = '✅ คัดลอกลิงก์เรียบร้อย!';
+                copyBtn.classList.remove('border-neutral-300', 'bg-white', 'text-neutral-700');
+                copyBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+
+                setTimeout(function() {
+                    if (copyText) copyText.textContent = 'คัดลอกลิงก์ประกาศ';
+                    copyBtn.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+                    copyBtn.classList.add('border-neutral-300', 'bg-white', 'text-neutral-700');
+                }, 2500);
+            }
+
+            // Method 1: Modern navigator.clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showCopiedFeedback();
+                }).catch(function() {
+                    fallbackCopyExec(url);
+                });
+            } else {
+                fallbackCopyExec(url);
+            }
+
+            function fallbackCopyExec(text) {
+                try {
+                    var textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    var successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (successful) {
+                        showCopiedFeedback();
+                        return;
+                    }
+                } catch (err) {}
+
+                // Method 3: Mobile Native Share if available
+                if (navigator.share) {
+                    navigator.share({
+                        title: document.title,
+                        url: text
+                    }).catch(function() {});
+                    return;
                 }
-            }).catch(function() {
-                fallbackCopy();
-            });
-        } else {
-            fallbackCopy();
-        }
+
+                // Method 4: prompt fallback
+                prompt('คัดลอกลิงก์ประกาศนี้เพื่อแชร์ต่อ:', text);
+            }
+        });
     }
 
-    function fallbackCopy() {
-        prompt('คัดลอกลิงก์ประกาศนี้เพื่อแชร์ต่อ:', window.location.href);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCopyListingLink);
+    } else {
+        setupCopyListingLink();
     }
 </script>
 {% endblock %}
