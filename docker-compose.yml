@@ -50,8 +50,8 @@ services:
     container_name: proptech_nginx
     restart: unless-stopped
     ports:
-      # Bind strictly to localhost so public access is routed only through Cloudflare Tunnel
-      - "127.0.0.1:80:80"
+      # Bind strictly to localhost:8018 so public access is routed through Cloudflare Tunnel
+      - "127.0.0.1:8018:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume:/app/staticfiles:ro
