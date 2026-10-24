@@ -157,28 +157,59 @@
         }
         @keyframes wiggle-action {
             0%, 100% { transform: scale(1) rotate(0deg); }
-            15% { transform: scale(1.05) rotate(-3deg); }
-            30% { transform: scale(1.05) rotate(3deg); }
-            45% { transform: scale(1.02) rotate(-2deg); }
-            60% { transform: scale(1.02) rotate(2deg); }
-            75% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.08) rotate(-4.5deg); }
+            20% { transform: scale(1.08) rotate(4.5deg); }
+            30% { transform: scale(1.05) rotate(-3deg); }
+            40% { transform: scale(1.05) rotate(3deg); }
+            50% { transform: scale(1.02) rotate(0deg); }
+            65% { transform: scale(1) rotate(0deg); }
         }
         @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(0, 194, 116, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(0, 194, 116, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(0, 194, 116, 0.85); }
+            45% { box-shadow: 0 0 0 10px rgba(0, 194, 116, 0); }
             100% { box-shadow: 0 0 0 0 rgba(0, 194, 116, 0); }
         }
         .animate-wiggle-btn {
-            animation: wiggle-action 3.5s ease-in-out infinite, pulse-ring 3.5s ease-in-out infinite;
+            animation: wiggle-action 2.2s ease-in-out infinite, pulse-ring 2.2s ease-in-out infinite;
         }
-        @keyframes vip-wiggle {
-            0%, 100% { transform: translateY(0) scale(1); }
-            20% { transform: translateY(-2px) scale(1.03) rotate(-1.5deg); }
-            40% { transform: translateY(-2px) scale(1.03) rotate(1.5deg); }
-            60% { transform: translateY(0) scale(1); }
+        @keyframes vip-wobble-active {
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            12% { transform: translateY(-3px) scale(1.07) rotate(-3.5deg); box-shadow: 0 6px 14px rgba(245, 158, 11, 0.55); }
+            24% { transform: translateY(-3px) scale(1.07) rotate(3.5deg); box-shadow: 0 6px 14px rgba(245, 158, 11, 0.55); }
+            36% { transform: translateY(-1.5px) scale(1.04) rotate(-2deg); }
+            48% { transform: translateY(-1.5px) scale(1.04) rotate(2deg); }
+            60% { transform: translateY(0) scale(1) rotate(0deg); }
+        }
+        @keyframes vip-glow-ring {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85); }
+            45% { box-shadow: 0 0 0 9px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
         }
         .animate-vip-btn {
-            animation: vip-wiggle 4s ease-in-out infinite;
+            animation: vip-wobble-active 2.2s ease-in-out infinite, vip-glow-ring 2.2s ease-in-out infinite;
+        }
+        @keyframes fav-heartbeat {
+            0%, 100% { transform: scale(1); }
+            12% { transform: scale(1.08); box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35); }
+            24% { transform: scale(1.02); }
+            36% { transform: scale(1.09); box-shadow: 0 4px 12px rgba(244, 63, 94, 0.45); }
+            50% { transform: scale(1); }
+        }
+        .animate-fav-btn {
+            animation: fav-heartbeat 2.2s ease-in-out infinite;
+        }
+        @keyframes bell-ring {
+            0%, 100% { transform: rotate(0deg); }
+            8% { transform: rotate(14deg); }
+            16% { transform: rotate(-14deg); }
+            24% { transform: rotate(10deg); }
+            32% { transform: rotate(-10deg); }
+            40% { transform: rotate(0deg); }
+        }
+        .animate-bell-icon {
+            display: inline-block;
+            animation: bell-ring 2.5s ease-in-out infinite;
+            transform-origin: top center;
         }
         @keyframes banner-gradient-flow {
             0% { background-position: 0% 50%; }
@@ -271,24 +302,24 @@
                     <i data-lucide="home" class="w-4 h-4"></i>
                 </a>
 
-                <!-- VIP Upgrade Pill (กระดุกกระดิกเรียกสายตา) -->
+                <!-- VIP Upgrade Pill (หัวสุดอันที่ 1: เคลื่อนไหวเด่นชัด) -->
                 <a href="{% url 'accounts:vip_membership' %}"
                    class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-xs transition animate-vip-btn">
-                    <i data-lucide="crown" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="crown" class="w-3.5 h-3.5 text-yellow-200"></i>
                     <span>👑 สิทธิพิเศษ VIP (1,000 บ.)</span>
                 </a>
 
-                <!-- Saved Favorites Pill -->
+                <!-- Saved Favorites Pill (หัวสุดอันที่ 2: เคลื่อนไหวเด่นชัด) -->
                 <a href="{% url 'listings:listing_favorites' %}"
-                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 hover:bg-pink-100 text-brand-700 border border-pink-200 text-xs font-bold shadow-xs transition">
+                   class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 hover:bg-pink-100 text-brand-700 border border-pink-300 text-xs font-bold shadow-xs transition animate-fav-btn">
                     <i data-lucide="heart" class="w-3.5 h-3.5 fill-brand-600 text-brand-600"></i>
                     <span>ร้านที่ถูกใจ</span>
                 </a>
 
-                <!-- New Listing Alert Pill -->
+                <!-- New Listing Alert Pill (อันที่ 3) -->
                 <a href="{% url 'listings:marketplace' %}"
                    class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FF6B00] hover:bg-[#e66000] text-white text-xs font-bold shadow-xs transition">
-                    <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="bell" class="w-3.5 h-3.5 animate-bell-icon"></i>
                     <span>เตือนร้านใหม่</span>
                 </a>
             </div>
