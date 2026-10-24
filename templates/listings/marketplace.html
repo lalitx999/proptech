@@ -39,6 +39,8 @@
 <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .htmx-indicator { display: none !important; opacity: 0; pointer-events: none; }
+    .htmx-request.htmx-indicator, .htmx-request .htmx-indicator { display: flex !important; opacity: 1; pointer-events: auto; }
 </style>
 {% endblock %}
 
@@ -249,7 +251,7 @@
         <!-- 3. Results Header Bar & 4-Column Listings Container -->
         <div class="relative">
             <!-- HTMX Loading Spinner -->
-            <div id="loading-spinner" class="htmx-indicator absolute inset-0 bg-white/70 backdrop-blur-xs z-20 flex items-center justify-center rounded-2xl">
+            <div id="loading-spinner" class="htmx-indicator hidden absolute inset-0 bg-white/70 backdrop-blur-xs z-20 items-center justify-center rounded-2xl">
                 <div class="inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-5 py-2.5 text-xs font-bold text-white shadow-xl">
                     <svg class="animate-spin h-4 w-4 text-brand-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
