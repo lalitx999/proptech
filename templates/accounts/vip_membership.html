@@ -7,78 +7,164 @@
 <div class="min-h-screen bg-[#fcfcfa] py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-5xl space-y-8">
 
-        <!-- VIP Premium Hero Banner -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-pink-950 p-6 sm:p-10 text-white shadow-xl border border-pink-900/30">
-            <div class="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-brand-500/20 blur-3xl"></div>
-            <div class="absolute -left-16 -bottom-20 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl"></div>
-
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div class="space-y-3">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-300">
-                        <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
-                        <span>แพ็กเกจลงประกาศพรีเมียม VIP & SUPER VIP</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white">
-                        เซ้งร้านไวขึ้น 5-10 เท่า กับสิทธิ์ <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-pink-400 to-pink-200">👑 VIP & SUPER VIP</span>
-                    </h1>
-                    <p class="text-xs sm:text-sm text-neutral-300 max-w-xl leading-relaxed">
-                        เลือกแพ็กเกจที่ตอบโจทย์คุณ: โพสต์ฟรี 1 ครั้ง/เดือน, VIP โพสต์ 4 ครั้ง/เดือน + กลุ่มไม่จำกัด, หรือ Super VIP โพสต์ไม่จำกัดจนกว่าจะเซ้งได้ พร้อมแอดมินดันคลิป TikTok, เพจ และ YouTube!
-                    </p>
+        <!-- User Status Strip -->
+        <div class="rounded-2xl bg-white border border-neutral-200/90 p-3.5 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl {% if user.is_super_vip_active %}bg-amber-100 text-amber-700{% elif user.is_vip_active %}bg-brand-100 text-brand-700{% else %}bg-neutral-100 text-neutral-600{% endif %} flex items-center justify-center font-bold">
+                    {% if user.is_super_vip_active %}
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    {% elif user.is_vip_active %}
+                        <i data-lucide="crown" class="w-5 h-5"></i>
+                    {% else %}
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    {% endif %}
                 </div>
-
-                <!-- Status Card in Hero -->
-                <div class="flex-shrink-0 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5 text-center min-w-[220px]">
-                    <div class="text-xs font-semibold text-neutral-300">สถานะปัจจุบันของคุณ</div>
-                    <div class="mt-1 flex items-center justify-center gap-1.5 text-lg font-black {% if user.is_super_vip_active %}text-amber-300{% elif user.is_vip_active %}text-amber-400{% else %}text-white{% endif %}">
+                <div>
+                    <div class="text-[11px] font-semibold text-neutral-500">สถานะปัจจุบันของคุณ</div>
+                    <div class="text-sm font-black text-neutral-900 flex items-center gap-1.5">
                         {% if user.is_authenticated %}
                             {% if user.is_super_vip_active %}
-                                <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
-                                <span>สมาชิก Super VIP 👑</span>
+                                <span class="text-amber-600">สมาชิก Super VIP 👑</span>
+                                <span class="text-[11px] font-normal text-amber-600/80">(ตลอดชีพจนกว่าจะเซ้งได้)</span>
                             {% elif user.is_vip_active %}
-                                <i data-lucide="crown" class="w-5 h-5 text-amber-400"></i>
-                                <span>สมาชิก VIP 👑</span>
+                                <span class="text-brand-600">สมาชิก VIP 👑</span>
+                                {% if user.vip_expires_at %}<span class="text-[11px] font-normal text-neutral-500">(หมดอายุ: {{ user.vip_expires_at|date:"d M Y" }})</span>{% endif %}
                             {% else %}
-                                <i data-lucide="user" class="w-5 h-5 text-neutral-400"></i>
                                 <span>สมาชิกทั่วไป (Free)</span>
                             {% endif %}
                         {% else %}
-                            <i data-lucide="user" class="w-5 h-5 text-neutral-300"></i>
-                            <span>ผู้เข้าชมทั่วไป</span>
+                            <span class="text-neutral-700">ผู้เข้าชมทั่วไป</span>
                         {% endif %}
                     </div>
-                    <div class="mt-2 text-xs text-neutral-300">
-                        {% if user.is_authenticated %}
-                            โควตาเดือนนี้: 
-                            <span class="font-bold text-white">
-                                {% if user.is_super_vip_active %}
-                                    ไม่จำกัด (Unlimited)
-                                {% else %}
-                                    {{ posted_count }}/{{ monthly_quota }} ประกาศ
-                                {% endif %}
-                            </span>
-                        {% else %}
-                            สิทธิ์เริ่มต้น: <span class="font-bold text-white">โพสต์ฟรี 1 ครั้ง/เดือน</span>
-                        {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 text-xs">
+                {% if user.is_authenticated %}
+                    <div class="rounded-xl bg-neutral-50 border border-neutral-200/80 px-3 py-1.5">
+                        <span class="text-neutral-500">โควตาเดือนนี้:</span>
+                        <strong class="text-neutral-900 ml-1">
+                            {% if user.is_super_vip_active %}
+                                ไม่จำกัด (Unlimited)
+                            {% else %}
+                                {{ posted_count }}/{{ monthly_quota }} ประกาศ
+                            {% endif %}
+                        </strong>
                     </div>
-                    {% if user.is_authenticated %}
-                        {% if user.is_super_vip_active %}
-                        <div class="mt-1 text-[11px] text-amber-300 font-bold">
-                            สถานะ: ตลอดชีพจนกว่าจะเซ้งได้
+                {% else %}
+                    <a href="{% url 'accounts:login' %}?next={% url 'accounts:vip_membership' %}"
+                       class="inline-flex items-center gap-1 rounded-xl bg-neutral-900 text-white font-bold px-3.5 py-1.5 text-xs hover:bg-neutral-800 transition">
+                        <span>เข้าสู่ระบบเช็คสิทธิ์</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 2 VIP & SUPER VIP HERO BANNERS (จิ้มสมัครผ่านแบนเนอร์ได้ทันที) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            
+            <!-- Banner 1: สมัคร VIP 1,000 บ. -->
+            <div id="banner-vip-card"
+                 class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-rose-950 p-6 sm:p-7 text-white shadow-xl border-2 border-brand-500/70 hover:border-brand-500 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-950/50">
+                <div class="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-brand-500/25 blur-3xl pointer-events-none group-hover:bg-brand-500/35 transition"></div>
+                <div class="absolute -left-12 -bottom-12 h-44 w-44 rounded-full bg-pink-500/15 blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 space-y-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="inline-flex items-center gap-1.5 rounded-full border border-brand-400/50 bg-brand-500/25 px-3 py-1 text-xs font-bold text-pink-300">
+                            <i data-lucide="crown" class="w-3.5 h-3.5 text-amber-400"></i>
+                            <span>แพ็กเกจยอดนิยม 🔥</span>
                         </div>
-                        {% elif user.is_vip_active and user.vip_expires_at %}
-                        <div class="mt-1 text-[11px] text-amber-300/80">
-                            หมดอายุ: {{ user.vip_expires_at|date:"d M Y" }}
+                        <span class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">30 วัน / รายเดือน</span>
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">แพ็กเกจสำหรับร้านค้า</div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline gap-2 mt-0.5">
+                            <span>สมัคร VIP</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-200 font-mono text-3xl sm:text-4xl font-black">฿1,000</span>
+                        </h2>
+                        <p class="text-xs text-neutral-300 mt-1">
+                            เซ้งร้านไวขึ้น ดันประกาศขึ้นอันดับต้นๆ บนเว็บและกลุ่มด่วน
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-white/10 text-xs sm:text-sm text-neutral-200">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                            <span>โพสต์ได้ <strong>4 ครั้งต่อเดือน</strong> ที่เว็บไซต์</span>
                         </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="mt-2.5 pt-2 border-t border-white/10">
-                            <a href="{% url 'accounts:login' %}?next={% url 'accounts:vip_membership' %}"
-                               class="inline-flex items-center gap-1 text-[11px] text-amber-300 hover:text-white font-bold transition">
-                                <span>เข้าสู่ระบบเพื่อเช็คสิทธิ์</span>
-                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </a>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                            <span>โพสต์กลุ่ม "เซ้งร้านด่วน" ได้ <strong>ไม่จำกัด</strong></span>
                         </div>
-                    {% endif %}
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                            <span>ติดป้าย <strong>👑 VIP สีทอง</strong> ดันประกาศติดหน้าแรก</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative z-10 mt-6 pt-4 border-t border-white/10">
+                    <button type="button"
+                            class="w-full rounded-2xl bg-gradient-to-r from-brand-600 via-rose-600 to-pink-600 hover:from-brand-500 hover:to-pink-500 text-white py-3.5 px-4 text-sm font-black shadow-lg shadow-brand-950/60 flex items-center justify-center gap-2 transition group-hover:shadow-brand-600/40">
+                        <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+                        <span>จิ้มสมัคร VIP 1,000 [คลิกที่นี่]</span>
+                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Banner 2: สมัคร Super VIP 5,000 บ. -->
+            <div id="banner-super-vip-card"
+                 class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-950 via-neutral-900 to-amber-950/60 p-6 sm:p-7 text-white shadow-xl border-2 border-amber-400 hover:border-amber-300 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-950/50 ring-2 ring-amber-400/25">
+                <div class="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-500/25 blur-3xl pointer-events-none group-hover:bg-amber-500/35 transition"></div>
+                <div class="absolute -left-12 -bottom-12 h-44 w-44 rounded-full bg-yellow-500/20 blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 space-y-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/60 bg-amber-400/20 px-3 py-1 text-xs font-black text-amber-300 shadow-sm">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                            <span>คุ้มค่าสูงสุด ครบวงจร 👑</span>
+                        </div>
+                        <span class="text-[11px] font-black text-amber-300 uppercase tracking-wider">ตลอดชีพจนกว่าจะเซ้งได้</span>
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">แพ็กเกจพรีเมียมเหมาจ่าย</div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline gap-2 mt-0.5">
+                            <span>สมัคร Super VIP</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-100 font-mono text-3xl sm:text-4xl font-black">฿5,000</span>
+                        </h2>
+                        <p class="text-xs text-amber-200/90 mt-1">
+                            จ่ายครั้งเดียวจบ! ดูแลจนกว่าจะเซ้งได้ โพสต์ได้ไม่จำกัด
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-white/10 text-xs sm:text-sm text-neutral-200">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                            <span>โพสต์ได้ <strong>ไม่จำกัดจำนวน & เวลา จนกว่าจะเซ้งได้</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2 font-bold text-amber-200">
+                            <i data-lucide="gift" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                            <span>แถมฟรี! <strong>แอดมินช่วยทำคลิปดัน TikTok, เพจ, YouTube</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                            <span>ติดป้าย <strong>👑 Super VIP</strong> ทีมงานดันประกาศทุกสัปดาห์</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative z-10 mt-6 pt-4 border-t border-white/10">
+                    <button type="button"
+                            class="w-full rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-neutral-950 py-3.5 px-4 text-sm font-black shadow-lg shadow-amber-950/60 flex items-center justify-center gap-2 transition group-hover:shadow-amber-500/40">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-neutral-950"></i>
+                        <span>จิ้มสมัคร Super VIP 5,000 [คลิกที่นี่]</span>
+                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -630,6 +716,23 @@
         }
         if (btnSelectSuperVip) {
             btnSelectSuperVip.addEventListener('click', function() {
+                switchTier('super_vip');
+                paymentSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        // Top Banner Cards Click Handlers
+        var bannerVipCard = document.getElementById('banner-vip-card');
+        var bannerSuperVipCard = document.getElementById('banner-super-vip-card');
+
+        if (bannerVipCard) {
+            bannerVipCard.addEventListener('click', function() {
+                switchTier('vip');
+                paymentSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+        if (bannerSuperVipCard) {
+            bannerSuperVipCard.addEventListener('click', function() {
                 switchTier('super_vip');
                 paymentSection.scrollIntoView({ behavior: 'smooth' });
             });
