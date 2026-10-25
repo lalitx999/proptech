@@ -137,10 +137,21 @@ def admin_command_center_view(request):
     avg_price = Listing.objects.filter(status=ListingStatus.PUBLISHED).aggregate(avg=Avg('price'))['avg'] or 0
 
     # -------------------------------------------------------------------------
-    # 9. Fast Post Helper Data
+    # 10. Shop Owners & Contacts Directory Data (ข้อ 10)
     # -------------------------------------------------------------------------
-    owners_list = User.objects.filter(role__in=[UserRole.OWNER, UserRole.CUSTOMER, UserRole.STAFF, UserRole.ADMIN]).order_by('username')
-    property_types = PropertyType.choices
+    owner_q = request.GET.get('owner_q', '').strip()
+    owner_directory_qs = Listing.objects.select_related('property', 'property__owner', 'agent').order_by('ref_code')
+    if owner_q:
+        owner_directory_qs = owner_directory_qs.filter(
+            Q(ref_code__icontains=owner_q) |
+            Q(property__title__icontains=owner_q) |
+            Q(owner_name__icontains=owner_q) |
+            Q(owner_phone__icontains=owner_q) |
+            Q(owner_line_id__icontains=owner_q) |
+            Q(owner_facebook__icontains=owner_q) |
+            Q(property__owner__username__icontains=owner_q)
+        )
+    owner_directory_list = owner_directory_qs[:100]
 
     context = {
         'active_tab': active_tab,
@@ -172,6 +183,8 @@ def admin_command_center_view(request):
         'recent_slips': recent_slips,
         'documents_list': documents_list,
         'contact_messages': contact_messages,
+        'owner_directory_list': owner_directory_list,
+        'owner_q': owner_q,
         # Choices & Fast Form Data
         'owners_list': owners_list,
         'property_types': property_types,
@@ -578,4 +591,52 @@ def admin_agent_action_view(request, pk):
         messages.success(request, f'🗑️ ลบประวัตินายหน้า "{name}" ออกจากระบบเรียบร้อยแล้ว')
 
     return redirect('/admin-dashboard/?tab=agents')
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_update_shop_owner_view(request, pk):
+    """
+    Update owner contact details (Name, Phone, LINE, Facebook, Notes) for a specific shop code (Ref Code).
+    """
+    listing = get_object_or_404(Listing.objects.select_related('property'), pk=pk)
+    
+    owner_name = request.POST.get('owner_name', '').strip()
+    owner_phone = request.POST.get('owner_phone', '').strip()
+    owner_line_id = request.POST.get('owner_line_id', '').strip()
+    owner_facebook = request.POST.get('owner_facebook', '').strip()
+    owner_notes = request.POST.get('owner_notes', '').strip()
+
+    listing.owner_name = owner_name
+    listing.owner_phone = owner_phone
+    listing.owner_line_id = owner_line_id
+    listing.owner_facebook = owner_facebook
+    listing.owner_notes = owner_notes
+
+    # Keep contact_phone & contact_line_id in sync if empty
+    if owner_phone and not listing.contact_phone:
+        listing.contact_phone = owner_phone
+    if owner_line_id and not listing.contact_line_id:
+        listing.contact_line_id = owner_line_id
+
+    listing.save(update_fields=['owner_name', 'owner_phone', 'owner_line_id', 'owner_facebook', 'owner_notes', 'contact_phone', 'contact_line_id'])
+
+    AuditService.log(
+        action='UPDATE',
+        model_name='Listing',
+        object_id=listing.pk,
+        changes={
+            'action': 'UPDATE_OWNER_CONTACT',
+            'ref_code': listing.ref_code,
+            'owner_name': owner_name,
+            'owner_phone': owner_phone,
+            'owner_line_id': owner_line_id,
+            'owner_facebook': owner_facebook,
+        },
+        request=request
+    )
+
+    messages.success(request, f'✅ บันทึกข้อมูลเจ้าของร้านรหัส "{listing.ref_code}" ({listing.property.title}) เรียบร้อยแล้ว')
+    return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=owners'))
 

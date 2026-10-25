@@ -1,3 +1,4 @@
+import builtins
 import re
 import string
 from django.db import models
@@ -104,6 +105,32 @@ class Listing(models.Model):
         max_length=100,
         blank=True,
         help_text=_('LINE ID สำหรับติดต่อประกาศนี้')
+    )
+
+    # Shop Owner Contact Record (ทะเบียนข้อมูลเจ้าของร้านแต่ละรหัส - สำหรับ Admin)
+    owner_name = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text=_('ชื่อ-นามสกุล เจ้าของร้าน')
+    )
+    owner_phone = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text=_('เบอร์โทรศัพท์เจ้าของร้าน')
+    )
+    owner_line_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text=_('LINE ID เจ้าของร้าน')
+    )
+    owner_facebook = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_('Facebook เจ้าของร้าน / ลิงก์โปรไฟล์')
+    )
+    owner_notes = models.TextField(
+        blank=True,
+        help_text=_('บันทึกข้อมูลเจ้าของร้าน / เงื่อนไขพิเศษ')
     )
     
     # Financial Metrics (จุดขายของแพลตฟอร์มเซ้งร้าน)
@@ -218,6 +245,39 @@ class Listing(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('listings:listing_detail', kwargs={'pk': self.pk})
+
+    @builtins.property
+    def display_owner_name(self):
+        if self.owner_name:
+            return self.owner_name
+        if hasattr(self, 'property') and self.property and self.property.owner:
+            full = self.property.owner.get_full_name()
+            return full if full else self.property.owner.username
+        return '-'
+
+    @builtins.property
+    def display_owner_phone(self):
+        if self.owner_phone:
+            return self.owner_phone
+        if self.contact_phone:
+            return self.contact_phone
+        if hasattr(self, 'property') and self.property and self.property.owner and self.property.owner.phone:
+            return self.property.owner.phone
+        return '-'
+
+    @builtins.property
+    def display_owner_line_id(self):
+        if self.owner_line_id:
+            return self.owner_line_id
+        if self.contact_line_id:
+            return self.contact_line_id
+        if hasattr(self, 'property') and self.property and self.property.owner and self.property.owner.line_id:
+            return self.property.owner.line_id
+        return '-'
+
+    @builtins.property
+    def display_owner_facebook(self):
+        return self.owner_facebook or '-'
 
 class ListingApproval(models.Model):
     """

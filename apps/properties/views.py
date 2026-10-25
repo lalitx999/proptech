@@ -222,10 +222,23 @@ def property_update_view(request, pk):
             listing.avg_profit_3m = avg_profit
             listing.avg_revenue_3m = avg_revenue
             listing.includes_equipment = equipment
+            owner_name = request.POST.get('owner_name', '').strip()
+            owner_facebook = request.POST.get('owner_facebook', '').strip()
+            owner_notes = request.POST.get('owner_notes', '').strip()
+            if owner_name:
+                listing.owner_name = owner_name
             if contact_phone:
                 listing.contact_phone = contact_phone
+                if not listing.owner_phone:
+                    listing.owner_phone = contact_phone
             if contact_line_id:
                 listing.contact_line_id = contact_line_id
+                if not listing.owner_line_id:
+                    listing.owner_line_id = contact_line_id
+            if owner_facebook:
+                listing.owner_facebook = owner_facebook
+            if owner_notes:
+                listing.owner_notes = owner_notes
 
             # Status: "เซ้งได้แล้ว" Toggle Logic
             if is_closed:

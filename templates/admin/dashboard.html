@@ -135,6 +135,15 @@
                             <span>9. สถิติและการวิเคราะห์</span>
                         </div>
                     </a>
+
+                    <a href="?tab=owners" data-tab="owners"
+                       class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'owners' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="contact-2" class="w-4 h-4 text-emerald-600"></i>
+                            <span>10. ทะเบียนเจ้าของร้าน</span>
+                        </div>
+                        <span class="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-mono font-bold">{{ owner_directory_list|length }}</span>
+                    </a>
                 </nav>
 
                 <!-- Official KBank Info Widget in Sidebar -->
@@ -1341,6 +1350,190 @@
                     </div>
                 </div>
                 {% endif %}
+ 
+
+                <!-- TAB 10: SHOP OWNERS & CONTACTS DIRECTORY (ข้อ 10: ทะเบียนเจ้าของร้านแต่ละรหัส) -->
+                {% if active_tab == 'owners' %}
+                <div class="space-y-6">
+                    <!-- Top Summary & Search Header -->
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                    <i data-lucide="contact-2" class="w-5 h-5 text-emerald-600"></i>
+                                    <span>ข้อ 10: ทะเบียนเจ้าของร้านค้าแต่ละรหัส (Shop Owners Directory)</span>
+                                </h2>
+                                <p class="text-xs text-neutral-500 mt-1">
+                                    บันทึกและตรวจสอบว่าร้านแต่ละรหัส (Ref Code) ใครเป็นเจ้าของ: ชื่อ-นามสกุล, เบอร์โทรศัพท์, LINE ID, Facebook และหมายเหตุ
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-2 text-xs font-bold font-mono">
+                                    รวม {{ owner_directory_list|length }} รหัสประกาศในระบบ
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Search Filter -->
+                        <form method="get" class="flex flex-col sm:flex-row gap-2 pt-2">
+                            <input type="hidden" name="tab" value="owners">
+                            <div class="relative flex-1">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-neutral-400"></i>
+                                <input type="text" name="owner_q" value="{{ owner_q }}" id="owner-search-input"
+                                       placeholder="ค้นหารหัสร้าน (เช่น F001, V002, N001), ชื่อร้าน, ชื่อเจ้าของ, เบอร์โทร, LINE..."
+                                       class="w-full text-xs rounded-xl border border-neutral-200 pl-10 pr-4 py-2.5 bg-neutral-50/60 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden transition">
+                            </div>
+                            <button type="submit" class="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                <span>ค้นหา</span>
+                            </button>
+                            {% if owner_q %}
+                            <a href="?tab=owners" class="px-4 py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-xs font-bold transition flex items-center justify-center">
+                                ล้างค้นหา
+                            </a>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <!-- Owners Directory Table -->
+                    <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600" id="owner-directory-table">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">รหัสร้าน</th>
+                                        <th class="py-3 px-4">ชื่อร้านค้า & ทำเล</th>
+                                        <th class="py-3 px-4">ชื่อเจ้าของร้าน</th>
+                                        <th class="py-3 px-4">เบอร์โทรศัพท์</th>
+                                        <th class="py-3 px-4">LINE ID</th>
+                                        <th class="py-3 px-4">Facebook</th>
+                                        <th class="py-3 px-4">หมายเหตุ</th>
+                                        <th class="py-3 px-4 text-right">จัดการข้อมูล</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for item in owner_directory_list %}
+                                    <tr class="hover:bg-neutral-50/70 transition owner-row">
+                                        <!-- Ref Code -->
+                                        <td class="py-3.5 px-4 font-mono font-bold">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-200">
+                                                    {{ item.ref_code }}
+                                                </span>
+                                                {% if item.status == 'closed' %}
+                                                <span class="rounded bg-rose-100 text-rose-800 text-[9px] font-black px-1.5 py-0.2">เซ้งแล้ว</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <!-- Shop Title & District -->
+                                        <td class="py-3.5 px-4">
+                                            <a href="{% url 'listings:listing_detail' item.pk %}" target="_blank" class="font-bold text-neutral-900 hover:text-brand-600 transition truncate max-w-xs block">
+                                                {{ item.property.title }}
+                                            </a>
+                                            <div class="text-[11px] text-neutral-400 flex items-center gap-1 mt-0.5">
+                                                <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 shrink-0"></i>
+                                                <span>{{ item.property.district }}, {{ item.property.province }}</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Owner Name -->
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-neutral-900 flex items-center gap-1.5">
+                                                <i data-lucide="user" class="w-3.5 h-3.5 text-neutral-400 shrink-0"></i>
+                                                <span>{{ item.display_owner_name }}</span>
+                                            </div>
+                                            {% if item.property.owner %}
+                                            <div class="text-[10px] text-neutral-400 mt-0.5 font-mono">
+                                                User: {{ item.property.owner.username }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Owner Phone -->
+                                        <td class="py-3.5 px-4 font-mono">
+                                            {% if item.display_owner_phone != '-' %}
+                                            <a href="tel:{{ item.display_owner_phone }}" class="inline-flex items-center gap-1.5 text-neutral-800 hover:text-brand-600 font-semibold transition">
+                                                <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                                                <span>{{ item.display_owner_phone }}</span>
+                                            </a>
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Owner LINE ID -->
+                                        <td class="py-3.5 px-4">
+                                            {% if item.display_owner_line_id != '-' %}
+                                            <div class="inline-flex items-center gap-1.5 text-neutral-800">
+                                                <span class="w-3.5 h-3.5 rounded-xs bg-[#06C755] text-white text-[8px] font-black flex items-center justify-center shrink-0">L</span>
+                                                <span class="font-mono font-semibold">{{ item.display_owner_line_id }}</span>
+                                            </div>
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Owner Facebook -->
+                                        <td class="py-3.5 px-4">
+                                            {% if item.owner_facebook %}
+                                            {% if 'http' in item.owner_facebook %}
+                                            <a href="{{ item.owner_facebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-600 hover:underline truncate max-w-[120px]">
+                                                <i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                                                <span class="truncate">เปิดโปรไฟล์</span>
+                                            </a>
+                                            {% else %}
+                                            <div class="inline-flex items-center gap-1 text-neutral-800">
+                                                <i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                                                <span class="truncate max-w-[120px]">{{ item.owner_facebook }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Notes -->
+                                        <td class="py-3.5 px-4 max-w-[150px]">
+                                            {% if item.owner_notes %}
+                                            <span class="text-[11px] text-neutral-600 italic line-clamp-2" title="{{ item.owner_notes }}">
+                                                "{{ item.owner_notes }}"
+                                            </span>
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Actions -->
+                                        <td class="py-3.5 px-4 text-right">
+                                            <button type="button"
+                                                    class="open-edit-owner-modal-btn px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs shadow-2xs border border-emerald-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                    data-pk="{{ item.pk }}"
+                                                    data-ref="{{ item.ref_code }}"
+                                                    data-title="{{ item.property.title }}"
+                                                    data-name="{{ item.owner_name|default:'' }}"
+                                                    data-phone="{{ item.owner_phone|default:item.contact_phone|default:'' }}"
+                                                    data-line="{{ item.owner_line_id|default:item.contact_line_id|default:'' }}"
+                                                    data-fb="{{ item.owner_facebook|default:'' }}"
+                                                    data-notes="{{ item.owner_notes|default:'' }}">
+                                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                                <span>ลง/แก้ข้อมูล</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="py-12 text-center text-xs text-neutral-400">
+                                            <i data-lucide="inbox" class="w-8 h-8 text-neutral-300 mx-auto mb-2"></i>
+                                            <div>ไม่พบรายการร้านค้าตามเงื่อนไขที่ระบุ</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
             </div>
         </div>
@@ -1750,6 +1943,116 @@
     </div>
 </div>
 
+<!-- ========================================================================= -->
+<!-- EDIT SHOP OWNER MODAL (ข้อ 10: ทะเบียนข้อมูลเจ้าของร้านแต่ละรหัส) -->
+<!-- ========================================================================= -->
+<div id="edit-owner-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="contact-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm text-neutral-900">ลงข้อมูลผู้เป็นเจ้าของร้าน (Contact Directory)</h4>
+                    <div class="text-[11px] text-neutral-400" id="owner-modal-ref-code">รหัสประกาศ: -</div>
+                </div>
+            </div>
+            <button type="button" id="close-owner-modal-btn" class="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="edit-owner-form" method="post" action="" class="space-y-4">
+            {% csrf_token %}
+
+            <!-- Shop Info Card -->
+            <div class="bg-neutral-50 rounded-2xl p-3.5 border border-neutral-200 space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">ชื่อร้าน / โพสต์</span>
+                    <span id="owner-modal-badge" class="px-2 py-0.5 rounded-md text-[10px] font-black font-mono bg-neutral-900 text-white">-</span>
+                </div>
+                <div class="font-black text-neutral-900 text-xs truncate" id="owner-modal-shop-title">-</div>
+            </div>
+
+            <!-- Owner Name -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    ชื่อ-นามสกุล / ชื่อเล่น เจ้าของร้าน
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-neutral-400"><i data-lucide="user" class="w-4 h-4"></i></span>
+                    <input type="text" id="owner-name-input" name="owner_name"
+                           placeholder="เช่น คุณสมชาย (พี่เอก)"
+                           class="w-full text-xs font-medium rounded-xl border border-neutral-200 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Phone -->
+                <div>
+                    <label class="block text-xs font-bold text-neutral-700 mb-1">
+                        เบอร์โทรศัพท์ติดต่อ
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-neutral-400"><i data-lucide="phone" class="w-4 h-4"></i></span>
+                        <input type="tel" id="owner-phone-input" name="owner_phone"
+                               placeholder="081-234-5678"
+                               class="w-full text-xs font-mono font-medium rounded-xl border border-neutral-200 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                </div>
+
+                <!-- LINE ID -->
+                <div>
+                    <label class="block text-xs font-bold text-neutral-700 mb-1">
+                        LINE ID
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-emerald-500"><i data-lucide="message-circle" class="w-4 h-4"></i></span>
+                        <input type="text" id="owner-line-input" name="owner_line_id"
+                               placeholder="ไอดีไลน์ หรือ เบอร์ไลน์"
+                               class="w-full text-xs font-medium rounded-xl border border-neutral-200 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facebook -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    Facebook (ชื่อโปรไฟล์ / ลิงก์เฟส)
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-blue-500"><i data-lucide="facebook" class="w-4 h-4"></i></span>
+                    <input type="text" id="owner-fb-input" name="owner_facebook"
+                           placeholder="เช่น Somchai Jaidee หรือ https://facebook.com/..."
+                           class="w-full text-xs font-medium rounded-xl border border-neutral-200 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    หมายเหตุเจ้าของร้าน / ข้อมูลเพิ่มเติม (เฉพาะแอดมินเห็น)
+                </label>
+                <textarea id="owner-notes-input" name="owner_notes" rows="2"
+                          placeholder="เช่น ติดต่อสะดวกหลังบ่าย 2, คุยผ่านน้องสาวคุณเปิ้ล, รอเอกสารสัญญา..."
+                          class="w-full text-xs rounded-xl border border-neutral-200 p-2.5 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"></textarea>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+                <button type="button" id="cancel-owner-modal-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>บันทึกข้อมูลเจ้าของ</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Admin Dashboard JavaScript (Strict CSP Nonce Compliant) -->
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
@@ -1931,6 +2234,56 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (closeSettleBtn) closeSettleBtn.addEventListener('click', closeSettlementModal);
     if (cancelSettleBtn) cancelSettleBtn.addEventListener('click', closeSettlementModal);
+
+    // 6. Tab 10: Shop Owner Directory Modal Controls
+    var ownerModal = document.getElementById('edit-owner-modal');
+    var ownerForm = document.getElementById('edit-owner-form');
+    var ownerModalRefCode = document.getElementById('owner-modal-ref-code');
+    var ownerModalBadge = document.getElementById('owner-modal-badge');
+    var ownerModalShopTitle = document.getElementById('owner-modal-shop-title');
+    var ownerNameInput = document.getElementById('owner-name-input');
+    var ownerPhoneInput = document.getElementById('owner-phone-input');
+    var ownerLineInput = document.getElementById('owner-line-input');
+    var ownerFbInput = document.getElementById('owner-fb-input');
+    var ownerNotesInput = document.getElementById('owner-notes-input');
+    var closeOwnerBtn = document.getElementById('close-owner-modal-btn');
+    var cancelOwnerBtn = document.getElementById('cancel-owner-modal-btn');
+
+    function openOwnerModal(pk, ref, title, name, phone, line, fb, notes) {
+        if (!ownerModal || !ownerForm) return;
+        ownerForm.action = '/admin-dashboard/shops/' + pk + '/update-owner/';
+        if (ownerModalRefCode) ownerModalRefCode.textContent = 'รหัสประกาศ: ' + (ref || '-');
+        if (ownerModalBadge) ownerModalBadge.textContent = ref || '-';
+        if (ownerModalShopTitle) ownerModalShopTitle.textContent = title || '-';
+        if (ownerNameInput) ownerNameInput.value = name || '';
+        if (ownerPhoneInput) ownerPhoneInput.value = phone || '';
+        if (ownerLineInput) ownerLineInput.value = line || '';
+        if (ownerFbInput) ownerFbInput.value = fb || '';
+        if (ownerNotesInput) ownerNotesInput.value = notes || '';
+        ownerModal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function closeOwnerModal() {
+        if (ownerModal) ownerModal.classList.add('hidden');
+    }
+
+    document.querySelectorAll('.open-edit-owner-modal-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var pk = this.getAttribute('data-pk');
+            var ref = this.getAttribute('data-ref');
+            var title = this.getAttribute('data-title');
+            var name = this.getAttribute('data-name');
+            var phone = this.getAttribute('data-phone');
+            var line = this.getAttribute('data-line');
+            var fb = this.getAttribute('data-fb');
+            var notes = this.getAttribute('data-notes');
+            openOwnerModal(pk, ref, title, name, phone, line, fb, notes);
+        });
+    });
+
+    if (closeOwnerBtn) closeOwnerBtn.addEventListener('click', closeOwnerModal);
+    if (cancelOwnerBtn) cancelOwnerBtn.addEventListener('click', closeOwnerModal);
 
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
