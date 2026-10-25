@@ -5,6 +5,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.db import connection
+from django.db.models import Q
 from django.views.decorators.http import require_GET, require_safe
 from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer
 from apps.properties.models import PropertyType
@@ -16,51 +17,53 @@ def home_view(request):
     """
     Public marketplace homepage benchmarked against เซ้งร้าน.com.
     Optimized with select_related & prefetch_related to eliminate N+1 queries.
-    Provides verified, promotional, and recent listings alongside geolocation map data.
+    Provides verified listings, recent listings, and latest massage shop listings.
     """
     base_qs = Listing.objects.filter(
         status__in=[ListingStatus.PUBLISHED, ListingStatus.CLOSED]
-    ).select_related('property', 'agent').prefetch_related('property__images')
+    ).select_related('property', 'agent', 'property__owner').prefetch_related('property__images')
 
     # 1. อันดับ 1: ฝากเซ้ง (ประเมินแล้ว)
     # แผน A (หลัก): ดึงเฉพาะโพสต์ที่ได้รับการ Verify (ยืนยัน/มีป้าย Verified จาก Admin)
     verified_listings = base_qs.filter(
         is_admin_verified=True
-    ).order_by('-admin_verified_at', '-created_at')[:6]
+    ).order_by('-admin_verified_at', '-created_at')[:8]
 
     # แผน B (สำรอง): หากยังไม่มีร้านที่ verify ให้ดึงโพสต์ที่ Admin/Staff เป็นคนลงเอง
     if not verified_listings.exists():
         verified_listings = base_qs.filter(
             property__owner__role__in=['admin', 'staff']
-        ).order_by('-created_at')[:6]
+        ).order_by('-created_at')[:8]
 
     # Fallback สุดท้าย: โพสต์ที่มีตัวเลขกำไร หรือยอดเข้าชมสูง
     if not verified_listings.exists():
         verified_listings = base_qs.filter(
             avg_profit_3m__isnull=False
-        ).order_by('-avg_profit_3m', '-created_at')[:6]
+        ).order_by('-avg_profit_3m', '-created_at')[:8]
     if not verified_listings.exists():
-        verified_listings = base_qs.order_by('-view_count')[:6]
+        verified_listings = base_qs.order_by('-view_count')[:8]
 
     # 2. อันดับ 2: ประกาศล่าสุด (Chronological newest listings)
-    recent_listings = base_qs.order_by('-created_at')[:6]
+    recent_listings = base_qs.order_by('-created_at')[:10]
 
-    # 3. อันดับ 3: โปรโมชั่นล่าสุด (Listings with promotional incentives e.g. Free lease transfer fee)
-    promo_listings = base_qs.filter(
-        lease_transfer_fee_payer=FeePayer.FREE
-    ).order_by('price', '-created_at')[:6]
-    if not promo_listings.exists():
-        promo_listings = base_qs.order_by('price')[:6]
+    # 3. อันดับ 3: ร้านนวดล่าสุด (Listings in MASSAGE_SPA category or title containing นวด/สปา)
+    massage_listings = base_qs.filter(
+        Q(property__type=PropertyType.MASSAGE_SPA) |
+        Q(property__title__icontains='นวด') |
+        Q(property__title__icontains='สปา')
+    ).order_by('-created_at')[:10]
 
     total_listings = Listing.objects.filter(status=ListingStatus.PUBLISHED).count()
 
     context = {
         'verified_listings': verified_listings,
-        'promo_listings': promo_listings,
         'recent_listings': recent_listings,
+        'massage_listings': massage_listings,
+        'promo_listings': massage_listings,  # Alias for backward compatibility
         'total_listings': total_listings,
     }
     return render(request, 'core/home.html', context)
+
 
 
 @require_GET
