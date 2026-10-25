@@ -6,8 +6,9 @@ from django.views.decorators.http import require_http_methods
 from apps.accounts.permissions import role_required, can_view, can_edit, can_delete, get_scoped_queryset
 from apps.accounts.models import UserRole
 from apps.accounts.services.audit import AuditService
-from apps.properties.models import Property, PropertyImage
+from apps.properties.models import Property, PropertyImage, PropertyType
 from apps.properties.forms import PropertyForm, PropertyImageForm
+from apps.listings.models import FeePayer
 
 @login_required
 @role_required(UserRole.CUSTOMER, UserRole.OWNER, UserRole.AGENT, UserRole.STAFF, UserRole.ADMIN)
@@ -57,7 +58,12 @@ def property_create_view(request):
     else:
         form = PropertyForm()
 
-    return render(request, 'properties/property_form.html', {'form': form, 'title': 'เพิ่มข้อมูลทรัพย์สินใหม่'})
+    return render(request, 'properties/property_form.html', {
+        'form': form,
+        'title': 'เพิ่มข้อมูลทรัพย์สินใหม่',
+        'property_types': PropertyType.choices,
+        'fee_payers': FeePayer.choices,
+    })
 
 @login_required
 @require_http_methods(["GET"])
@@ -72,7 +78,6 @@ def property_detail_view(request, pk):
     return render(request, 'properties/property_detail.html', {'property': property_obj})
 
 @login_required
-@login_required
 @require_http_methods(["GET", "POST"])
 def property_update_view(request, pk):
     """
@@ -86,7 +91,7 @@ def property_update_view(request, pk):
     import logging
     from decimal import Decimal, InvalidOperation
     from django.utils import timezone
-    from apps.listings.models import Listing, ListingStatus, ListingType, generate_ref_code
+    from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer, generate_ref_code
     from apps.properties.models import PropertyType
 
     logger = logging.getLogger(__name__)
