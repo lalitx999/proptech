@@ -193,6 +193,52 @@
                         </div>
                     </div>
 
+                    <!-- Section: แนบลิงก์วิดีโอรีวิวร้าน (YouTube & TikTok) -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                                <i data-lucide="video" class="w-4 h-4"></i>
+                            </div>
+                            <span>แนบลิงก์วิดีโอรีวิวร้าน (YouTube & TikTok)</span>
+                        </div>
+                        <p class="text-xs text-neutral-500">
+                            แนบลิงก์คลิปวิดีโอพาชมร้านจาก YouTube หรือ TikTok เพื่อให้ผู้สนใจเห็นบรรยากาศจริง เพิ่มโอกาสปิดดีลเซ้งได้เร็วยิ่งขึ้น
+                        </p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1 flex items-center gap-1.5">
+                                    <i data-lucide="youtube" class="w-4 h-4 text-red-600"></i>
+                                    <span>ลิงก์คลิป YouTube รีวิวร้าน</span>
+                                </label>
+                                <input type="url" name="youtube_url" value="{% if listing %}{{ listing.youtube_url|default:'' }}{% endif %}"
+                                       placeholder="เช่น https://www.youtube.com/watch?v=... หรือ https://youtu.be/..."
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                                <p class="text-[10px] text-neutral-400 mt-1">ระบบจะดึงวิดีโอมาแสดงและเล่นบนหน้าประกาศให้อัตโนมัติ</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1 flex items-center gap-1.5">
+                                    <span class="w-4 h-4 rounded bg-black text-white text-[9px] font-black flex items-center justify-center">TT</span>
+                                    <span>ลิงก์คลิป TikTok รีวิวร้าน</span>
+                                </label>
+                                <input type="url" name="tiktok_url" value="{% if listing %}{{ listing.tiktok_url|default:'' }}{% endif %}"
+                                       placeholder="เช่น https://www.tiktok.com/@user/video/... หรือ https://vt.tiktok.com/..."
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1 flex items-center gap-1.5">
+                                    <i data-lucide="facebook" class="w-4 h-4 text-blue-600"></i>
+                                    <span>ลิงก์โพสต์ Facebook หรือเพจร้าน (ถ้ามี)</span>
+                                </label>
+                                <input type="url" name="facebook_post_url" value="{% if listing %}{{ listing.facebook_post_url|default:'' }}{% endif %}"
+                                       placeholder="เช่น https://www.facebook.com/..."
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
 

@@ -212,6 +212,26 @@ class Listing(models.Model):
     )
     admin_verified_at = models.DateTimeField(null=True, blank=True)
 
+    # Social & Video Review Links (YouTube, TikTok, Facebook)
+    youtube_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text=_('ลิงก์คลิป YouTube รีวิวร้าน (เช่น https://www.youtube.com/watch?v=... หรือ https://youtu.be/...)')
+    )
+    tiktok_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text=_('ลิงก์คลิป TikTok รีวิวร้าน (เช่น https://www.tiktok.com/@.../video/...)')
+    )
+    facebook_post_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text=_('ลิงก์โพสต์ Facebook หรือเพจร้าน')
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -279,6 +299,17 @@ class Listing(models.Model):
     def display_owner_facebook(self):
         return self.owner_facebook or '-'
 
+    @builtins.property
+    def youtube_embed_url(self):
+        """Extract YouTube video ID and return embed URL if valid."""
+        if not self.youtube_url:
+            return None
+        import re
+        match = re.search(r'(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|shorts\/|&v=)([^#&?]+)', self.youtube_url)
+        if match:
+            return f"https://www.youtube.com/embed/{match.group(1)}"
+        return None
+
 class ListingApproval(models.Model):
     """
     WHY SECURE:
@@ -312,3 +343,60 @@ class ListingApproval(models.Model):
 
     def __str__(self):
         return f"{self.reviewer} {self.action} on {self.listing.ref_code}"
+
+
+class ShopOwnerRecord(models.Model):
+    """
+    WHY SECURE & PRACTICAL:
+    Raw shop owner contacts recorded by Admin directly (before or without a post/listing).
+    Admin can input raw owner data first and convert to listing / fast post later.
+    """
+    owner_name = models.CharField(max_length=150, help_text=_('ชื่อ-นามสกุล เจ้าของร้าน'))
+    owner_phone = models.CharField(max_length=50, blank=True, help_text=_('เบอร์โทรศัพท์'))
+    owner_line_id = models.CharField(max_length=100, blank=True, help_text=_('LINE ID'))
+    owner_facebook = models.CharField(max_length=255, blank=True, help_text=_('Facebook / ลิงก์โปรไฟล์'))
+    shop_name = models.CharField(max_length=255, blank=True, help_text=_('ชื่อร้าน / กิจการ'))
+    category = models.CharField(max_length=100, blank=True, help_text=_('หมวดหมู่ร้านค้า'))
+    location = models.CharField(max_length=255, blank=True, help_text=_('ทำเลที่ตั้ง / เขต / จังหวัด'))
+    expected_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('ราคาเซ้งโดยประมาณ (บาท)')
+    )
+    monthly_rent = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_('ค่าเช่า/เดือน (บาท)')
+    )
+    notes = models.TextField(blank=True, help_text=_('ข้อมูลดิบ / รายละเอียด / เงื่อนไขเจ้าของร้าน'))
+    
+    # Optional link to listing when post is created
+    listing = models.ForeignKey(
+        'Listing',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='raw_owner_records',
+        help_text=_('โพสต์ประกาศที่สร้างจากข้อมูลนี้ (ถ้ามี)')
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_owner_records'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _('Shop Owner Record')
+        verbose_name_plural = _('Shop Owner Records')
+
+    def __str__(self):
+        return f"{self.owner_name} ({self.shop_name or 'ไม่ระบุชื่อร้าน'})"

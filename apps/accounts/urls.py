@@ -26,6 +26,9 @@ urlpatterns = [
     path('dashboard/telegram/detect/', admin_views.admin_telegram_detect_view, name='admin_telegram_detect'),
     path('dashboard/agents/create/', admin_views.admin_create_agent_view, name='admin_create_agent'),
     path('dashboard/agents/<int:pk>/action/', admin_views.admin_agent_action_view, name='admin_agent_action'),
+    path('dashboard/owners/create/', admin_views.admin_create_raw_owner_view, name='admin_create_raw_owner'),
+    path('dashboard/owners/<int:pk>/update/', admin_views.admin_update_raw_owner_view, name='admin_update_raw_owner'),
+    path('dashboard/owners/<int:pk>/delete/', admin_views.admin_delete_raw_owner_view, name='admin_delete_raw_owner'),
     path('dashboard/shops/<int:pk>/update-owner/', admin_views.admin_update_shop_owner_view, name='admin_update_shop_owner'),
     path('dashboard/shops/<int:pk>/delete-owner/', admin_views.admin_delete_shop_owner_view, name='admin_delete_shop_owner'),
 ]

@@ -1,5 +1,5 @@
 import logging
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,7 @@ from apps.accounts.permissions import role_required
 from apps.accounts.models import User, UserRole, VIPPaymentTransaction, AgentProfile
 from apps.accounts.services.audit import AuditService
 from apps.properties.models import Property, PropertyType, PropertyImage
-from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer
+from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer, ShopOwnerRecord
 from apps.leads.models import Lead, LeadStatus, LeadUrgency
 from apps.contracts.models import Deal, DealStage, ContractDocument, DocumentType
 from apps.core.models import ContactMessage
@@ -147,6 +147,8 @@ def admin_command_center_view(request):
     # -------------------------------------------------------------------------
     owner_q = request.GET.get('owner_q', '').strip()
     owner_directory_qs = Listing.objects.select_related('property', 'property__owner', 'agent').order_by('ref_code')
+    raw_owner_records_qs = ShopOwnerRecord.objects.select_related('listing', 'listing__property').order_by('-created_at')
+
     if owner_q:
         owner_directory_qs = owner_directory_qs.filter(
             Q(ref_code__icontains=owner_q) |
@@ -157,7 +159,18 @@ def admin_command_center_view(request):
             Q(owner_facebook__icontains=owner_q) |
             Q(property__owner__username__icontains=owner_q)
         )
+        raw_owner_records_qs = raw_owner_records_qs.filter(
+            Q(owner_name__icontains=owner_q) |
+            Q(owner_phone__icontains=owner_q) |
+            Q(owner_line_id__icontains=owner_q) |
+            Q(owner_facebook__icontains=owner_q) |
+            Q(shop_name__icontains=owner_q) |
+            Q(location__icontains=owner_q) |
+            Q(notes__icontains=owner_q) |
+            Q(listing__ref_code__icontains=owner_q)
+        )
     owner_directory_list = owner_directory_qs[:100]
+    raw_owner_records = raw_owner_records_qs[:100]
 
     context = {
         'active_tab': active_tab,
@@ -190,6 +203,7 @@ def admin_command_center_view(request):
         'documents_list': documents_list,
         'contact_messages': contact_messages,
         'owner_directory_list': owner_directory_list,
+        'raw_owner_records': raw_owner_records,
         'owner_q': owner_q,
         # Choices & Fast Form Data
         'owners_list': owners_list,
@@ -343,6 +357,11 @@ def admin_fast_create_shop_view(request):
         request.POST.get('auto_publish') == '1'
     )
 
+    youtube_url = request.POST.get('youtube_url', '').strip()
+    tiktok_url = request.POST.get('tiktok_url', '').strip()
+    facebook_post_url = request.POST.get('facebook_post_url', '').strip()
+    raw_owner_id = request.POST.get('raw_owner_id')
+
     if not title or not price or not district:
         messages.error(request, 'กรุณากรอกชื่อร้าน ราคาเซ้ง และทำเลที่ตั้งให้ครบถ้วน')
         return redirect('/admin-dashboard/?tab=shops')
@@ -416,11 +435,18 @@ def admin_fast_create_shop_view(request):
             owner_notes=owner_notes,
             contact_phone=contact_phone or (owner.phone if owner else ''),
             contact_line_id=contact_line_id or (getattr(owner, 'line_id', '') if owner else ''),
+            youtube_url=youtube_url or None,
+            tiktok_url=tiktok_url or None,
+            facebook_post_url=facebook_post_url or None,
             status=ListingStatus.PUBLISHED if is_immediate_publish else ListingStatus.PENDING,
             is_admin_verified=is_admin_verified,
             admin_verified_at=timezone.now() if is_admin_verified else None,
             type=ListingType.TAKEOVER,
         )
+
+        # Link raw owner record if created from raw owner lead
+        if raw_owner_id:
+            ShopOwnerRecord.objects.filter(pk=raw_owner_id).update(listing=listing)
 
         # 3. Handle Multi-Image Upload
         image_files = request.FILES.getlist('images')
@@ -708,4 +734,136 @@ def admin_delete_shop_owner_view(request, pk):
 
     messages.success(request, f'🗑️ ลบข้อมูลเจ้าของร้านรหัส "{ref_code}" ({shop_title}) เรียบร้อยแล้ว')
     return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=owners'))
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_create_raw_owner_view(request):
+    """
+    Directly register raw shop owner data into Tab 10 without requiring an existing post.
+    Admins can record seller contacts ahead of time, then create a post later.
+    """
+    owner_name = request.POST.get('owner_name', '').strip()
+    owner_phone = request.POST.get('owner_phone', '').strip()
+    owner_line_id = request.POST.get('owner_line_id', '').strip()
+    owner_facebook = request.POST.get('owner_facebook', '').strip()
+    shop_name = request.POST.get('shop_name', '').strip()
+    category = request.POST.get('category', '').strip()
+    location = request.POST.get('location', '').strip()
+    notes = request.POST.get('notes', '').strip()
+    
+    price_raw = request.POST.get('expected_price', '').replace(',', '').strip()
+    rent_raw = request.POST.get('monthly_rent', '').replace(',', '').strip()
+    
+    expected_price = None
+    if price_raw:
+        try:
+            expected_price = Decimal(price_raw)
+        except (ValueError, InvalidOperation):
+            expected_price = None
+            
+    monthly_rent = None
+    if rent_raw:
+        try:
+            monthly_rent = Decimal(rent_raw)
+        except (ValueError, InvalidOperation):
+            monthly_rent = None
+
+    if not owner_name:
+        messages.error(request, 'กรุณาระบุชื่อเจ้าของร้าน')
+        return redirect('/admin-dashboard/?tab=owners')
+
+    record = ShopOwnerRecord.objects.create(
+        owner_name=owner_name,
+        owner_phone=owner_phone,
+        owner_line_id=owner_line_id,
+        owner_facebook=owner_facebook,
+        shop_name=shop_name,
+        category=category,
+        location=location,
+        expected_price=expected_price,
+        monthly_rent=monthly_rent,
+        notes=notes,
+        created_by=request.user
+    )
+
+    AuditService.log(
+        action='CREATE',
+        model_name='ShopOwnerRecord',
+        object_id=record.pk,
+        changes={'owner_name': owner_name, 'shop_name': shop_name, 'phone': owner_phone},
+        request=request
+    )
+    messages.success(request, f'✅ บันทึกข้อมูลดิบเจ้าของร้าน "{owner_name}" ({shop_name or "ยังไม่มีชื่อร้าน"}) เรียบร้อยแล้ว')
+    return redirect('/admin-dashboard/?tab=owners')
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_update_raw_owner_view(request, pk):
+    """
+    Update raw shop owner record.
+    """
+    record = get_object_or_404(ShopOwnerRecord, pk=pk)
+    
+    owner_name = request.POST.get('owner_name', '').strip()
+    if not owner_name:
+        messages.error(request, 'กรุณาระบุชื่อเจ้าของร้าน')
+        return redirect('/admin-dashboard/?tab=owners')
+
+    record.owner_name = owner_name
+    record.owner_phone = request.POST.get('owner_phone', '').strip()
+    record.owner_line_id = request.POST.get('owner_line_id', '').strip()
+    record.owner_facebook = request.POST.get('owner_facebook', '').strip()
+    record.shop_name = request.POST.get('shop_name', '').strip()
+    record.category = request.POST.get('category', '').strip()
+    record.location = request.POST.get('location', '').strip()
+    record.notes = request.POST.get('notes', '').strip()
+    
+    price_raw = request.POST.get('expected_price', '').replace(',', '').strip()
+    rent_raw = request.POST.get('monthly_rent', '').replace(',', '').strip()
+    try:
+        record.expected_price = Decimal(price_raw) if price_raw else None
+    except (ValueError, InvalidOperation):
+        pass
+    try:
+        record.monthly_rent = Decimal(rent_raw) if rent_raw else None
+    except (ValueError, InvalidOperation):
+        pass
+
+    record.save()
+    AuditService.log(
+        action='UPDATE',
+        model_name='ShopOwnerRecord',
+        object_id=record.pk,
+        changes={'owner_name': record.owner_name, 'shop_name': record.shop_name},
+        request=request
+    )
+    messages.success(request, f'✅ อัปเดตข้อมูลเจ้าของร้าน "{record.owner_name}" เรียบร้อยแล้ว')
+    return redirect('/admin-dashboard/?tab=owners')
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_delete_raw_owner_view(request, pk):
+    """
+    Delete a raw shop owner record.
+    """
+    record = get_object_or_404(ShopOwnerRecord, pk=pk)
+    name = record.owner_name
+    shop = record.shop_name
+    record.delete()
+    
+    AuditService.log(
+        action='DELETE',
+        model_name='ShopOwnerRecord',
+        object_id=pk,
+        changes={'owner_name': name, 'shop_name': shop},
+        request=request
+    )
+    messages.success(request, f'🗑️ ลบข้อมูลเจ้าของร้าน "{name}" ออกจากระบบเรียบร้อยแล้ว')
+    return redirect('/admin-dashboard/?tab=owners')
 

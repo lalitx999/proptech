@@ -177,6 +177,18 @@
                         <span>มีพนักงานพร้อมทำต่อ</span>
                     </span>
                     {% endif %}
+                    {% if listing.youtube_url %}
+                    <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg bg-red-600/90 hover:bg-red-600 backdrop-blur-md px-2.5 py-1 text-xs font-bold text-white inline-flex items-center gap-1 transition">
+                        <i data-lucide="youtube" class="w-3.5 h-3.5"></i>
+                        <span>มีคลิป YouTube</span>
+                    </a>
+                    {% endif %}
+                    {% if listing.tiktok_url %}
+                    <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg bg-neutral-900/90 hover:bg-black backdrop-blur-md px-2.5 py-1 text-xs font-bold text-white inline-flex items-center gap-1 transition">
+                        <span class="w-3.5 h-3.5 rounded bg-white text-black text-[8px] font-black flex items-center justify-center">TT</span>
+                        <span>มีคลิป TikTok</span>
+                    </a>
+                    {% endif %}
                 </div>
 
                 <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
@@ -327,6 +339,61 @@
                         {{ listing.property.desc }}
                     </div>
                 </div>
+
+                {% if listing.youtube_url or listing.tiktok_url or listing.facebook_post_url %}
+                <!-- 2.3.5 Video Review & Social Tour (YouTube, TikTok, Facebook) -->
+                <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+                        <h2 class="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="video" class="w-5 h-5 text-red-600"></i>
+                            <span>วิดีโอรีวิวและคลิปพาชมสถานที่จริง</span>
+                        </h2>
+                        <span class="text-[10px] font-bold bg-red-50 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+                            <span>คลิปรีวิว</span>
+                        </span>
+                    </div>
+
+                    {% if listing.youtube_embed_url %}
+                    <!-- Embedded YouTube Player -->
+                    <div class="relative aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-200 bg-neutral-950">
+                        <iframe src="{{ listing.youtube_embed_url }}"
+                                title="วิดีโอรีวิวร้าน {{ listing.property.title }}"
+                                class="w-full h-full"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen></iframe>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                        {% if listing.youtube_url %}
+                        <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-xs">
+                            <i data-lucide="youtube" class="w-4 h-4"></i>
+                            <span>เปิดดูบน YouTube</span>
+                        </a>
+                        {% endif %}
+
+                        {% if listing.tiktok_url %}
+                        <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-black text-white text-xs font-bold transition shadow-xs">
+                            <span class="w-4 h-4 rounded bg-white text-black text-[9px] font-black flex items-center justify-center">TT</span>
+                            <span>เปิดดูคลิปรีวิวบน TikTok</span>
+                        </a>
+                        {% endif %}
+
+                        {% if listing.facebook_post_url %}
+                        <a href="{{ listing.facebook_post_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
+                            <i data-lucide="facebook" class="w-4 h-4"></i>
+                            <span>เปิดดูบน Facebook</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
 
                 <!-- 2.4 Lease Terms & Inventory Table -->
                 <div class="rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-5">

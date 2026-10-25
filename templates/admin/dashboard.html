@@ -1352,29 +1352,36 @@
                 {% endif %}
  
 
-                <!-- TAB 10: SHOP OWNERS & CONTACTS DIRECTORY (ข้อ 10: ทะเบียนเจ้าของร้านแต่ละรหัส) -->
+                <!-- TAB 10: SHOP OWNERS & CONTACTS DIRECTORY (ข้อ 10: ทะเบียนเจ้าของร้านแต่ละรหัส & ข้อมูลดิบก่อนลงโพสต์) -->
                 {% if active_tab == 'owners' %}
                 <div class="space-y-6">
-                    <!-- Top Summary & Search Header -->
+                    <!-- Top Summary & Action Buttons Header -->
                     <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
                                 <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
                                     <i data-lucide="contact-2" class="w-5 h-5 text-emerald-600"></i>
-                                    <span>ข้อ 10: ทะเบียนเจ้าของร้านค้าแต่ละรหัส (Shop Owners Directory)</span>
+                                    <span>ข้อ 10: ทะเบียนเจ้าของร้าน & บันทึกข้อมูลดิบก่อนลงโพสต์ (Shop Owners Directory & Raw Leads)</span>
                                 </h2>
                                 <p class="text-xs text-neutral-500 mt-1">
-                                    บันทึกและตรวจสอบว่าร้านแต่ละรหัส (Ref Code) ใครเป็นเจ้าของ: ชื่อ-นามสกุล, เบอร์โทรศัพท์, LINE ID, Facebook และหมายเหตุ
+                                    ลงข้อมูลดิบเจ้าของร้านล่วงหน้าได้ทันที (คุยไว้ก่อน/ลงโพสต์ทีหลัง) และตรวจสอบว่าร้านแต่ละรหัส (Ref Code) ใครเป็นเจ้าของ
                                 </p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <button type="button" id="open-add-owner-modal-btn"
-                                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
-                                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                                    <span>+ เพิ่มข้อมูลเจ้าของร้าน</span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <!-- Button 1: Add Raw Owner Record Directly -->
+                                <button type="button" id="open-raw-owner-modal-btn"
+                                        class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                    <span>+ บันทึกข้อมูลดิบเจ้าของร้าน (ไม่ต้องอิงโพสต์)</span>
                                 </button>
-                                <span class="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-2 text-xs font-bold font-mono">
-                                    รวม {{ owner_directory_list|length }} รหัสประกาศในระบบ
+                                <!-- Button 2: Assign Owner to Existing Listing -->
+                                <button type="button" id="open-add-owner-modal-btn"
+                                        class="px-3.5 py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="link" class="w-4 h-4 text-neutral-500"></i>
+                                    <span>ผูกเจ้าของกับรหัสประกาศเดิม</span>
+                                </button>
+                                <span class="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-2 text-xs font-bold font-mono">
+                                    {{ raw_owner_records|length }} ข้อมูลดิบ | {{ owner_directory_list|length }} รหัสประกาศ
                                 </span>
                             </div>
                         </div>
@@ -1385,7 +1392,7 @@
                             <div class="relative flex-1">
                                 <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-neutral-400"></i>
                                 <input type="text" name="owner_q" value="{{ owner_q }}" id="owner-search-input"
-                                       placeholder="ค้นหารหัสร้าน (เช่น F001, V002, N001), ชื่อร้าน, ชื่อเจ้าของ, เบอร์โทร, LINE..."
+                                       placeholder="ค้นหาชื่อเจ้าของ, เบอร์โทร, LINE, Facebook, ชื่อร้าน, ทำเล หรือรหัสร้าน (เช่น F001, V002, N001)..."
                                        class="w-full text-xs rounded-xl border border-neutral-200 pl-10 pr-4 py-2.5 bg-neutral-50/60 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden transition">
                             </div>
                             <button type="submit" class="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
@@ -1399,8 +1406,239 @@
                         </form>
                     </div>
 
-                    <!-- Owners Directory Table -->
+                    <!-- ========================================================================= -->
+                    <!-- SECTION 1: RAW OWNER RECORDS (บันทึกข้อมูลดิบก่อน / นำไปลงโพสต์ทีหลัง) -->
+                    <!-- ========================================================================= -->
                     <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
+                        <div class="p-4 sm:p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-50/50">
+                            <div>
+                                <h3 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span>1. ทะเบียนข้อมูลดิบเจ้าของร้าน (บันทึกข้อมูลก่อน / โพสต์ทีหลัง)</span>
+                                </h3>
+                                <p class="text-[11px] text-neutral-500 mt-0.5">
+                                    ข้อมูลผู้สนใจลงเซ้งร้านที่โทรเข้ามาหรือทัก LINE ไว้ก่อน ยังไม่จำเป็นต้องมีโพสต์ เมื่อพร้อมสามารถกด "🚀 นำไปลงโพสต์" ได้ทันที
+                                </p>
+                            </div>
+                            <span class="rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black px-2.5 py-1 shrink-0 self-start sm:self-auto font-mono">
+                                รวม {{ raw_owner_records|length }} รายการ
+                            </span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">วันที่บันทึก</th>
+                                        <th class="py-3 px-4">ข้อมูลเจ้าของร้าน</th>
+                                        <th class="py-3 px-4">ชื่อร้าน & ทำเล</th>
+                                        <th class="py-3 px-4">ราคาเซ้ง / ค่าเช่า</th>
+                                        <th class="py-3 px-4">หมายเหตุ / การคุย</th>
+                                        <th class="py-3 px-4">สถานะโพสต์</th>
+                                        <th class="py-3 px-4 text-right">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for rec in raw_owner_records %}
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <!-- Created Date -->
+                                        <td class="py-3 px-4 font-mono text-[11px] text-neutral-400 whitespace-nowrap">
+                                            {{ rec.created_at|date:"d M Y" }}<br>
+                                            <span class="text-[10px] text-neutral-400">{{ rec.created_at|date:"H:i" }} น.</span>
+                                        </td>
+
+                                        <!-- Owner Contact -->
+                                        <td class="py-3 px-4">
+                                            <div class="font-bold text-neutral-900 flex items-center gap-1.5">
+                                                <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                                                <span>{{ rec.owner_name }}</span>
+                                            </div>
+                                            <div class="mt-1 flex flex-col gap-0.5 text-[11px]">
+                                                {% if rec.owner_phone %}
+                                                <a href="tel:{{ rec.owner_phone }}" class="inline-flex items-center gap-1 text-neutral-700 hover:text-brand-600 font-mono font-medium">
+                                                    <i data-lucide="phone" class="w-3 h-3 text-neutral-400"></i>
+                                                    <span>{{ rec.owner_phone }}</span>
+                                                </a>
+                                                {% endif %}
+                                                {% if rec.owner_line_id %}
+                                                <div class="inline-flex items-center gap-1 text-neutral-700 font-mono">
+                                                    <span class="w-3 h-3 rounded-xs bg-[#06C755] text-white text-[7px] font-black flex items-center justify-center">L</span>
+                                                    <span>{{ rec.owner_line_id }}</span>
+                                                </div>
+                                                {% endif %}
+                                                {% if rec.owner_facebook %}
+                                                {% if 'http' in rec.owner_facebook %}
+                                                <a href="{{ rec.owner_facebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                                                    <i data-lucide="facebook" class="w-3 h-3"></i>
+                                                    <span>เปิด Facebook</span>
+                                                </a>
+                                                {% else %}
+                                                <div class="inline-flex items-center gap-1 text-neutral-700">
+                                                    <i data-lucide="facebook" class="w-3 h-3 text-blue-600"></i>
+                                                    <span>{{ rec.owner_facebook }}</span>
+                                                </div>
+                                                {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <!-- Shop Name & Location -->
+                                        <td class="py-3 px-4">
+                                            <div class="font-bold text-neutral-900">
+                                                {{ rec.shop_name|default:"(ยังไม่ระบุชื่อร้าน)" }}
+                                            </div>
+                                            <div class="text-[11px] text-neutral-500 mt-0.5 flex flex-wrap items-center gap-1.5">
+                                                {% if rec.category %}
+                                                <span class="rounded bg-neutral-100 text-neutral-700 text-[10px] px-1.5 py-0.5 font-medium">
+                                                    {{ rec.category }}
+                                                </span>
+                                                {% endif %}
+                                                {% if rec.location %}
+                                                <span class="flex items-center gap-0.5 text-neutral-400">
+                                                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                                    <span>{{ rec.location }}</span>
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <!-- Price & Rent -->
+                                        <td class="py-3 px-4 font-mono">
+                                            {% if rec.expected_price %}
+                                            <div class="font-black text-brand-600">
+                                                ฿{{ rec.expected_price|floatformat:0 }}
+                                            </div>
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                            {% if rec.monthly_rent %}
+                                            <div class="text-[11px] text-neutral-500 mt-0.5">
+                                                ค่าเช่า: ฿{{ rec.monthly_rent|floatformat:0 }}/ด.
+                                            </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Notes -->
+                                        <td class="py-3 px-4 max-w-[180px]">
+                                            {% if rec.notes %}
+                                            <span class="text-[11px] text-neutral-600 line-clamp-3 italic" title="{{ rec.notes }}">
+                                                "{{ rec.notes }}"
+                                            </span>
+                                            {% else %}
+                                            <span class="text-neutral-300">-</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Post Status & Convert to Post -->
+                                        <td class="py-3 px-4">
+                                            {% if rec.listing %}
+                                            <div class="space-y-1">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono">
+                                                    <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-600"></i>
+                                                    <span>ลงโพสต์แล้ว: {{ rec.listing.ref_code }}</span>
+                                                </span>
+                                                <a href="{% url 'listings:listing_detail' rec.listing.pk %}" target="_blank"
+                                                   class="block text-[10px] text-brand-600 hover:underline font-bold truncate max-w-[130px]">
+                                                    {{ rec.listing.property.title }}
+                                                </a>
+                                            </div>
+                                            {% else %}
+                                            <div class="space-y-1.5">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                    <i data-lucide="clock" class="w-3 h-3"></i>
+                                                    <span>ยังไม่ลงโพสต์</span>
+                                                </span>
+                                                <div>
+                                                    <button type="button"
+                                                            class="convert-raw-to-post-btn px-2.5 py-1 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black shadow-xs transition flex items-center gap-1 cursor-pointer"
+                                                            data-id="{{ rec.pk }}"
+                                                            data-name="{{ rec.owner_name }}"
+                                                            data-shop="{{ rec.shop_name|default:'' }}"
+                                                            data-category="{{ rec.category|default:'' }}"
+                                                            data-location="{{ rec.location|default:'' }}"
+                                                            data-price="{{ rec.expected_price|default:'' }}"
+                                                            data-rent="{{ rec.monthly_rent|default:'' }}"
+                                                            data-phone="{{ rec.owner_phone|default:'' }}"
+                                                            data-line="{{ rec.owner_line_id|default:'' }}"
+                                                            data-notes="{{ rec.notes|default:'' }}"
+                                                            title="นำข้อมูลนี้ไปเปิดฟอร์มสร้างโพสต์ด่วน">
+                                                        <i data-lucide="zap" class="w-3 h-3"></i>
+                                                        <span>🚀 นำไปลงโพสต์</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Actions -->
+                                        <td class="py-3 px-4 text-right">
+                                            <div class="flex items-center justify-end gap-1.5">
+                                                <!-- Edit Raw Owner -->
+                                                <button type="button"
+                                                        class="open-edit-raw-owner-btn px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 cursor-pointer"
+                                                        data-pk="{{ rec.pk }}"
+                                                        data-name="{{ rec.owner_name }}"
+                                                        data-phone="{{ rec.owner_phone|default:'' }}"
+                                                        data-line="{{ rec.owner_line_id|default:'' }}"
+                                                        data-fb="{{ rec.owner_facebook|default:'' }}"
+                                                        data-shop="{{ rec.shop_name|default:'' }}"
+                                                        data-category="{{ rec.category|default:'' }}"
+                                                        data-location="{{ rec.location|default:'' }}"
+                                                        data-price="{{ rec.expected_price|default:'' }}"
+                                                        data-rent="{{ rec.monthly_rent|default:'' }}"
+                                                        data-notes="{{ rec.notes|default:'' }}"
+                                                        title="แก้ไขข้อมูลดิบเจ้าของร้าน">
+                                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                                    <span>แก้ไข</span>
+                                                </button>
+
+                                                <!-- Delete Raw Owner -->
+                                                <form method="post" action="/admin-dashboard/owners/{{ rec.pk }}/delete/"
+                                                      onsubmit="return confirm('ยืนยันลบข้อมูลดิบเจ้าของร้าน {{ rec.owner_name }} ({{ rec.shop_name|default:"ไม่มีชื่อร้าน" }}) หรือไม่?');"
+                                                      class="inline-block">
+                                                    {% csrf_token %}
+                                                    <button type="submit"
+                                                            class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                            title="ลบข้อมูลดิบเจ้าของร้านนี้">
+                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                        <span>ลบ</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="py-10 text-center text-xs text-neutral-400">
+                                            <i data-lucide="folder-plus" class="w-8 h-8 text-neutral-300 mx-auto mb-2"></i>
+                                            <div>ยังไม่มีข้อมูลดิบเจ้าของร้านในระบบ</div>
+                                            <div class="mt-1 text-[11px] text-neutral-400">สามารถกดปุ่ม "+ บันทึกข้อมูลดิบเจ้าของร้าน" ด้านบนเพื่อลงข้อมูลได้ทันที</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================================= -->
+                    <!-- SECTION 2: LISTING REF CODES DIRECTORY (ทะเบียนเจ้าของร้านตามรหัสประกาศในระบบ) -->
+                    <!-- ========================================================================= -->
+                    <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
+                        <div class="p-4 sm:p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-50/50">
+                            <div>
+                                <h3 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                    <span>2. ทะเบียนเจ้าของร้านตามรหัสประกาศในระบบ (Active Ref Codes Directory)</span>
+                                </h3>
+                                <p class="text-[11px] text-neutral-500 mt-0.5">
+                                    จับคู่รหัสประกาศ (เช่น F..., V..., N..., S...) เข้ากับข้อมูลติดต่อเจ้าของร้านตัวจริง เพื่อความสะดวกในการติดตามงาน
+                                </p>
+                            </div>
+                            <span class="rounded-lg bg-blue-50 text-blue-800 text-[11px] font-black px-2.5 py-1 shrink-0 self-start sm:self-auto font-mono">
+                                รวม {{ owner_directory_list|length }} รหัสประกาศ
+                            </span>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs text-neutral-600" id="owner-directory-table">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
@@ -1588,6 +1826,7 @@
         
         <form method="post" action="{% url 'accounts:admin_fast_create_shop' %}" enctype="multipart/form-data" class="flex flex-col h-full max-h-[92vh]">
             {% csrf_token %}
+            <input type="hidden" name="raw_owner_id" id="fast-create-raw-owner-id" value="">
 
             <!-- Sticky Modal Header -->
             <div class="px-6 py-4 border-b border-neutral-100 flex items-center justify-between shrink-0 bg-neutral-50/70">
@@ -1633,7 +1872,7 @@
                             <!-- Shop Title -->
                             <div class="space-y-1">
                                 <label class="block font-bold text-neutral-700">ชื่อร้าน / หัวข้อประกาศ <span class="text-red-500">*</span></label>
-                                <input type="text" name="title" required placeholder="เช่น เซ้งด่วน คาเฟ่มินิมอล ย่านทองหล่อ"
+                                <input type="text" name="title" id="fast-create-title" required placeholder="เช่น เซ้งด่วน คาเฟ่มินิมอล ย่านทองหล่อ"
                                        class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
                             </div>
 
@@ -1641,7 +1880,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div class="space-y-1 sm:col-span-1">
                                     <label class="block font-bold text-neutral-700">หมวดหมู่ร้านค้า <span class="text-red-500">*</span></label>
-                                    <select name="category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                                    <select name="category" id="fast-create-category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
                                         {% for val, label in property_types %}
                                         <option value="{{ val }}">{{ label }}</option>
                                         {% endfor %}
@@ -1692,12 +1931,12 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">อำเภอ/เขต <span class="text-red-500">*</span></label>
-                                    <input type="text" name="district" required placeholder="เช่น วัฒนา"
+                                    <input type="text" name="district" id="fast-create-district" required placeholder="เช่น วัฒนา"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">จังหวัด</label>
-                                    <input type="text" name="province" value="กรุงเทพมหานคร"
+                                    <input type="text" name="province" id="fast-create-province" value="กรุงเทพมหานคร"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                             </div>
@@ -1726,12 +1965,12 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/60">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">เบอร์โทรติดต่อ</label>
-                                    <input type="text" name="contact_phone" placeholder="เช่น 0812345678"
+                                    <input type="text" name="contact_phone" id="fast-create-phone" placeholder="เช่น 0812345678"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">LINE ID</label>
-                                    <input type="text" name="contact_line_id" placeholder="เช่น @myshopline"
+                                    <input type="text" name="contact_line_id" id="fast-create-line" placeholder="เช่น @myshopline"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                             </div>
@@ -1746,14 +1985,34 @@
 
                             <div class="space-y-1">
                                 <label class="block font-bold text-neutral-700">จุดเด่น & รายละเอียดร้าน</label>
-                                <textarea name="description" rows="3" placeholder="ทำเลติดถนนใหญ่ ใกล้สถานีรถไฟฟ้า พร้อมสูตรและฐานลูกค้าประจำ..."
+                                <textarea name="description" id="fast-create-description" rows="3" placeholder="ทำเลติดถนนใหญ่ ใกล้สถานีรถไฟฟ้า พร้อมสูตรและฐานลูกค้าประจำ..."
                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500"></textarea>
                             </div>
 
                             <div class="space-y-1">
                                 <label class="block font-bold text-neutral-700">อุปกรณ์และของแถมที่ให้</label>
-                                <input type="text" name="equipment_included" placeholder="เครื่องชงกาแฟ, แอร์ 3 ตัว, โต๊ะเก้าอี้ 15 ชุด, ตู้เย็น 2 เครื่อง"
+                                <input type="text" name="equipment_included" id="fast-create-equipment" placeholder="เครื่องชงกาแฟ, แอร์ 3 ตัว, โต๊ะเก้าอี้ 15 ชุด, ตู้เย็น 2 เครื่อง"
                                        class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+
+                            <!-- Video Review Links (YouTube, TikTok) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/60">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700 flex items-center gap-1">
+                                        <i data-lucide="youtube" class="w-3.5 h-3.5 text-red-600"></i>
+                                        <span>ลิงก์ YouTube รีวิวร้าน</span>
+                                    </label>
+                                    <input type="url" name="youtube_url" id="fast-create-youtube" placeholder="https://www.youtube.com/watch?v=..."
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700 flex items-center gap-1">
+                                        <span class="w-3.5 h-3.5 rounded bg-black text-white text-[8px] font-black flex items-center justify-center">TT</span>
+                                        <span>ลิงก์ TikTok รีวิวร้าน</span>
+                                    </label>
+                                    <input type="url" name="tiktok_url" id="fast-create-tiktok" placeholder="https://www.tiktok.com/@.../video/..."
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1770,12 +2029,12 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">ราคาเซ้ง (บาท) <span class="text-red-500">*</span></label>
-                                    <input type="number" name="price" required placeholder="550000"
+                                    <input type="number" name="price" id="fast-create-price" required placeholder="550000"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono font-bold text-brand-600 focus:outline-none focus:border-brand-500">
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">ค่าเช่า/เดือน (บาท)</label>
-                                    <input type="number" name="monthly_rent" placeholder="35000"
+                                    <input type="number" name="monthly_rent" id="fast-create-monthly-rent" placeholder="35000"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
                                 </div>
                                 <div class="space-y-1">
@@ -2197,6 +2456,135 @@
     </div>
 </div>
 
+<!-- RAW OWNER MODAL (ข้อ 10: บันทึกข้อมูลดิบเจ้าของร้านโดยไม่ต้องอิงโพสต์) -->
+<div id="raw-owner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-neutral-100 max-h-[90vh] overflow-y-auto space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-neutral-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-neutral-900" id="raw-owner-modal-title">บันทึกข้อมูลดิบเจ้าของร้าน</h3>
+                    <p class="text-[11px] text-neutral-500">ลงข้อมูลผู้ติดต่อและรายละเอียดร้านค้าไว้ก่อน โดยยังไม่ต้องมีโพสต์ในระบบ</p>
+                </div>
+            </div>
+            <button type="button" id="close-raw-owner-modal-btn" class="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="raw-owner-form" method="post" action="{% url 'accounts:admin_create_raw_owner' %}" class="space-y-4 text-xs">
+            {% csrf_token %}
+
+            <!-- Section A: ข้อมูลผู้ติดต่อ -->
+            <div class="bg-emerald-50/50 p-3.5 rounded-2xl border border-emerald-100 space-y-3">
+                <div class="text-[11px] font-black text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span>1. ข้อมูลติดต่อเจ้าของร้าน</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-700 mb-1">
+                        ชื่อ-นามสกุล / ชื่อเล่น เจ้าของร้าน <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="raw-owner-name-input" name="owner_name" required
+                           placeholder="เช่น คุณสมชาย (พี่เอก)"
+                           class="w-full text-xs font-medium rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+                        <input type="tel" id="raw-owner-phone-input" name="owner_phone"
+                               placeholder="เช่น 0812345678"
+                               class="w-full text-xs font-mono font-medium rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">LINE ID</label>
+                        <input type="text" id="raw-owner-line-input" name="owner_line_id"
+                               placeholder="ไอดีไลน์ หรือ เบอร์ไลน์"
+                               class="w-full text-xs font-medium rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-700 mb-1">Facebook (โปรไฟล์ / ลิงก์เฟส)</label>
+                    <input type="text" id="raw-owner-fb-input" name="owner_facebook"
+                           placeholder="เช่น Somchai Jaidee หรือ https://facebook.com/..."
+                           class="w-full text-xs font-medium rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+            </div>
+
+            <!-- Section B: ข้อมูลร้านค้าเบื้องต้น -->
+            <div class="bg-neutral-50/70 p-3.5 rounded-2xl border border-neutral-200/80 space-y-3">
+                <div class="text-[11px] font-black text-neutral-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="store" class="w-3.5 h-3.5 text-neutral-500"></i>
+                    <span>2. ข้อมูลร้านค้าและเงื่อนไข (เบื้องต้น)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">ชื่อร้านค้า</label>
+                        <input type="text" id="raw-owner-shop-name-input" name="shop_name"
+                               placeholder="เช่น ชานมชิมเพลิน สาขาสยาม"
+                               class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">ประเภทธุรกิจ / หมวดหมู่</label>
+                        <input type="text" id="raw-owner-category-input" name="category"
+                               placeholder="เช่น ชานม/คาเฟ่, ร้านอาหาร, สปา"
+                               class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-700 mb-1">ทำเล / เขต / โซน</label>
+                    <input type="text" id="raw-owner-location-input" name="location"
+                           placeholder="เช่น สยามสแควร์ กรุงเทพฯ หรือ ถ.นิมมาน เชียงใหม่"
+                           class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">ราคาเซ้งที่คาดหวัง (บาท)</label>
+                        <input type="number" id="raw-owner-price-input" name="expected_price"
+                               placeholder="เช่น 450000"
+                               class="w-full text-xs font-mono font-bold text-brand-600 rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">ค่าเช่ารายเดือน (บาท)</label>
+                        <input type="number" id="raw-owner-rent-input" name="monthly_rent"
+                               placeholder="เช่น 30000"
+                               class="w-full text-xs font-mono rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section C: หมายเหตุ -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    หมายเหตุ / บันทึกการพูดคุย (เฉพาะแอดมินเห็น)
+                </label>
+                <textarea id="raw-owner-notes-input" name="notes" rows="2.5"
+                          placeholder="เช่น โทรมาคุยเมื่อเช้า อยากเซ้งด่วนก่อนสิ้นเดือน มีอุปกรณ์ครบพร้อมดำเนินกิจการต่อ..."
+                          class="w-full text-xs rounded-xl border border-neutral-200 p-2.5 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"></textarea>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+                <button type="button" id="cancel-raw-owner-modal-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span id="raw-owner-submit-btn-text">บันทึกข้อมูลดิบ</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Admin Dashboard JavaScript (Strict CSP Nonce Compliant) -->
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
@@ -2527,6 +2915,142 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (closeOwnerBtn) closeOwnerBtn.addEventListener('click', closeOwnerModal);
     if (cancelOwnerBtn) cancelOwnerBtn.addEventListener('click', closeOwnerModal);
+
+    // 7. Tab 10: Raw Shop Owner Records Modal Controls (บันทึกข้อมูลดิบก่อน / นำไปลงโพสต์ทีหลัง)
+    var rawOwnerModal = document.getElementById('raw-owner-modal');
+    var rawOwnerForm = document.getElementById('raw-owner-form');
+    var openRawOwnerBtn = document.getElementById('open-raw-owner-modal-btn');
+    var closeRawOwnerBtn = document.getElementById('close-raw-owner-modal-btn');
+    var cancelRawOwnerBtn = document.getElementById('cancel-raw-owner-modal-btn');
+    var rawOwnerModalTitle = document.getElementById('raw-owner-modal-title');
+    var rawOwnerSubmitBtnText = document.getElementById('raw-owner-submit-btn-text');
+
+    var rawNameInput = document.getElementById('raw-owner-name-input');
+    var rawPhoneInput = document.getElementById('raw-owner-phone-input');
+    var rawLineInput = document.getElementById('raw-owner-line-input');
+    var rawFbInput = document.getElementById('raw-owner-fb-input');
+    var rawShopInput = document.getElementById('raw-owner-shop-name-input');
+    var rawCategoryInput = document.getElementById('raw-owner-category-input');
+    var rawLocationInput = document.getElementById('raw-owner-location-input');
+    var rawPriceInput = document.getElementById('raw-owner-price-input');
+    var rawRentInput = document.getElementById('raw-owner-rent-input');
+    var rawNotesInput = document.getElementById('raw-owner-notes-input');
+
+    function openRawModalCreate() {
+        if (!rawOwnerModal || !rawOwnerForm) return;
+        rawOwnerForm.action = '{% url "accounts:admin_create_raw_owner" %}';
+        if (rawOwnerModalTitle) rawOwnerModalTitle.textContent = 'บันทึกข้อมูลดิบเจ้าของร้านใหม่';
+        if (rawOwnerSubmitBtnText) rawOwnerSubmitBtnText.textContent = 'บันทึกข้อมูลดิบ';
+
+        if (rawNameInput) rawNameInput.value = '';
+        if (rawPhoneInput) rawPhoneInput.value = '';
+        if (rawLineInput) rawLineInput.value = '';
+        if (rawFbInput) rawFbInput.value = '';
+        if (rawShopInput) rawShopInput.value = '';
+        if (rawCategoryInput) rawCategoryInput.value = '';
+        if (rawLocationInput) rawLocationInput.value = '';
+        if (rawPriceInput) rawPriceInput.value = '';
+        if (rawRentInput) rawRentInput.value = '';
+        if (rawNotesInput) rawNotesInput.value = '';
+
+        rawOwnerModal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function openRawModalEdit(pk, name, phone, line, fb, shop, category, location, price, rent, notes) {
+        if (!rawOwnerModal || !rawOwnerForm) return;
+        rawOwnerForm.action = '/admin-dashboard/owners/' + pk + '/update/';
+        if (rawOwnerModalTitle) rawOwnerModalTitle.textContent = 'แก้ไขข้อมูลดิบเจ้าของร้าน (' + name + ')';
+        if (rawOwnerSubmitBtnText) rawOwnerSubmitBtnText.textContent = 'บันทึกการแก้ไข';
+
+        if (rawNameInput) rawNameInput.value = name || '';
+        if (rawPhoneInput) rawPhoneInput.value = phone || '';
+        if (rawLineInput) rawLineInput.value = line || '';
+        if (rawFbInput) rawFbInput.value = fb || '';
+        if (rawShopInput) rawShopInput.value = shop || '';
+        if (rawCategoryInput) rawCategoryInput.value = category || '';
+        if (rawLocationInput) rawLocationInput.value = location || '';
+        if (rawPriceInput) rawPriceInput.value = price || '';
+        if (rawRentInput) rawRentInput.value = rent || '';
+        if (rawNotesInput) rawNotesInput.value = notes || '';
+
+        rawOwnerModal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function closeRawModal() {
+        if (rawOwnerModal) rawOwnerModal.classList.add('hidden');
+    }
+
+    if (openRawOwnerBtn) openRawOwnerBtn.addEventListener('click', openRawModalCreate);
+    if (closeRawOwnerBtn) closeRawOwnerBtn.addEventListener('click', closeRawModal);
+    if (cancelRawOwnerBtn) cancelRawOwnerBtn.addEventListener('click', closeRawModal);
+
+    document.querySelectorAll('.open-edit-raw-owner-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var pk = this.getAttribute('data-pk');
+            var name = this.getAttribute('data-name');
+            var phone = this.getAttribute('data-phone');
+            var line = this.getAttribute('data-line');
+            var fb = this.getAttribute('data-fb');
+            var shop = this.getAttribute('data-shop');
+            var category = this.getAttribute('data-category');
+            var location = this.getAttribute('data-location');
+            var price = this.getAttribute('data-price');
+            var rent = this.getAttribute('data-rent');
+            var notes = this.getAttribute('data-notes');
+            openRawModalEdit(pk, name, phone, line, fb, shop, category, location, price, rent, notes);
+        });
+    });
+
+    // 8. Convert Raw Owner to Fast Post (นำข้อมูลดิบไปเปิดฟอร์มสร้างโพสต์ด่วนทันที)
+    document.querySelectorAll('.convert-raw-to-post-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var name = this.getAttribute('data-name');
+            var shop = this.getAttribute('data-shop');
+            var category = this.getAttribute('data-category');
+            var location = this.getAttribute('data-location');
+            var price = this.getAttribute('data-price');
+            var rent = this.getAttribute('data-rent');
+            var phone = this.getAttribute('data-phone');
+            var line = this.getAttribute('data-line');
+            var notes = this.getAttribute('data-notes');
+
+            // Populate Fast Post Modal inputs
+            var rawIdInput = document.getElementById('fast-create-raw-owner-id');
+            var titleInput = document.getElementById('fast-create-title');
+            var priceInput = document.getElementById('fast-create-price');
+            var rentInput = document.getElementById('fast-create-monthly-rent');
+            var phoneInput = document.getElementById('fast-create-phone');
+            var lineInput = document.getElementById('fast-create-line');
+            var districtInput = document.getElementById('fast-create-district');
+            var descInput = document.getElementById('fast-create-description');
+
+            if (rawIdInput) rawIdInput.value = id || '';
+            if (titleInput) {
+                if (shop) {
+                    titleInput.value = 'เซ้ง ' + shop;
+                } else if (category) {
+                    titleInput.value = 'เซ้ง ' + category + ' ' + (location || '');
+                } else {
+                    titleInput.value = 'เซ้งร้านค้า (' + (name || 'เจ้าของร้าน') + ')';
+                }
+            }
+            if (priceInput) priceInput.value = price ? Math.round(parseFloat(price)) : '';
+            if (rentInput) rentInput.value = rent ? Math.round(parseFloat(rent)) : '';
+            if (phoneInput) phoneInput.value = phone || '';
+            if (lineInput) lineInput.value = line || '';
+            if (districtInput && location) districtInput.value = location;
+            if (descInput) descInput.value = (notes ? notes + '\n\n' : '') + 'ติดต่อเจ้าของ: ' + (name || '-') + (phone ? ' โทร ' + phone : '') + (line ? ' LINE: ' + line : '');
+
+            // Open Fast Post Modal
+            if (fastPostModal) {
+                fastPostModal.classList.remove('hidden');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        });
+    });
 
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();

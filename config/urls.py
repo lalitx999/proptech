@@ -7,6 +7,9 @@ urlpatterns = [
     path('', include('apps.core.urls')),
     path('admin-dashboard/', include([
         path('', admin_views.admin_command_center_view, name='admin_dashboard_root'),
+        path('owners/create/', admin_views.admin_create_raw_owner_view, name='admin_create_raw_owner_root'),
+        path('owners/<int:pk>/update/', admin_views.admin_update_raw_owner_view, name='admin_update_raw_owner_root'),
+        path('owners/<int:pk>/delete/', admin_views.admin_delete_raw_owner_view, name='admin_delete_raw_owner_root'),
         path('shops/<int:pk>/update-owner/', admin_views.admin_update_shop_owner_view, name='admin_update_shop_owner_root'),
         path('shops/<int:pk>/delete-owner/', admin_views.admin_delete_shop_owner_view, name='admin_delete_shop_owner_root'),
         path('shops/<int:pk>/action/', admin_views.admin_shop_action_view, name='admin_shop_action_root'),

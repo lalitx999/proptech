@@ -231,6 +231,10 @@ def property_update_view(request, pk):
         if fee_payer not in FeePayer.values:
             fee_payer = FeePayer.FREE
 
+        youtube_url = request.POST.get('youtube_url', '').strip()
+        tiktok_url = request.POST.get('tiktok_url', '').strip()
+        facebook_post_url = request.POST.get('facebook_post_url', '').strip()
+
         if listing:
             listing.price = price
             listing.monthly_rent = monthly_rent
@@ -242,6 +246,9 @@ def property_update_view(request, pk):
             listing.avg_profit_3m = avg_profit
             listing.avg_revenue_3m = avg_revenue
             listing.includes_equipment = equipment
+            listing.youtube_url = youtube_url or None
+            listing.tiktok_url = tiktok_url or None
+            listing.facebook_post_url = facebook_post_url or None
             if request.user.role in [UserRole.ADMIN, UserRole.STAFF]:
                 listing.is_admin_verified = is_admin_verified
                 if is_admin_verified and not listing.admin_verified_at:
@@ -288,6 +295,9 @@ def property_update_view(request, pk):
                 includes_equipment=equipment,
                 contact_phone=contact_phone,
                 contact_line_id=contact_line_id,
+                youtube_url=youtube_url or None,
+                tiktok_url=tiktok_url or None,
+                facebook_post_url=facebook_post_url or None,
                 status=status,
                 published_at=timezone.now()
             )
