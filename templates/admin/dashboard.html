@@ -1637,14 +1637,26 @@
                                        class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
                             </div>
 
-                            <!-- Category -->
-                            <div class="space-y-1">
-                                <label class="block font-bold text-neutral-700">หมวดหมู่ร้านค้า <span class="text-red-500">*</span></label>
-                                <select name="category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
-                                    {% for val, label in property_types %}
-                                    <option value="{{ val }}">{{ label }}</option>
-                                    {% endfor %}
-                                </select>
+                            <!-- Category & Space/Floors -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="space-y-1 sm:col-span-1">
+                                    <label class="block font-bold text-neutral-700">หมวดหมู่ร้านค้า <span class="text-red-500">*</span></label>
+                                    <select name="category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                                        {% for val, label in property_types %}
+                                        <option value="{{ val }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="space-y-1 sm:col-span-1">
+                                    <label class="block font-bold text-neutral-700">พื้นที่ใช้สอย (ตร.ม.)</label>
+                                    <input type="number" step="0.01" name="area_sqm" placeholder="เช่น 60.00"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1 sm:col-span-1">
+                                    <label class="block font-bold text-neutral-700">จำนวนชั้น</label>
+                                    <input type="number" min="1" name="floors" value="1"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
                             </div>
 
                             <!-- Plan & Ref Code -->
@@ -1690,6 +1702,12 @@
                                 </div>
                             </div>
 
+                            <div class="space-y-1">
+                                <label class="block font-bold text-neutral-700">ที่อยู่ / ซอย / ถนน</label>
+                                <input type="text" name="address" placeholder="เช่น 123/4 ซอยสุขุมวิท 55 ถนนทองหล่อ"
+                                       class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+
                             <!-- Google Maps URL -->
                             <div class="space-y-1">
                                 <label class="block font-bold text-neutral-700 flex items-center justify-between">
@@ -1702,6 +1720,20 @@
                                 <input type="url" name="google_maps_url" placeholder="เช่น https://maps.app.goo.gl/... หรือ https://goo.gl/maps/..."
                                        class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 <p class="text-[10px] text-neutral-400">คัดลอกลิงก์แชร์จาก Google Maps นำมาวาง ระบบจะดึงพิกัดเพื่อปักหมุดบนแผนที่ให้อัตโนมัติ</p>
+                            </div>
+
+                            <!-- Contact Phone & LINE -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/60">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">เบอร์โทรติดต่อ</label>
+                                    <input type="text" name="contact_phone" placeholder="เช่น 0812345678"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">LINE ID</label>
+                                    <input type="text" name="contact_line_id" placeholder="เช่น @myshopline"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
                             </div>
                         </div>
 
@@ -1732,7 +1764,7 @@
                         <div class="bg-neutral-50/60 p-4 rounded-2xl border border-neutral-200/80 space-y-3">
                             <div class="text-[11px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
                                 <i data-lucide="coins" class="w-4 h-4 text-amber-500"></i>
-                                <span>4. ตัวเลขการเงิน & รายได้</span>
+                                <span>4. ตัวเลขการเงิน & รายได้ & เงื่อนไขสัญญา</span>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1769,6 +1801,45 @@
                                     <input type="number" name="remaining_lease_months" value="18"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
                                 </div>
+                            </div>
+
+                            <!-- Lease Transfer Fee & Who Pays (Fixing default half_half issue) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 border-t border-neutral-200/60">
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">ค่าเปลี่ยนสัญญา (บาท)</label>
+                                    <input type="number" name="lease_transfer_fee" value="0" placeholder="0"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700">ผู้รับผิดชอบค่าเปลี่ยนสัญญา</label>
+                                    <select name="lease_transfer_fee_payer" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                        {% for val, label in fee_payers %}
+                                        <option value="{{ val }}" {% if val == 'free' %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Staff & Admin Verified toggles -->
+                            <div class="space-y-2 pt-1">
+                                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-white border border-neutral-200 cursor-pointer hover:bg-neutral-50 transition">
+                                    <input type="checkbox" name="includes_staff" value="1" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                                    <div class="text-xs">
+                                        <span class="font-bold text-neutral-800">มีทีมงาน / พนักงานเดิมพร้อมส่งต่องาน</span>
+                                        <p class="text-[10px] text-neutral-400">ติ๊กถูกหากมีพนักงานเดิมยินดีทำงานต่อ</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-amber-50/70 border border-amber-200 cursor-pointer hover:bg-amber-100/60 transition">
+                                    <input type="checkbox" name="is_admin_verified" value="1" checked class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                                    <div class="text-xs">
+                                        <span class="font-bold text-amber-950 flex items-center gap-1">
+                                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i>
+                                            <span>ติดป้ายรับรอง "Admin Verified" (ฝากเซ้ง-ประเมินแล้ว)</span>
+                                        </span>
+                                        <p class="text-[10px] text-amber-800/80">นำไปแสดงในแถวอันดับ 1 ของหน้าแรก</p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 

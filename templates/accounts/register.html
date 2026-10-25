@@ -12,7 +12,7 @@
         <h1 class="text-2xl font-black tracking-tight text-neutral-900">สร้างบัญชีผู้ใช้งาน</h1>
         <p class="mt-1 text-sm text-neutral-500">ลงทะเบียนเพื่อลงประกาศเซ้งร้าน หรือค้นหาดีลทำเลทอง (จะได้รับรหัส OTP ทางอีเมล)</p>
 
-        <form method="post" action="{% url 'accounts:register' %}" class="mt-6 space-y-4">
+        <form method="post" action="{% url 'accounts:register' %}" enctype="multipart/form-data" class="mt-6 space-y-4">
             {% csrf_token %}
             
             <!-- Honeypot anti-bot field -->
@@ -20,8 +20,31 @@
                 {{ form.website }}
             </div>
 
+            <!-- Profile Photo / Selfie Camera Verification -->
+            <div class="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 space-y-2">
+                <label class="block text-xs font-bold text-neutral-800">
+                    รูปโปรไฟล์จริง / ถ่ายภาพยืนยันตัวตน
+                </label>
+                <p class="text-[11px] text-neutral-500 leading-relaxed">
+                    อัปโหลดรูปภาพจริง หรือเปิดกล้องถ่ายจากมือถือเพื่อยืนยันตัวตน สร้างความน่าเชื่อถือ และป้องกันกลุ่มมิจฉาชีพ
+                </p>
+                <div class="flex items-center gap-3 pt-1">
+                    <div id="avatar-preview-box" class="w-14 h-14 rounded-2xl bg-white border-2 border-dashed border-neutral-300 flex items-center justify-center overflow-hidden shrink-0 text-neutral-400 shadow-2xs">
+                        <i data-lucide="camera" class="w-6 h-6 text-neutral-400"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <input type="file" name="avatar" id="avatar-input" accept="image/*" capture="user"
+                               class="block w-full text-xs text-neutral-500 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+                        <p class="text-[10px] text-neutral-400 mt-1">รองรับ JPG, PNG, WEBP (เลือกไฟล์ หรือ กดถ่ายภาพ)</p>
+                    </div>
+                </div>
+                {% if form.avatar.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.avatar.errors.0 }}</p>
+                {% endif %}
+            </div>
+
             <div>
-                <label class="block text-sm font-medium text-neutral-700">อีเมล</label>
+                <label class="block text-sm font-medium text-neutral-700">อีเมล <span class="text-red-500">*</span></label>
                 <input type="email" name="email" value="{{ form.email.value|default:'' }}" required
                        class="mt-1 block w-full rounded-lg border border-neutral-300 px-3.5 py-2 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
                 {% if form.email.errors %}
@@ -89,4 +112,23 @@
         </p>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var avatarInput = document.getElementById('avatar-input');
+    var previewBox = document.getElementById('avatar-preview-box');
+    if (avatarInput && previewBox) {
+        avatarInput.addEventListener('change', function(e) {
+            var file = e.target.files && e.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(evt) {
+                    previewBox.innerHTML = '<img src="' + evt.target.result + '" class="w-full h-full object-cover rounded-2xl" alt="Preview">';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

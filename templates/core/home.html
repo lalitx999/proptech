@@ -517,7 +517,117 @@
 </section>
 
 <!-- ============================================================================== -->
-<!-- 6. SECTION: โปรโมชั่นล่าสุด -->
+<!-- 6. SECTION: ประกาศล่าสุด (อันดับ 2) -->
+<!-- ============================================================================== -->
+<section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-lg sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
+                <i data-lucide="clock" class="w-5 h-5 text-blue-600"></i>
+                <span>ประกาศล่าสุด</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5">
+                รายการประกาศเซ้งร้านและพื้นที่ธุรกิจใหม่ล่าสุด อัปเดตสดใหม่ทุกวัน
+            </p>
+        </div>
+        <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+            <span>ดูทั้งหมด ({{ total_listings }} แห่ง)</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {% for listing in recent_listings %}
+        <div class="group rounded-2xl border border-neutral-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col">
+            <div class="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
+                <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block h-full w-full cursor-pointer" title="{{ listing.property.title }}">
+                    {% if listing.property.cover_image %}
+                    <img src="{{ listing.property.cover_image.image.url }}"
+                         alt="{{ listing.property.title }}"
+                         loading="lazy"
+                         class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                    <div class="flex h-full w-full items-center justify-center text-xs text-neutral-400 bg-gradient-to-tr from-neutral-100 to-neutral-200 flex-col gap-1">
+                        <i data-lucide="store" class="w-8 h-8 text-neutral-400"></i>
+                        <span>ไม่มีรูปภาพ</span>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <div class="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1.5 pointer-events-none">
+                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
+                        {{ listing.ref_code }}
+                    </span>
+                    <span class="rounded-lg bg-neutral-800 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                        {{ listing.get_type_display }}
+                    </span>
+                </div>
+
+                {% if listing.status == 'closed' %}
+                <!-- Transferred / Sold Out Overlay -->
+                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
+                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs px-3.5 py-1.5 shadow-xl border border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
+                        <span>🎉 เซ้งได้แล้ว</span>
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if listing.is_admin_verified %}
+                <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md pointer-events-none">
+                    <img src="/static/images/admin_verified_gold.png?v=20261025_05" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">{{ listing.property.get_type_display }}</span>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block">
+                        <h3 class="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
+                            {{ listing.property.title }}
+                        </h3>
+                    </a>
+                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
+                        <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 flex-shrink-0"></i>
+                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">ค่าเช่าต่อเดือน</span>
+                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
+                        <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-neutral-400 font-medium block">ราคาเซ้ง</span>
+                        <span class="text-xl font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</span>
+                    </div>
+                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
+                       class="rounded-xl bg-neutral-900 hover:bg-brand-600 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs">
+                        ดูร้านนี้ →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
+            ยังไม่มีรายการประกาศในระบบ
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 7. SECTION: โปรโมชั่นล่าสุด (อันดับ 3) -->
 <!-- ============================================================================== -->
 <section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
     <div class="flex items-center justify-between mb-4">
@@ -626,116 +736,6 @@
         {% empty %}
         <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
             ยังไม่มีรายการโปรโมชั่นในขณะนี้
-        </div>
-        {% endfor %}
-    </div>
-</section>
-
-<!-- ============================================================================== -->
-<!-- 7. SECTION: ประกาศล่าสุด -->
-<!-- ============================================================================== -->
-<section class="mx-auto max-w-6xl px-3 sm:px-6 py-6">
-    <div class="flex items-center justify-between mb-4">
-        <div>
-            <h2 class="text-lg sm:text-xl font-black text-neutral-900 tracking-tight flex items-center gap-2">
-                <i data-lucide="clock" class="w-5 h-5 text-blue-600"></i>
-                <span>ประกาศล่าสุด</span>
-            </h2>
-            <p class="text-xs text-neutral-500 mt-0.5">
-                รายการประกาศเซ้งร้านและพื้นที่ธุรกิจใหม่ล่าสุด อัปเดตสดใหม่ทุกวัน
-            </p>
-        </div>
-        <a href="{% url 'listings:marketplace' %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition">
-            <span>ดูทั้งหมด ({{ total_listings }} แห่ง)</span>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </a>
-    </div>
-
-    <!-- Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {% for listing in recent_listings %}
-        <div class="group rounded-2xl border border-neutral-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col">
-            <div class="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
-                <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block h-full w-full cursor-pointer" title="{{ listing.property.title }}">
-                    {% if listing.property.cover_image %}
-                    <img src="{{ listing.property.cover_image.image.url }}"
-                         alt="{{ listing.property.title }}"
-                         loading="lazy"
-                         class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    {% else %}
-                    <div class="flex h-full w-full items-center justify-center text-xs text-neutral-400 bg-gradient-to-tr from-neutral-100 to-neutral-200 flex-col gap-1">
-                        <i data-lucide="store" class="w-8 h-8 text-neutral-400"></i>
-                        <span>ไม่มีรูปภาพ</span>
-                    </div>
-                    {% endif %}
-                </a>
-
-                <div class="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1.5 pointer-events-none">
-                    <span class="rounded-lg bg-neutral-900/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow">
-                        {{ listing.ref_code }}
-                    </span>
-                    <span class="rounded-lg bg-neutral-800 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                        {{ listing.get_type_display }}
-                    </span>
-                </div>
-
-                {% if listing.status == 'closed' %}
-                <!-- Transferred / Sold Out Overlay -->
-                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
-                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs px-3.5 py-1.5 shadow-xl border border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
-                        <span>🎉 เซ้งได้แล้ว</span>
-                    </span>
-                </div>
-                {% endif %}
-
-                {% if listing.is_admin_verified %}
-                <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md pointer-events-none">
-                    <img src="/static/images/admin_verified_gold.png?v=20261025_05" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">{{ listing.property.get_type_display }}</span>
-                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block">
-                        <h3 class="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
-                            {{ listing.property.title }}
-                        </h3>
-                    </a>
-                    <p class="text-xs text-neutral-500 flex items-center gap-1 truncate">
-                        <i data-lucide="map-pin" class="w-3 h-3 text-neutral-400 flex-shrink-0"></i>
-                        <span>{{ listing.property.district }}, {{ listing.property.province }}</span>
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 bg-neutral-50 rounded-xl p-2.5 text-[11px] border border-neutral-100">
-                    <div>
-                        <span class="text-[10px] text-neutral-400 block">ค่าเช่าต่อเดือน</span>
-                        <span class="font-bold text-neutral-800">฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-neutral-400 block">สัญญาคงเหลือ</span>
-                        <span class="font-bold text-neutral-800">{{ listing.lease_remaining_months }} เดือน</span>
-                    </div>
-                </div>
-
-                <div class="pt-2 border-t border-neutral-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] text-neutral-400 font-medium block">ราคาเซ้ง</span>
-                        <span class="text-xl font-black text-brand-600">฿{{ listing.price|floatformat:0 }}</span>
-                    </div>
-                    <a href="{% url 'listings:listing_detail' pk=listing.pk %}"
-                       class="rounded-xl bg-neutral-900 hover:bg-brand-600 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs">
-                        ดูร้านนี้ →
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-span-full py-8 text-center text-neutral-500 text-xs">
-            ยังไม่มีรายการประกาศในระบบ
         </div>
         {% endfor %}
     </div>

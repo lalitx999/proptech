@@ -43,7 +43,7 @@ def register_view(request):
         return redirect('core:home')
 
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
 

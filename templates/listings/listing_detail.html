@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}[{{ listing.ref_code }}] {{ listing.property.title }} — เซ้งร้านด่วน.com{% endblock %}
 {% block meta_description %}[{{ listing.ref_code }}] {{ listing.property.title }} เซ้งราคา ฿{{ listing.price|floatformat:0 }} (ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0 }}/ด.) ทำเล{{ listing.property.district }} {{ listing.property.province }} พื้นที่ {{ listing.property.area_sqm }} ตร.ม. พร้อมอุปกรณ์ครบครัน ดำเนินกิจการต่อได้ทันที{% endblock %}
@@ -516,15 +517,35 @@
                         </button>
                     </div>
 
-                    <!-- Assigned Agent Profile -->
+                    <!-- Assigned Agent / Publisher Profile (Real Photo) -->
                     <div class="border-t border-neutral-100 pt-4 flex items-center gap-3">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700 font-bold text-base shadow-2xs">
-                            {% if listing.agent %}{{ listing.agent.first_name|default:"A"|first }}{% else %}S{% endif %}
+                        <div class="relative shrink-0">
+                            {% if listing.agent and listing.agent.avatar %}
+                                <img src="{{ listing.agent.avatar.url }}" alt="{{ listing.agent.get_full_name }}" class="h-12 w-12 rounded-2xl object-cover shadow-2xs border border-neutral-200">
+                            {% elif listing.property.owner and listing.property.owner.avatar %}
+                                <img src="{{ listing.property.owner.avatar.url }}" alt="{{ listing.property.owner.get_full_name }}" class="h-12 w-12 rounded-2xl object-cover shadow-2xs border border-neutral-200">
+                            {% else %}
+                                <div class="h-12 w-12 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center p-1.5 shadow-2xs">
+                                    <img src="{% static 'images/logo.png' %}" alt="ทีมงานเซ้งร้าน" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='/static/images/logo.png';">
+                                </div>
+                            {% endif %}
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white shadow-xs" title="เจ้าหน้าที่ยืนยันตัวตนแล้ว">
+                                <i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>
+                            </div>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <span class="text-[10px] text-neutral-400 block font-medium">นายหน้าผู้ดูแลเคส</span>
-                            <span class="text-xs font-bold text-neutral-900 truncate block">
-                                {% if listing.agent %}{{ listing.agent.get_full_name|default:listing.agent.email }}{% else %}ทีมงานเซ้งร้านด่วน (LINE: @shopforsale){% endif %}
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] text-neutral-400 block font-medium">ผู้ดูแลเคส / เจ้าหน้าที่ยืนยันตัวตน</span>
+                                <span class="text-[9px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-200">Verified</span>
+                            </div>
+                            <span class="text-xs font-bold text-neutral-900 truncate block mt-0.5">
+                                {% if listing.agent %}
+                                    {{ listing.agent.get_full_name|default:listing.agent.email }}
+                                {% elif listing.property.owner %}
+                                    {{ listing.property.owner.get_full_name|default:listing.property.owner.username }}
+                                {% else %}
+                                    ทีมงานเซ้งร้านด่วน (LINE: @shopforsale)
+                                {% endif %}
                             </span>
                             <span class="text-[10px] text-brand-600 font-semibold block">รหัสเคส: {{ listing.ref_code }}</span>
                         </div>

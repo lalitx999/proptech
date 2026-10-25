@@ -213,15 +213,37 @@ def property_update_view(request, pk):
         contact_phone = request.POST.get('contact_phone', '').strip()
         contact_line_id = request.POST.get('contact_line_id', '').strip()
         is_closed = request.POST.get('is_closed') in ['1', 'true', 'on']
+        includes_staff = request.POST.get('includes_staff') in ['1', 'true', 'on']
+        is_admin_verified = request.POST.get('is_admin_verified') in ['1', 'true', 'on']
+
+        lease_transfer_fee_raw = request.POST.get('lease_transfer_fee', '').replace(',', '').strip()
+        try:
+            lease_transfer_fee = Decimal(lease_transfer_fee_raw) if lease_transfer_fee_raw else Decimal('0.00')
+        except (ValueError, InvalidOperation):
+            lease_transfer_fee = Decimal('0.00')
+
+        fee_payer = request.POST.get('lease_transfer_fee_payer', '').strip().lower()
+        if fee_payer not in FeePayer.values:
+            fee_payer = FeePayer.FREE
 
         if listing:
             listing.price = price
             listing.monthly_rent = monthly_rent
             listing.security_deposit = security_deposit
             listing.lease_remaining_months = lease_months
+            listing.lease_transfer_fee = lease_transfer_fee
+            listing.lease_transfer_fee_payer = fee_payer
+            listing.includes_staff = includes_staff
             listing.avg_profit_3m = avg_profit
             listing.avg_revenue_3m = avg_revenue
             listing.includes_equipment = equipment
+            if request.user.role in [UserRole.ADMIN, UserRole.STAFF]:
+                listing.is_admin_verified = is_admin_verified
+                if is_admin_verified and not listing.admin_verified_at:
+                    listing.admin_verified_at = timezone.now()
+                elif not is_admin_verified:
+                    listing.admin_verified_at = None
+
             owner_name = request.POST.get('owner_name', '').strip()
             owner_facebook = request.POST.get('owner_facebook', '').strip()
             owner_notes = request.POST.get('owner_notes', '').strip()
@@ -283,6 +305,7 @@ def property_update_view(request, pk):
         'listing': listing,
         'images': property_obj.images.all(),
         'property_types': PropertyType.choices,
+        'fee_payers': FeePayer.choices,
         'title': f'แก้ไขข้อมูลร้านค้า: {property_obj.title}',
     }
     return render(request, 'properties/property_form.html', context)

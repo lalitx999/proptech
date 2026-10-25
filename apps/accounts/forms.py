@@ -28,7 +28,7 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'phone', 'role']
+        fields = ['email', 'first_name', 'last_name', 'phone', 'role', 'avatar']
         widgets = {
             'role': forms.Select(choices=[
                 (UserRole.OWNER, 'เจ้าของร้าน/ผู้ต้องการเซ้ง (Shop Owner)'),
@@ -41,6 +41,16 @@ class UserRegistrationForm(forms.ModelForm):
         if self.cleaned_data.get('website'):
             raise ValidationError("Spam bot detected.")
         return ''
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar')
+        if avatar:
+            from apps.core.utils.files import validate_and_sanitize_image
+            try:
+                return validate_and_sanitize_image(avatar)
+            except Exception as e:
+                raise ValidationError(str(e))
+        return avatar
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').strip().lower()

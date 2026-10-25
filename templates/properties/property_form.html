@@ -294,6 +294,60 @@
                                        class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
                             </div>
                         </div>
+
+                        <!-- Lease Transfer Fee & Staff -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    ค่าเปลี่ยนสัญญา (บาท)
+                                </label>
+                                <input type="number" name="lease_transfer_fee" value="{% if listing %}{{ listing.lease_transfer_fee|floatformat:0 }}{% else %}0{% endif %}"
+                                       placeholder="เช่น 0 หรือ 20000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    ผู้รับผิดชอบค่าเปลี่ยนสัญญา <span class="text-red-500">*</span>
+                                </label>
+                                <select name="lease_transfer_fee_payer"
+                                        class="w-full rounded-xl border border-neutral-200 bg-white p-3 text-xs focus:outline-none focus:border-brand-500">
+                                    {% for val, label in fee_payers %}
+                                    <option value="{{ val }}" {% if listing and listing.lease_transfer_fee_payer == val %}selected{% elif not listing and val == 'free' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Existing Staff Checkbox -->
+                        <div class="pt-2">
+                            <label class="flex items-center gap-2.5 p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 cursor-pointer hover:bg-neutral-100/70 transition">
+                                <input type="checkbox" name="includes_staff" value="1"
+                                       {% if listing and listing.includes_staff %}checked{% endif %}
+                                       class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                                <div class="text-xs">
+                                    <span class="font-bold text-neutral-900">มีทีมงาน / พนักงานเดิมพร้อมส่งต่องาน</span>
+                                    <p class="text-[11px] text-neutral-500">ติ๊กถูกหากมีพนักงานเดิมของร้านยินดีทำงานต่อกับผู้เซ้งใหม่</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {% if request.user.role == 'admin' or request.user.role == 'staff' %}
+                        <!-- Admin Verified Toggle -->
+                        <div class="pt-1">
+                            <label class="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50/70 border border-amber-200 cursor-pointer hover:bg-amber-100/60 transition">
+                                <input type="checkbox" name="is_admin_verified" value="1"
+                                       {% if listing and listing.is_admin_verified %}checked{% endif %}
+                                       class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                                <div class="text-xs">
+                                    <span class="font-black text-amber-950 flex items-center gap-1">
+                                        <i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>
+                                        <span>ติดป้ายรับรอง "Admin Verified" (ฝากเซ้ง-ประเมินแล้ว)</span>
+                                    </span>
+                                    <p class="text-[11px] text-amber-800/80 mt-0.5">ร้านที่แอดมินยืนยันความถูกต้องจะถูกนำไปแสดงในอันดับ 1 "ฝากเซ้ง (ประเมินแล้ว)" บนหน้าแรก</p>
+                                </div>
+                            </label>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Section 6: ข้อมูลติดต่อ -->

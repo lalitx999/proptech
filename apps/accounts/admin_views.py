@@ -194,6 +194,7 @@ def admin_command_center_view(request):
         # Choices & Fast Form Data
         'owners_list': owners_list,
         'property_types': property_types,
+        'fee_payers': FeePayer.choices,
         'listing_statuses': ListingStatus.choices,
         'lead_statuses': LeadStatus.choices,
         'category_analytics': category_analytics,
@@ -315,8 +316,27 @@ def admin_fast_create_shop_view(request):
     address = request.POST.get('address', '').strip()
     description = request.POST.get('description', '').strip()
     equipment_included = request.POST.get('equipment_included', '').strip()
-    sqm = request.POST.get('sqm', '50.00')
+    sqm = request.POST.get('sqm', request.POST.get('area_sqm', '50.00'))
+    floors = int(request.POST.get('floors', '1') or '1')
     postal = request.POST.get('postal', '10400' if 'กรุงเทพ' in province else '20150')
+    contact_phone = request.POST.get('contact_phone', '').strip()
+    contact_line_id = request.POST.get('contact_line_id', '').strip()
+    owner_name = request.POST.get('owner_name', '').strip()
+    owner_facebook = request.POST.get('owner_facebook', '').strip()
+    owner_notes = request.POST.get('owner_notes', '').strip()
+    includes_staff = request.POST.get('includes_staff') in ['1', 'true', 'on']
+    is_admin_verified = request.POST.get('is_admin_verified') in ['1', 'true', 'on']
+
+    lease_transfer_fee_raw = request.POST.get('lease_transfer_fee', '0').replace(',', '').strip()
+    try:
+        lease_transfer_fee = Decimal(lease_transfer_fee_raw) if lease_transfer_fee_raw else Decimal('0')
+    except (ValueError, InvalidOperation):
+        lease_transfer_fee = Decimal('0')
+
+    lease_transfer_fee_payer = request.POST.get('lease_transfer_fee_payer', FeePayer.FREE).strip().lower()
+    if lease_transfer_fee_payer not in FeePayer.values:
+        lease_transfer_fee_payer = FeePayer.FREE
+
     is_immediate_publish = (
         request.POST.get('is_published') == '1' or
         request.POST.get('auto_publish') == 'on' or
@@ -371,6 +391,7 @@ def admin_fast_create_shop_view(request):
             lng=lng,
             desc=description or f"{title} ในทำเลศักยภาพ {district} {province}",
             area_sqm=Decimal(sqm or '50.00'),
+            floors=floors,
         )
 
         # 2. Create Listing
@@ -382,14 +403,23 @@ def admin_fast_create_shop_view(request):
             monthly_rent=Decimal(monthly_rent or '0'),
             security_deposit=Decimal(deposit_amount or '0'),
             lease_remaining_months=int(remaining_lease_months or 12),
+            lease_transfer_fee=lease_transfer_fee,
+            lease_transfer_fee_payer=lease_transfer_fee_payer,
+            includes_staff=includes_staff,
             avg_profit_3m=Decimal(avg_profit_3m) if avg_profit_3m else None,
             avg_revenue_3m=Decimal(avg_revenue_3m) if avg_revenue_3m else None,
             includes_equipment=equipment_included,
-            contact_phone=owner.phone if owner else '',
-            contact_line_id=getattr(owner, 'line_id', '') if owner else '',
+            owner_name=owner_name or (owner.get_full_name() if owner else ''),
+            owner_phone=contact_phone or (owner.phone if owner else ''),
+            owner_line_id=contact_line_id or (getattr(owner, 'line_id', '') if owner else ''),
+            owner_facebook=owner_facebook,
+            owner_notes=owner_notes,
+            contact_phone=contact_phone or (owner.phone if owner else ''),
+            contact_line_id=contact_line_id or (getattr(owner, 'line_id', '') if owner else ''),
             status=ListingStatus.PUBLISHED if is_immediate_publish else ListingStatus.PENDING,
+            is_admin_verified=is_admin_verified,
+            admin_verified_at=timezone.now() if is_admin_verified else None,
             type=ListingType.TAKEOVER,
-            lease_transfer_fee_payer=FeePayer.HALF_HALF
         )
 
         # 3. Handle Multi-Image Upload

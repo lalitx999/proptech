@@ -22,22 +22,35 @@ def home_view(request):
         status__in=[ListingStatus.PUBLISHED, ListingStatus.CLOSED]
     ).select_related('property', 'agent').prefetch_related('property__images')
 
-    # 1. ฝากเซ้ง-ประเมินราคาแล้ว: Audited/reviewed listings with proven profit metrics
+    # 1. อันดับ 1: ฝากเซ้ง (ประเมินแล้ว)
+    # แผน A (หลัก): ดึงเฉพาะโพสต์ที่ได้รับการ Verify (ยืนยัน/มีป้าย Verified จาก Admin)
     verified_listings = base_qs.filter(
-        avg_profit_3m__isnull=False
-    ).order_by('-avg_profit_3m', '-created_at')[:6]
+        is_admin_verified=True
+    ).order_by('-admin_verified_at', '-created_at')[:6]
+
+    # แผน B (สำรอง): หากยังไม่มีร้านที่ verify ให้ดึงโพสต์ที่ Admin/Staff เป็นคนลงเอง
+    if not verified_listings.exists():
+        verified_listings = base_qs.filter(
+            property__owner__role__in=['admin', 'staff']
+        ).order_by('-created_at')[:6]
+
+    # Fallback สุดท้าย: โพสต์ที่มีตัวเลขกำไร หรือยอดเข้าชมสูง
+    if not verified_listings.exists():
+        verified_listings = base_qs.filter(
+            avg_profit_3m__isnull=False
+        ).order_by('-avg_profit_3m', '-created_at')[:6]
     if not verified_listings.exists():
         verified_listings = base_qs.order_by('-view_count')[:6]
 
-    # 2. โปรโมชั่นล่าสุด: Listings with promotional incentives (e.g. Free lease transfer fee)
+    # 2. อันดับ 2: ประกาศล่าสุด (Chronological newest listings)
+    recent_listings = base_qs.order_by('-created_at')[:6]
+
+    # 3. อันดับ 3: โปรโมชั่นล่าสุด (Listings with promotional incentives e.g. Free lease transfer fee)
     promo_listings = base_qs.filter(
         lease_transfer_fee_payer=FeePayer.FREE
     ).order_by('price', '-created_at')[:6]
     if not promo_listings.exists():
         promo_listings = base_qs.order_by('price')[:6]
-
-    # 3. ประกาศล่าสุด: Chronological newest listings
-    recent_listings = base_qs.order_by('-created_at')[:6]
 
     total_listings = Listing.objects.filter(status=ListingStatus.PUBLISHED).count()
 
