@@ -19,7 +19,7 @@ def home_view(request):
     Provides verified, promotional, and recent listings alongside geolocation map data.
     """
     base_qs = Listing.objects.filter(
-        status=ListingStatus.PUBLISHED
+        status__in=[ListingStatus.PUBLISHED, ListingStatus.CLOSED]
     ).select_related('property', 'agent').prefetch_related('property__images')
 
     # 1. ฝากเซ้ง-ประเมินราคาแล้ว: Audited/reviewed listings with proven profit metrics

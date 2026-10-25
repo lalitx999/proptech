@@ -31,8 +31,10 @@ class ListingSearchService:
 
     @classmethod
     def search(cls, params):
-        # ⚠️ Public discovery must strictly filter for published status only
-        queryset = Listing.objects.filter(status=ListingStatus.PUBLISHED).select_related(
+        # ⚠️ Public discovery filters for published and closed (เซ้งได้แล้ว) listings
+        queryset = Listing.objects.filter(
+            status__in=[ListingStatus.PUBLISHED, ListingStatus.CLOSED]
+        ).select_related(
             'property', 'property__owner', 'agent'
         ).prefetch_related('property__images')
 

@@ -134,9 +134,20 @@
                     <span class="rounded-full bg-brand-500/90 backdrop-blur-md px-3 py-1 text-xs font-mono font-bold text-white shadow">
                         รหัสประกาศ: {{ listing.ref_code }}
                     </span>
-                    <span class="rounded-full px-3 py-1 text-xs font-bold {% if listing.status == 'published' %}bg-emerald-500/90 text-white{% else %}bg-amber-500/90 text-white{% endif %}">
+                    {% if listing.status == 'closed' %}
+                    <span class="rounded-full px-3 py-1 text-xs font-black bg-red-600 text-white shadow flex items-center gap-1">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                        <span>🎉 เซ้งได้แล้ว (ปิดการขาย)</span>
+                    </span>
+                    {% elif listing.status == 'published' %}
+                    <span class="rounded-full px-3 py-1 text-xs font-bold bg-emerald-500/90 text-white shadow">
                         {{ listing.get_status_display }}
                     </span>
+                    {% else %}
+                    <span class="rounded-full px-3 py-1 text-xs font-bold bg-amber-500/90 text-white shadow">
+                        {{ listing.get_status_display }}
+                    </span>
+                    {% endif %}
 
                     <!-- Facebook Share Pill -->
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
@@ -457,6 +468,17 @@
                             <div class="font-black text-emerald-950 text-sm">ร้านนี้ได้รับการตรวจและยืนยันโดยแอดมิน</div>
                             <div class="text-[11px] text-emerald-800 leading-relaxed mt-0.5">ผ่านการยืนยันตัวตนเจ้าของกิจการและตรวจสอบเอกสารสัญญาเรียบร้อย ปลอดภัย 100%</div>
                         </div>
+                    </div>
+                    {% endif %}
+
+                    {% if listing.status == 'closed' %}
+                    <!-- Notice for closed shop -->
+                    <div class="rounded-2xl bg-red-50 border-2 border-red-300 p-4 text-center space-y-1 shadow-xs">
+                        <div class="inline-flex items-center gap-1.5 text-red-700 font-black text-sm">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-red-600"></i>
+                            <span>ร้านนี้เซ้งได้แล้ว (ปิดการขายเรียบร้อย)</span>
+                        </div>
+                        <p class="text-xs text-red-600">ขอขอบคุณทุกท่านที่ให้ความสนใจ ท่านสามารถเลือกดูร้านเซ้งทำเลใกล้เคียงอื่นๆ ได้ที่หน้ารวมประกาศ</p>
                     </div>
                     {% endif %}
 

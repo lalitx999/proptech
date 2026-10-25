@@ -276,3 +276,76 @@ def contract_document_download_view(request, pk):
         as_attachment=True,
         filename=document.file_name_display
     )
+
+
+@login_required
+@role_required(UserRole.ADMIN, UserRole.STAFF)
+@require_http_methods(["POST"])
+def deal_settlement_view(request, pk):
+    """
+    WHY SECURE:
+    Settles deal commission (Option A: Quick Deal Settlement Modal):
+    - 5% total commission rate
+    - Platform closed: Platform receives 100% of 5% (5% total), Agent 0%
+    - Agent closed: 50/50 split -> Platform 2.5%, Agent 2.5%
+    - Updates listing status to CLOSED (เซ้งได้แล้ว) if requested
+    """
+    from django.utils import timezone
+    from apps.listings.models import ListingStatus
+    from apps.accounts.models import AgentProfile
+
+    deal = get_object_or_404(Deal, pk=pk)
+    try:
+        raw_price = request.POST.get('agreed_price', '0').replace(',', '').strip()
+        agreed_price = Decimal(raw_price) if raw_price else Decimal('0.00')
+    except (ValueError, TypeError):
+        messages.error(request, 'กรุณาระบุราคาเซ้งเป็นตัวเลขที่ถูกต้อง')
+        return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=pipeline'))
+
+    closed_by = request.POST.get('closed_by', 'platform')
+    agent_profile_id = request.POST.get('agent_profile_id')
+    mark_shop_closed = request.POST.get('mark_shop_closed') in ['true', '1', 'on']
+    notes = request.POST.get('notes', '').strip()
+
+    deal.agreed_price = agreed_price
+    deal.closed_by = closed_by
+    if closed_by == 'agent' and agent_profile_id:
+        try:
+            deal.assigned_agent_profile = AgentProfile.objects.get(pk=agent_profile_id)
+        except AgentProfile.DoesNotExist:
+            pass
+
+    deal.calculate_commission()
+    deal.stage = DealStage.CLOSED_WON
+    deal.closed_at = timezone.now()
+    if notes:
+        deal.notes = f"{deal.notes}\n[บันทึกการปิดดีล]: {notes}".strip()
+    deal.save()
+
+    # Update Listing status to 'closed' (เซ้งได้แล้ว) if requested
+    if mark_shop_closed and deal.listing:
+        deal.listing.status = ListingStatus.CLOSED
+        deal.listing.save(update_fields=['status'])
+
+    AuditService.log(
+        action='UPDATE',
+        model_name='Deal',
+        object_id=deal.pk,
+        changes={
+            'action': 'COMMISSION_SETTLEMENT',
+            'agreed_price': str(deal.agreed_price),
+            'closed_by': deal.closed_by,
+            'gross_commission': str(deal.gross_commission),
+            'platform_payout': str(deal.platform_payout),
+            'agent_payout': str(deal.agent_payout)
+        },
+        request=request
+    )
+
+    messages.success(
+        request,
+        f'🎉 บันทึกปิดการขายดีล {deal.deal_code} สำเร็จ! ยอดคอมมิชชัน 5%: ฿{deal.gross_commission:,.2f} '
+        f'(แพลตฟอร์ม: ฿{deal.platform_payout:,.2f} | นายหน้า: ฿{deal.agent_payout:,.2f})'
+    )
+    return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=pipeline'))
+

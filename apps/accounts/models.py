@@ -224,3 +224,54 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"[{self.created_at}] {self.user} - {self.action} on {self.model_name}({self.object_id})"
+
+
+class AgentProfile(models.Model):
+    """
+    WHY SECURE:
+    - Dedicated Agent directory model storing verified broker credentials.
+    - Integrated with CRM deal assignment and commission settlement.
+    """
+    class Status(models.TextChoices):
+        PENDING = 'pending', _('รอการตรวจสอบ')
+        APPROVED = 'approved', _('อนุมัติแล้ว (พร้อมรับงาน)')
+        INACTIVE = 'inactive', _('ปิดการใช้งาน')
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='agent_profile',
+        help_text=_('บัญชีผู้ใช้ในระบบ (ถ้ามี)')
+    )
+    full_name = models.CharField(max_length=150, help_text=_('ชื่อ-นามสกุล นายหน้า'))
+    phone = models.CharField(max_length=30, help_text=_('เบอร์โทรศัพท์'))
+    line_id = models.CharField(max_length=100, blank=True, help_text=_('LINE ID'))
+    facebook_url = models.URLField(max_length=350, blank=True, help_text=_('ลิงก์โปรไฟล์ Facebook ส่วนตัว'))
+    photo = models.ImageField(upload_to='agents/avatars/', null=True, blank=True, help_text=_('รูปถ่ายนายหน้า'))
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.APPROVED,
+        db_index=True,
+        help_text=_('สถานะการตรวจสอบ/อนุมัติ')
+    )
+    commission_share = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=2.50,
+        help_text=_('ส่วนแบ่งค่าคอมมิชชั่น (%) เช่น 2.5%')
+    )
+    notes = models.TextField(blank=True, help_text=_('หมายเหตุภายในสำหรับแอดมิน'))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _('Agent Profile')
+        verbose_name_plural = _('Agent Profiles')
+
+    def __str__(self):
+        return f"{self.full_name} ({self.phone}) - {self.get_status_display()}"
+

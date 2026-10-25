@@ -3,102 +3,416 @@
 {% block title %}{{ title }} — เซ้งร้านด่วน{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-2xl px-4 py-10">
-    <div class="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-        <h1 class="text-xl font-bold text-neutral-900">{{ title }}</h1>
-        <p class="mt-1 text-xs text-neutral-500">กรอกข้อมูลสถานที่และขนาดพื้นที่ให้ครบถ้วน</p>
+<div class="bg-neutral-50/70 min-h-screen py-8 sm:py-10">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-6">
 
-        {% if form.errors %}
-        <div class="mt-4 rounded-xl bg-red-50 p-4 border border-red-200 text-xs text-red-700">
-            <p class="font-bold flex items-center gap-1.5 text-sm mb-1 text-red-800">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i>
-                <span>กรุณาตรวจสอบข้อมูลที่กรอก:</span>
-            </p>
-            <ul class="list-disc pl-5 space-y-0.5">
-                {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                        <li><strong>{{ field }}:</strong> {{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
+        <!-- Header & Breadcrumb -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <a href="{% if listing %}{% url 'listings:listing_detail' listing.pk %}{% elif property %}{% url 'properties:property_detail' property.pk %}{% else %}{% url 'properties:property_list' %}{% endif %}"
+                   class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-brand-600 transition mb-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>กลับหน้ารายละเอียดร้าน</span>
+                </a>
+                <h1 class="text-xl sm:text-2xl font-black text-neutral-900 flex items-center gap-2">
+                    <i data-lucide="edit-3" class="w-6 h-6 text-brand-600"></i>
+                    <span>{{ title }}</span>
+                </h1>
+                <p class="text-xs text-neutral-500 mt-1">
+                    ปรับปรุงข้อมูลร้านค้า ตัวเลขการเงิน จัดการรูปภาพ และปรับสถานะประกาศให้เป็นปัจจุบัน
+                </p>
+            </div>
+
+            {% if listing %}
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="rounded-xl bg-neutral-200/80 px-3 py-1.5 text-xs font-mono font-bold text-neutral-800">
+                    รหัส: {{ listing.ref_code }}
+                </span>
+                <span class="rounded-xl px-3 py-1.5 text-xs font-bold {% if listing.status == 'closed' %}bg-red-600 text-white{% elif listing.status == 'published' %}bg-emerald-600 text-white{% else %}bg-amber-500 text-white{% endif %}">
+                    {% if listing.status == 'closed' %}🎉 เซ้งได้แล้ว{% else %}{{ listing.get_status_display }}{% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+            <div class="p-4 rounded-2xl text-xs font-bold flex items-center gap-2 {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">
+                <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
         </div>
         {% endif %}
 
-        <form method="post" class="mt-6 space-y-4">
+        <!-- Unified 2-Column Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
 
-            <div>
-                <label class="block text-sm font-medium text-neutral-700">ประเภทสถานที่</label>
-                {{ form.type }}
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-            <div>
-                <label class="block text-sm font-medium text-neutral-700">ชื่อร้าน / ชื่อสถานที่</label>
-                <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
-                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
-                {% if form.title.errors %}
-                <p class="mt-1 text-xs text-red-600">{{ form.title.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <!-- ========================================================= -->
+                <!-- LEFT COLUMN: Shop Basic Info, Location, Features -->
+                <!-- ========================================================= -->
+                <div class="space-y-6">
 
-            <div>
-                <label class="block text-sm font-medium text-neutral-700">รายละเอียดพื้นที่และสภาพแวดล้อม</label>
-                <textarea name="desc" rows="4" required class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ form.desc.value|default:'' }}</textarea>
-            </div>
+                    <!-- Section 1: ข้อมูลร้านค้าทั่วไป -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+                                <i data-lucide="store" class="w-4 h-4"></i>
+                            </div>
+                            <span>1. ข้อมูลร้านค้าทั่วไป</span>
+                        </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-neutral-700">จังหวัด</label>
-                    <input type="text" name="province" value="{{ form.province.value|default:'' }}" required
-                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                ชื่อร้าน / หัวข้อประกาศ <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="title" value="{{ property.title|default:'' }}" required
+                                   placeholder="เช่น เซ้งด่วน คาเฟ่มินิมอล พร้อมอุปกรณ์ ย่านอารีย์"
+                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    หมวดหมู่ร้านค้า <span class="text-red-500">*</span>
+                                </label>
+                                <select name="type" required
+                                        class="w-full rounded-xl border border-neutral-200 bg-white p-3 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                                    {% for val, label in property_types %}
+                                    <option value="{{ val }}" {% if property.type == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    พื้นที่ใช้สอย (ตร.ม.)
+                                </label>
+                                <input type="number" step="0.01" name="area_sqm" value="{{ property.area_sqm|default:'0' }}"
+                                       placeholder="เช่น 65.00"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                จำนวนชั้น
+                            </label>
+                            <input type="number" min="1" name="floors" value="{{ property.floors|default:'1' }}"
+                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <!-- Section 2: ทำเลและแผนที่ -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            </div>
+                            <span>2. ทำเลและพิกัดแผนที่</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    จังหวัด <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="province" value="{{ property.province|default:'กรุงเทพมหานคร' }}" required
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    เขต / อำเภอ <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="district" value="{{ property.district|default:'' }}" required
+                                       placeholder="เช่น วัฒนา, บางละมุง"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                ที่อยู่ / ซอย / ถนน <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="address" value="{{ property.address|default:'' }}" required
+                                   placeholder="เช่น 123/4 ซอยสุขุมวิท 55 ถนนทองหล่อ"
+                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                รหัสไปรษณีย์
+                            </label>
+                            <input type="text" name="postal" value="{{ property.postal|default:'20000' }}"
+                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1 flex items-center justify-between">
+                                <span>ลิงก์ Google Maps ของร้าน</span>
+                                <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">
+                                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                    <span>ปักหมุดแผนที่จริง</span>
+                                </span>
+                            </label>
+                            <input type="url" name="google_maps_url" value="{{ property.google_maps_url|default:'' }}"
+                                   placeholder="เช่น https://maps.app.goo.gl/... หรือ https://goo.gl/maps/..."
+                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            <p class="text-[10px] text-neutral-400 mt-1">วางลิงก์จาก Google Maps เพื่อแสดงแผนที่แบบโต้ตอบได้บนหน้าประกาศ</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: รายละเอียดและอุปกรณ์ของแถม -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                            </div>
+                            <span>3. รายละเอียดและของแถม</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                จุดเด่น & รายละเอียดร้าน <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="desc" rows="5" required
+                                      placeholder="เล่าจุดเด่นของร้าน ทำเล ฐานลูกค้าประจำ รายได้ และเหตุผลที่ปล่อยเซ้ง..."
+                                      class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500 leading-relaxed">{{ property.desc|default:'' }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                รายการอุปกรณ์และของแถมที่ให้
+                            </label>
+                            <textarea name="equipment_included" rows="3"
+                                      placeholder="เช่น เครื่องชงกาแฟ 2 หัว, ตู้เย็นสแตนเลส 3 ตู้, โต๊ะเก้าอี้ 15 ชุด, ระบบ POS..."
+                                      class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500 leading-relaxed">{% if listing %}{{ listing.includes_equipment|default:'' }}{% endif %}</textarea>
+                        </div>
+                    </div>
+
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-neutral-700">เขต / อำเภอ</label>
-                    <input type="text" name="district" value="{{ form.district.value|default:'' }}" required
-                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+
+
+                <!-- ========================================================= -->
+                <!-- RIGHT COLUMN: Financials, Contact, Status & Media Photos -->
+                <!-- ========================================================= -->
+                <div class="space-y-6">
+
+                    <!-- Section 4: สถานะ "เซ้งได้แล้ว" (Sold Out / Transferred) -->
+                    <div class="rounded-3xl border-2 {% if listing.status == 'closed' %}border-red-400 bg-red-50/60{% else %}border-neutral-200 bg-white{% endif %} p-6 shadow-xs space-y-3 transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 font-black text-sm text-neutral-900">
+                                <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                </div>
+                                <span>สถานะประกาศ: เซ้งได้แล้ว</span>
+                            </div>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {% if listing.status == 'closed' %}bg-red-600 text-white{% else %}bg-neutral-100 text-neutral-500{% endif %}">
+                                {% if listing.status == 'closed' %}ปิดการขายแล้ว{% else %}กำลังเผยแพร่{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-white border border-neutral-200/80 space-y-2">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" name="is_closed" value="1"
+                                       {% if listing.status == 'closed' %}checked{% endif %}
+                                       class="mt-1 w-5 h-5 rounded-md text-red-600 border-neutral-300 focus:ring-red-500">
+                                <div>
+                                    <div class="text-xs font-black text-neutral-900 flex items-center gap-1.5">
+                                        <span>ทำเครื่องหมายว่า "เซ้งได้แล้ว" (ปิดดีลสำเร็จ)</span>
+                                        <span class="text-xs">🎉</span>
+                                    </div>
+                                    <p class="text-[11px] text-neutral-500 mt-1 leading-relaxed">
+                                        หากเลือกตัวเลือกนี้ <strong>หน้าร้านจะไม่ถูกลบหรือซ่อนออกจากฟีด/หน้าแรก</strong> แต่จะติดป้าย <strong>"🎉 เซ้งได้แล้ว"</strong> เด่นชัดบนการ์ด เพื่อเป็นหลักฐานความสำเร็จ (Social Proof) สร้างความน่าเชื่อถือให้กับแพลตฟอร์ม
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: ตัวเลขการเงินและรายได้ -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                <i data-lucide="coins" class="w-4 h-4"></i>
+                            </div>
+                            <span>4. ตัวเลขการเงินและสัญญา</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    ราคาเซ้ง (บาท) <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" name="price" value="{% if listing %}{{ listing.price|floatformat:0 }}{% else %}0{% endif %}" required
+                                       placeholder="เช่น 500000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono font-bold text-brand-600 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    ค่าเช่า/เดือน (บาท)
+                                </label>
+                                <input type="number" name="monthly_rent" value="{% if listing %}{{ listing.monthly_rent|floatformat:0 }}{% else %}0{% endif %}"
+                                       placeholder="เช่น 35000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    เงินประกันตึก (บาท)
+                                </label>
+                                <input type="number" name="deposit_amount" value="{% if listing %}{{ listing.security_deposit|floatformat:0 }}{% else %}0{% endif %}"
+                                       placeholder="เช่น 70000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    กำไรสุทธิ/ด. (3 ด.)
+                                </label>
+                                <input type="number" name="avg_profit_3m" value="{% if listing and listing.avg_profit_3m %}{{ listing.avg_profit_3m|floatformat:0 }}{% endif %}"
+                                       placeholder="เช่น 60000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    รายได้เฉลี่ย/ด. (3 ด.)
+                                </label>
+                                <input type="number" name="avg_revenue_3m" value="{% if listing and listing.avg_revenue_3m %}{{ listing.avg_revenue_3m|floatformat:0 }}{% endif %}"
+                                       placeholder="เช่น 200000"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    สัญญาคงเหลือ (ด.)
+                                </label>
+                                <input type="number" name="remaining_lease_months" value="{% if listing %}{{ listing.lease_remaining_months }}{% else %}12{% endif %}"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 6: ข้อมูลติดต่อ -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center gap-2 text-neutral-900 font-black text-sm pb-2 border-b border-neutral-100">
+                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </div>
+                            <span>5. ช่องทางติดต่อประกาศนี้</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    เบอร์โทรศัพท์ติดต่อ
+                                </label>
+                                <input type="text" name="contact_phone" value="{% if listing and listing.contact_phone %}{{ listing.contact_phone }}{% elif property.owner.phone %}{{ property.owner.phone }}{% endif %}"
+                                       placeholder="เช่น 081-234-5678"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                                    LINE ID สำหรับติดต่อ
+                                </label>
+                                <input type="text" name="contact_line_id" value="{% if listing and listing.contact_line_id %}{{ listing.contact_line_id }}{% elif property.owner.line_id %}{{ property.owner.line_id }}{% endif %}"
+                                       placeholder="เช่น @shopforsale หรือ line_id"
+                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 7: การจัดการรูปถ่ายร้านค้า (Complete Photo Management) -->
+                    <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-neutral-100">
+                            <div class="flex items-center gap-2 text-neutral-900 font-black text-sm">
+                                <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                                    <i data-lucide="images" class="w-4 h-4"></i>
+                                </div>
+                                <span>6. จัดการรูปถ่ายร้านค้า ({{ images|length }} รูป)</span>
+                            </div>
+                        </div>
+
+                        <!-- Existing Photos Grid -->
+                        {% if images %}
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {% for img in images %}
+                            <div class="group relative rounded-2xl overflow-hidden border-2 {% if img.is_cover %}border-amber-400 ring-2 ring-amber-300{% else %}border-neutral-200{% endif %} bg-neutral-100 aspect-4/3">
+                                <img src="{{ img.image.url }}" alt="รูปถ่ายร้าน" class="w-full h-full object-cover">
+
+                                <!-- Badge: Is Cover -->
+                                {% if img.is_cover %}
+                                <div class="absolute top-2 left-2 z-10 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                    <span>หน้าปกหลัก</span>
+                                </div>
+                                {% endif %}
+
+                                <!-- Overlay Action Buttons -->
+                                <div class="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2 p-2">
+                                    {% if not img.is_cover %}
+                                    <button type="submit" formaction="{% url 'properties:property_image_set_cover' property.pk img.pk %}"
+                                            title="ตั้งเป็นภาพหน้าปกหลัก"
+                                            class="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-md transition cursor-pointer">
+                                        <i data-lucide="star" class="w-4 h-4"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="submit" formaction="{% url 'properties:property_image_delete' property.pk img.pk %}"
+                                            onclick="return confirm('ยืนยันการลบรูปภาพนี้หรือไม่?');"
+                                            title="ลบรูปภาพนี้"
+                                            class="p-2 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-md transition cursor-pointer">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="py-6 text-center text-xs text-neutral-400 bg-neutral-50 rounded-2xl border border-dashed border-neutral-300">
+                            ยังไม่มีรูปถ่ายร้านค้า กรุณาอัปโหลดรูปภาพด้านล่าง
+                        </div>
+                        {% endif %}
+
+                        <!-- Upload New Photos -->
+                        <div class="pt-2">
+                            <label class="block text-xs font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-600"></i>
+                                <span>อัปโหลดรูปถ่ายเพิ่มเติม (เลือกหลายรูปพร้อมกันได้)</span>
+                            </label>
+                            <input type="file" name="images" multiple accept="image/*"
+                                   class="w-full text-xs text-neutral-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+                            <p class="text-[10px] text-neutral-400 mt-1.5">รองรับไฟล์ JPG, PNG, WEBP ขนาดไม่เกิน 10MB ต่อภาพ</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Sticky Bottom Action Bar -->
+            <div class="sticky bottom-4 z-20 rounded-3xl bg-neutral-900/95 backdrop-blur-md p-4 text-white shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 border border-white/10">
+                <div class="text-xs text-neutral-300 flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                    <span>ตรวจทานข้อมูลให้เรียบร้อยก่อนกดยืนยันการบันทึก</span>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <a href="{% if listing %}{% url 'listings:listing_detail' listing.pk %}{% elif property %}{% url 'properties:property_detail' property.pk %}{% else %}{% url 'properties:property_list' %}{% endif %}"
+                       class="flex-1 sm:flex-none text-center rounded-xl bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 text-xs font-bold transition">
+                        ยกเลิก
+                    </a>
+                    <button type="submit"
+                            class="flex-1 sm:flex-none rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 text-xs font-black shadow-lg transition hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span>💾 บันทึกข้อมูลร้านค้า</span>
+                    </button>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-neutral-700">ที่อยู่ / ถนน / ซอย</label>
-                <input type="text" name="address" value="{{ form.address.value|default:'' }}" required
-                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-neutral-700 flex items-center justify-between">
-                    <span>ลิงก์ Google Maps ของร้าน</span>
-                    <span class="text-xs text-emerald-600 font-normal">ปักหมุดแผนที่จริง</span>
-                </label>
-                <input type="url" name="google_maps_url" value="{{ form.google_maps_url.value|default:'' }}"
-                       placeholder="เช่น https://maps.app.goo.gl/... หรือ https://goo.gl/maps/..."
-                       class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
-                <p class="mt-1 text-xs text-neutral-400">คัดลอกลิงก์แชร์จากแอป Google Maps แล้วนำมาวางได้ทันที เพื่อให้ขึ้นพิกัดในแผนที่แบบจริงๆ</p>
-                {% if form.google_maps_url.errors %}
-                <p class="mt-1 text-xs text-red-600">{{ form.google_maps_url.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-neutral-700">จำนวนชั้น</label>
-                    <input type="number" min="1" name="floors" value="{{ form.floors.value|default:'1' }}"
-                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-neutral-700">รหัสไปรษณีย์</label>
-                    <input type="text" name="postal" value="{{ form.postal.value|default:'20000' }}"
-                           class="mt-1 block w-full rounded-lg border border-neutral-300 p-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-4 border-t">
-                <a href="{% url 'properties:property_list' %}" class="text-sm font-medium text-neutral-600 hover:text-neutral-900">ยกเลิก</a>
-                <button type="submit" class="rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                    บันทึกข้อมูลร้านค้า →
-                </button>
-            </div>
         </form>
+
     </div>
 </div>
 {% endblock %}

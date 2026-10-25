@@ -9,7 +9,7 @@ from django.db.models import Sum, Count, Q, Avg
 from django.conf import settings
 
 from apps.accounts.permissions import role_required
-from apps.accounts.models import User, UserRole, VIPPaymentTransaction
+from apps.accounts.models import User, UserRole, VIPPaymentTransaction, AgentProfile
 from apps.accounts.services.audit import AuditService
 from apps.properties.models import Property, PropertyType, PropertyImage
 from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer
@@ -109,7 +109,8 @@ def admin_command_center_view(request):
     # -------------------------------------------------------------------------
     # 5. Deal Pipeline
     # -------------------------------------------------------------------------
-    deals_list = Deal.objects.select_related('listing', 'listing__property', 'lead', 'agent').order_by('-updated_at')[:40]
+    deals_list = Deal.objects.select_related('listing', 'listing__property', 'lead', 'agent', 'assigned_agent_profile').order_by('-updated_at')[:40]
+    settled_deals = Deal.objects.filter(stage=DealStage.CLOSED_WON).select_related('listing', 'listing__property', 'lead', 'agent', 'assigned_agent_profile').order_by('-closed_at', '-updated_at')[:30]
     stages_choices = DealStage.choices
 
     # -------------------------------------------------------------------------
@@ -162,7 +163,10 @@ def admin_command_center_view(request):
         'shops_list': shops_list,
         'leads_list': leads_list,
         'agents_list': agents_list,
+        'agent_profiles': AgentProfile.objects.all().order_by('-created_at'),
+        'approved_agents': AgentProfile.objects.filter(status=AgentProfile.Status.APPROVED).order_by('full_name'),
         'deals_list': deals_list,
+        'settled_deals': settled_deals,
         'stages_choices': stages_choices,
         'pending_slips': pending_slips,
         'recent_slips': recent_slips,
@@ -419,12 +423,27 @@ def admin_lead_action_view(request, pk):
         updated = True
         messages.success(request, f'อัปเดตสถานะของลีด {lead.full_name} เป็น "{lead.get_status_display()}"')
 
-    if agent_id:
-        agent = User.objects.filter(pk=agent_id).first()
-        lead.assigned_agent = agent
-        updated = True
-        agent_name = agent.get_full_name() or agent.username if agent else "ไม่ระบุ"
-        messages.success(request, f'จ่ายงานลีด {lead.full_name} ให้นายหน้า "{agent_name}" สำเร็จ')
+    if agent_id is not None:
+        if agent_id.startswith('profile_'):
+            p_id = agent_id.replace('profile_', '')
+            profile = AgentProfile.objects.filter(pk=p_id).first()
+            lead.assigned_agent_profile = profile
+            lead.assigned_agent = None
+            updated = True
+            messages.success(request, f'จ่ายงานลีด {lead.full_name} ให้นายหน้า "{profile.full_name if profile else "-"}" สำเร็จ')
+        elif agent_id.startswith('user_') or (agent_id.isdigit() and agent_id != ''):
+            u_id = agent_id.replace('user_', '')
+            agent = User.objects.filter(pk=u_id).first()
+            lead.assigned_agent = agent
+            lead.assigned_agent_profile = None
+            updated = True
+            agent_name = agent.get_full_name() or agent.username if agent else "ไม่ระบุ"
+            messages.success(request, f'จ่ายงานลีด {lead.full_name} ให้นายหน้า "{agent_name}" สำเร็จ')
+        elif agent_id == '':
+            lead.assigned_agent = None
+            lead.assigned_agent_profile = None
+            updated = True
+            messages.info(request, f'ยกเลิกการมอบหมายผู้ดูแลลีด {lead.full_name}')
 
     if updated:
         lead.save()
@@ -494,3 +513,69 @@ def admin_telegram_detect_view(request):
         messages.warning(request, '⚠️ ยังไม่พบข้อความในคิว! กรุณาดึงบอท @proptech2026_th_bot เข้ากลุ่ม Telegram แล้วพิมพ์ข้อความอะไรก็ได้ 1 ข้อความในกลุ่ม แล้วกดปุ่มนี้อีกครั้ง')
 
     return redirect('/admin-dashboard/?tab=overview')
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_create_agent_view(request):
+    """
+    WHY SECURE:
+    Admin endpoint to register a new verified agent/broker:
+    - full_name, phone, line_id, facebook_url, photo
+    """
+    full_name = request.POST.get('full_name', '').strip()
+    phone = request.POST.get('phone', '').strip()
+    line_id = request.POST.get('line_id', '').strip()
+    facebook_url = request.POST.get('facebook_url', '').strip()
+    notes = request.POST.get('notes', '').strip()
+    photo = request.FILES.get('photo')
+
+    if not full_name or not phone:
+        messages.error(request, 'กรุณาระบุชื่อ-นามสกุล และเบอร์โทรศัพท์ของนายหน้า')
+        return redirect('/admin-dashboard/?tab=agents')
+
+    agent = AgentProfile.objects.create(
+        full_name=full_name,
+        phone=phone,
+        line_id=line_id,
+        facebook_url=facebook_url,
+        notes=notes,
+        status=AgentProfile.Status.APPROVED,
+        photo=photo
+    )
+    AuditService.log(
+        action='CREATE',
+        model_name='AgentProfile',
+        object_id=agent.pk,
+        changes={'full_name': full_name, 'phone': phone},
+        request=request
+    )
+    messages.success(request, f'✅ บันทึกประวัตินายหน้า "{full_name}" เข้าระบบเรียบร้อยแล้ว')
+    return redirect('/admin-dashboard/?tab=agents')
+
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_agent_action_view(request, pk):
+    """Update status or delete agent profile."""
+    agent = get_object_or_404(AgentProfile, pk=pk)
+    action = request.POST.get('action')
+
+    if action == 'toggle_status':
+        if agent.status == AgentProfile.Status.APPROVED:
+            agent.status = AgentProfile.Status.INACTIVE
+            status_txt = "ปิดใช้งานชั่วคราว"
+        else:
+            agent.status = AgentProfile.Status.APPROVED
+            status_txt = "อนุมัติพร้อมรับงาน"
+        agent.save(update_fields=['status'])
+        messages.success(request, f'เปลี่ยนสถานะนายหน้า "{agent.full_name}" เป็น: {status_txt}')
+    elif action == 'delete':
+        name = agent.full_name
+        agent.delete()
+        messages.success(request, f'🗑️ ลบประวัตินายหน้า "{name}" ออกจากระบบเรียบร้อยแล้ว')
+
+    return redirect('/admin-dashboard/?tab=agents')
+

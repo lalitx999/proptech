@@ -435,6 +435,16 @@
                     </span>
                 </div>
 
+                {% if listing.status == 'closed' %}
+                <!-- Transferred / Sold Out Overlay -->
+                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
+                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs px-3.5 py-1.5 shadow-xl border border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
+                        <span>🎉 เซ้งได้แล้ว</span>
+                    </span>
+                </div>
+                {% endif %}
+
                 {% if listing.is_admin_verified %}
                 <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md pointer-events-none">
                     <img src="/static/images/admin_verified_gold.png?v=transparent" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
@@ -559,6 +569,16 @@
                     </span>
                 </div>
 
+                {% if listing.status == 'closed' %}
+                <!-- Transferred / Sold Out Overlay -->
+                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
+                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs px-3.5 py-1.5 shadow-xl border border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
+                        <span>🎉 เซ้งได้แล้ว</span>
+                    </span>
+                </div>
+                {% endif %}
+
                 {% if listing.is_admin_verified %}
                 <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md pointer-events-none">
                     <img src="/static/images/admin_verified_gold.png?v=transparent" alt="Admin Verified" class="h-8 object-contain" title="ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
@@ -658,6 +678,16 @@
                         {{ listing.get_type_display }}
                     </span>
                 </div>
+
+                {% if listing.status == 'closed' %}
+                <!-- Transferred / Sold Out Overlay -->
+                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
+                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs px-3.5 py-1.5 shadow-xl border border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-white"></i>
+                        <span>🎉 เซ้งได้แล้ว</span>
+                    </span>
+                </div>
+                {% endif %}
 
                 {% if listing.is_admin_verified %}
                 <div class="absolute top-2.5 right-2.5 z-10 drop-shadow-md pointer-events-none">

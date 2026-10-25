@@ -57,13 +57,31 @@ class Deal(models.Model):
     deal_code = models.CharField(max_length=30, unique=True, db_index=True)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='deals')
     lead = models.ForeignKey(Lead, on_delete=models.SET_NULL, null=True, blank=True, related_name='deals')
-    agent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='agent_deals')
+    agent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='agent_deals')
+    assigned_agent_profile = models.ForeignKey(
+        'accounts.AgentProfile',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contract_deals',
+        help_text=_('นายหน้าผู้ดูแลดีล')
+    )
 
     stage = models.CharField(
         max_length=30,
         choices=DealStage.choices,
         default=DealStage.NEW_LEAD,
         db_index=True
+    )
+    closed_by = models.CharField(
+        max_length=20,
+        choices=[
+            ('platform', _('แพลตฟอร์มปิดเอง (รับเต็ม 5%)')),
+            ('agent', _('นายหน้าเป็นผู้ปิด (แบ่ง 2.5% / 2.5%)'))
+        ],
+        default='platform',
+        db_index=True,
+        help_text=_('ผู้ปิดการขายดีลนี้')
     )
     
     # Financial settlement figures
@@ -81,37 +99,56 @@ class Deal(models.Model):
         help_text=_('เงินมัดจำที่ชำระแล้ว (บาท)')
     )
 
-    # Commission Calculation Engine
+    # Commission Calculation Engine (5% total: 5% platform vs 2.5%/2.5% split)
     commission_rate = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=Decimal('10.00'),
-        help_text=_('อัตราค่าคอมมิชชั่นรวม (%) เช่น 10%')
+        default=Decimal('5.00'),
+        help_text=_('อัตราค่าคอมมิชชั่นรวม (%) เช่น 5%')
     )
     agent_commission_share = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=Decimal('50.00'),
-        help_text=_('ส่วนแบ่งของนายหน้า (%) เช่น 50%')
+        help_text=_('ส่วนแบ่งของนายหน้า (%) เช่น 50% ของคอมฯ รวม')
     )
     gross_commission = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal('0.00'),
-        help_text=_('ยอดค่าคอมมิชชั่นรวมที่เรียกเก็บได้ (บาท)')
+        help_text=_('ยอดค่าคอมมิชชั่นรวม 5% ที่เรียกเก็บได้ (บาท)')
     )
     agent_payout = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal('0.00'),
-        help_text=_('เงินค่าคอมมิชชั่นจ่ายให้นายหน้า (บาท)')
+        help_text=_('เงินค่าคอมมิชชั่นจ่ายให้นายหน้า (บาท) [2.5%]')
     )
     platform_payout = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal('0.00'),
-        help_text=_('ส่วนแบ่งรายได้เข้าแพลตฟอร์ม (บาท)')
+        help_text=_('ส่วนแบ่งรายได้เข้าแพลตฟอร์ม (บาท) [2.5% หรือ 5%]')
     )
+
+    def calculate_commission(self):
+        """
+        Calculates 5% total fee:
+        - Platform closed: 100% of 5% goes to Platform.
+        - Agent closed: 50% (2.5%) goes to Platform, 50% (2.5%) goes to Agent.
+        """
+        if not self.agreed_price:
+            return
+        self.commission_rate = Decimal('5.00')
+        self.gross_commission = (Decimal(str(self.agreed_price)) * Decimal('0.05')).quantize(Decimal('0.01'))
+        if self.closed_by == 'platform':
+            self.platform_payout = self.gross_commission
+            self.agent_payout = Decimal('0.00')
+        else:
+            half = (self.gross_commission / Decimal('2')).quantize(Decimal('0.01'))
+            self.platform_payout = half
+            self.agent_payout = self.gross_commission - half
+
 
     site_visit_date = models.DateTimeField(null=True, blank=True)
     closed_at = models.DateTimeField(null=True, blank=True)

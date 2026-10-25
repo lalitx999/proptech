@@ -8,5 +8,6 @@ urlpatterns = [
     path('deals/<int:pk>/', views.deal_detail_view, name='deal_detail'),
     path('deals/<int:pk>/stage/', views.deal_advance_stage_view, name='deal_advance_stage'),
     path('deals/<int:pk>/upload-document/', views.deal_upload_document_view, name='deal_upload_document'),
+    path('deals/<int:pk>/settle/', views.deal_settlement_view, name='deal_settle'),
     path('documents/<int:pk>/download/', views.contract_document_download_view, name='document_download'),
 ]

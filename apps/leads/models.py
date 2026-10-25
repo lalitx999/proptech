@@ -63,6 +63,14 @@ class Lead(models.Model):
         related_name='assigned_leads',
         help_text=_('นายหน้าที่ได้รับมอบหมายให้ดูแลลีดนี้')
     )
+    assigned_agent_profile = models.ForeignKey(
+        'accounts.AgentProfile',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='leads',
+        help_text=_('โปรไฟล์นายหน้าที่ดูแล')
+    )
     notes = models.TextField(blank=True, help_text=_('บันทึกการพูดคุย / ความต้องการพิเศษ'))
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)

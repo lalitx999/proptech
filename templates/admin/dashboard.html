@@ -774,12 +774,25 @@
                                                 {% csrf_token %}
                                                 <input type="hidden" name="action" value="assign">
                                                 <select name="agent_id" class="agent-assign-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
-                                                    <option value="">ยังไม่มอบหมาย</option>
-                                                    {% for ag in agents_list %}
-                                                    <option value="{{ ag.pk }}" {% if lead.assigned_agent_id == ag.pk %}selected{% endif %}>
-                                                        {{ ag.username }}
-                                                    </option>
-                                                    {% endfor %}
+                                                    <option value="">-- ยังไม่มอบหมาย --</option>
+                                                    {% if approved_agents %}
+                                                    <optgroup label="นายหน้า/โบรกเกอร์ (Agent Profile)">
+                                                        {% for ap in approved_agents %}
+                                                        <option value="profile_{{ ap.pk }}" {% if lead.assigned_agent_profile_id == ap.pk %}selected{% endif %}>
+                                                            {{ ap.full_name }} (โทร {{ ap.phone }})
+                                                        </option>
+                                                        {% endfor %}
+                                                    </optgroup>
+                                                    {% endif %}
+                                                    {% if agents_list %}
+                                                    <optgroup label="ทีมงานภายในระบบ">
+                                                        {% for ag in agents_list %}
+                                                        <option value="user_{{ ag.pk }}" {% if lead.assigned_agent_id == ag.pk and not lead.assigned_agent_profile_id %}selected{% endif %}>
+                                                            {{ ag.get_full_name|default:ag.username }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </optgroup>
+                                                    {% endif %}
                                                 </select>
                                             </form>
                                         </td>
@@ -861,14 +874,32 @@
                                             </span>
                                         </td>
                                         <td class="py-3.5 px-4 text-right">
-                                            <form method="post" action="{% url 'accounts:admin_deal_action' deal.pk %}">
-                                                {% csrf_token %}
-                                                <select name="stage" class="deal-stage-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
-                                                    {% for val, label in stages_choices %}
-                                                    <option value="{{ val }}" {% if deal.stage == val %}selected{% endif %}>{{ label }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </form>
+                                            <div class="flex items-center justify-end gap-1.5">
+                                                {% if deal.stage != 'closed_won' and deal.stage != 'closed_lost' %}
+                                                <button type="button"
+                                                        class="open-settle-modal-btn px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs flex items-center gap-1 shrink-0 transition"
+                                                        data-deal-id="{{ deal.pk }}"
+                                                        data-deal-code="{{ deal.deal_code }}"
+                                                        data-shop-title="{{ deal.listing.property.title }}"
+                                                        data-price="{{ deal.agreed_price|default:deal.listing.price|floatformat:0 }}"
+                                                        data-agent-profile-id="{{ deal.assigned_agent_profile_id|default:'' }}">
+                                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                                                    <span>ปิดดีล (คอม 5%)</span>
+                                                </button>
+                                                {% elif deal.stage == 'closed_won' %}
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black">
+                                                    <i data-lucide="award" class="w-3 h-3 text-emerald-600"></i> ปิดดีลสำเร็จ
+                                                </span>
+                                                {% endif %}
+                                                <form method="post" action="{% url 'accounts:admin_deal_action' deal.pk %}">
+                                                    {% csrf_token %}
+                                                    <select name="stage" class="deal-stage-select rounded-lg border border-neutral-200 px-2 py-1 text-[11px]">
+                                                        {% for val, label in stages_choices %}
+                                                        <option value="{{ val }}" {% if deal.stage == val %}selected{% endif %}>{{ label }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -882,13 +913,163 @@
                 {% endif %}
 
 
-                <!-- TAB 6: AGENTS PERFORMANCE -->
+                <!-- TAB 6: AGENTS PERFORMANCE & BROKER DIRECTORY -->
                 {% if active_tab == 'agents' %}
                 <div class="space-y-6">
+                    <!-- Top Actions & Summary Banner -->
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                    <i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i>
+                                    <span>สมุดรายชื่อนายหน้าและตัวแทน (Brokers & Agents Directory)</span>
+                                </h2>
+                                <p class="text-xs text-neutral-500 mt-1">
+                                    จัดการข้อมูลนายหน้า เบอร์โทร, LINE ID, Facebook และสถานะการรับงาน เพื่อเชื่อมต่อกับระบบ CRM และกระจายลีด
+                                </p>
+                            </div>
+                            <button type="button" id="toggle-add-agent-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition shrink-0 cursor-pointer">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                <span>+ เพิ่มนายหน้าใหม่</span>
+                            </button>
+                        </div>
+
+                        <!-- Add Agent Form Collapse -->
+                        <div id="add-agent-form-container" class="hidden mt-6 pt-6 border-t border-neutral-100 bg-neutral-50/70 p-5 rounded-2xl">
+                            <h3 class="text-xs font-black text-neutral-900 mb-3 flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+                                <span>ลงทะเบียนนายหน้า / โบรกเกอร์ใหม่</span>
+                            </h3>
+                            <form method="post" action="{% url 'accounts:admin_create_agent' %}" enctype="multipart/form-data" class="space-y-4">
+                                {% csrf_token %}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">ชื่อ-นามสกุล *</label>
+                                        <input type="text" name="full_name" required placeholder="เช่น สมชาย ใจซื่อ" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">เบอร์โทรศัพท์ *</label>
+                                        <input type="text" name="phone" required placeholder="เช่น 081-999-8888" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">LINE ID</label>
+                                        <input type="text" name="line_id" placeholder="เช่น somchai_broker" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">ลิงก์ Facebook ส่วนตัว</label>
+                                        <input type="url" name="facebook_url" placeholder="https://facebook.com/..." class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">รูปถ่ายนายหน้า (ทางเลือก)</label>
+                                        <input type="file" name="photo" accept="image/*" class="w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-neutral-700 mb-1">หมายเหตุ / ทำเลที่ถนัด</label>
+                                        <input type="text" name="notes" placeholder="เช่น ถนัดร้านอาหารย่านสยาม, อารีย์, เอกมัย" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end gap-2 pt-2">
+                                    <button type="button" id="cancel-add-agent-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">ยกเลิก</button>
+                                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                        <span>บันทึกนายหน้า</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Agents Profiles Directory Grid -->
+                        <div class="mt-6">
+                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">รายชื่อนายหน้าในระบบ ({{ agent_profiles.count }} ท่าน)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for ap in agent_profiles %}
+                                <div class="rounded-2xl border border-neutral-200 p-4 bg-white hover:border-amber-300 transition shadow-xs flex flex-col justify-between space-y-3">
+                                    <div class="flex items-start gap-3">
+                                        {% if ap.photo %}
+                                        <img src="{{ ap.photo.url }}" alt="{{ ap.full_name }}" class="w-12 h-12 rounded-full object-cover border-2 border-amber-200 shadow-xs shrink-0">
+                                        {% else %}
+                                        <div class="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-amber-600 text-white font-black text-base flex items-center justify-center shrink-0 shadow-xs">
+                                            {{ ap.full_name|slice:":1"|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <h4 class="font-bold text-neutral-900 text-sm truncate">{{ ap.full_name }}</h4>
+                                                {% if ap.status == 'approved' %}
+                                                <span class="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 shrink-0">อนุมัติแล้ว</span>
+                                                {% elif ap.status == 'inactive' %}
+                                                <span class="rounded-full bg-neutral-100 text-neutral-600 text-[10px] font-bold px-2 py-0.5 shrink-0">ปิดใช้งาน</span>
+                                                {% else %}
+                                                <span class="rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 shrink-0">รอตรวจสอบ</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="text-[11px] text-neutral-500 mt-0.5">ส่วนแบ่งค่าคอม: <span class="font-bold text-neutral-700">{{ ap.commission_share }}%</span> (2.5% สุทธิ)</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contact Info Badges -->
+                                    <div class="space-y-1.5 text-xs bg-neutral-50/70 p-2.5 rounded-xl border border-neutral-100">
+                                        <div class="flex items-center gap-2 text-neutral-700">
+                                            <i data-lucide="phone" class="w-3.5 h-3.5 text-neutral-400"></i>
+                                            <a href="tel:{{ ap.phone }}" class="hover:text-brand-600 font-mono font-semibold">{{ ap.phone }}</a>
+                                        </div>
+                                        {% if ap.line_id %}
+                                        <div class="flex items-center gap-2 text-neutral-700">
+                                            <span class="w-3.5 h-3.5 rounded-xs bg-[#06C755] text-white text-[9px] font-black flex items-center justify-center">L</span>
+                                            <span class="font-mono text-[11px]">LINE: {{ ap.line_id }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if ap.facebook_url %}
+                                        <div class="flex items-center gap-2 text-neutral-700 truncate">
+                                            <i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-600"></i>
+                                            <a href="{{ ap.facebook_url }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline truncate text-[11px]">
+                                                {{ ap.facebook_url|truncatechars:30 }}
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        {% if ap.notes %}
+                                        <div class="text-[11px] text-neutral-500 pt-1 border-t border-neutral-200 italic">
+                                            "{{ ap.notes }}"
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Actions Row -->
+                                    <div class="flex items-center justify-between pt-1 border-t border-neutral-100 text-[11px]">
+                                        <form method="post" action="{% url 'accounts:admin_agent_action' ap.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="toggle_status">
+                                            <button type="submit" class="text-neutral-500 hover:text-amber-600 font-semibold transition cursor-pointer">
+                                                {% if ap.status == 'approved' %}พักงานชั่วคราว{% else %}เปิดใช้งาน{% endif %}
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'accounts:admin_agent_action' ap.pk %}" onsubmit="return confirm('ยืนยันลบประวัตินายหน้า {{ ap.full_name }} หรือไม่?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete">
+                                            <button type="submit" class="text-neutral-400 hover:text-rose-600 transition cursor-pointer">
+                                                ลบ
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-span-full py-8 text-center bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
+                                    <i data-lucide="users" class="w-8 h-8 text-neutral-300 mx-auto mb-2"></i>
+                                    <div class="text-xs text-neutral-500 font-bold">ยังไม่มีข้อมูลนายหน้าในระบบ</div>
+                                    <p class="text-[11px] text-neutral-400 mt-1">กดปุ่ม "+ เพิ่มนายหน้าใหม่" ด้านบนเพื่อเริ่มบันทึก</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Internal Team (User accounts) -->
                     <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
-                        <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
-                            <i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i>
-                            <span>ทีมนายหน้า & ประสิทธิภาพการปิดดีล (Brokers & Agents)</span>
+                        <h2 class="text-sm font-black text-neutral-900 flex items-center gap-2">
+                            <i data-lucide="shield" class="w-4 h-4 text-brand-600"></i>
+                            <span>บัญชีผู้ใช้งานทีมงานและแอดมิน (Staff & Internal Users)</span>
                         </h2>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -921,9 +1102,10 @@
                 {% endif %}
 
 
-                <!-- TAB 7: REVENUE & COMMISSIONS -->
+                <!-- TAB 7: REVENUE & COMMISSIONS (OPTION A: QUICK SETTLEMENT & 5% COMMISSION) -->
                 {% if active_tab == 'revenue' %}
                 <div class="space-y-6">
+                    <!-- Top Stat Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
                             <div class="text-xs font-bold text-neutral-400">รายได้ค่าสมาชิก VIP รวม</div>
@@ -934,13 +1116,147 @@
                         <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
                             <div class="text-xs font-bold text-neutral-400">ส่วนแบ่งค่าคอมมิชชั่นปิดดีล</div>
                             <div class="text-3xl font-black text-emerald-600 font-mono">฿{{ total_deal_commission|floatformat:2 }}</div>
-                            <div class="text-xs text-neutral-500">ส่วนแบ่งแพลตฟอร์ม 50% จากค่าคอม 5%</div>
+                            <div class="text-xs text-neutral-500">รายรับแพลตฟอร์มจากค่าคอมมิชชัน</div>
                         </div>
 
                         <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
                             <div class="text-xs font-bold text-neutral-400">รายรับสุทธิของแพลตฟอร์ม</div>
                             <div class="text-3xl font-black text-brand-600 font-mono">฿{{ total_platform_revenue|floatformat:2 }}</div>
                             <div class="text-xs text-emerald-600 font-semibold">Net Platform Revenue สะสม</div>
+                        </div>
+                    </div>
+
+                    <!-- 5% Commission Structure Policy Callout -->
+                    <div class="rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-50/80 to-teal-50/50 p-6 shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black mb-2 shadow-xs">
+                                    <i data-lucide="percent" class="w-3.5 h-3.5"></i>
+                                    <span>โครงสร้างคิดค่าคอมมิชชั่น 5% มาตรฐาน</span>
+                                </div>
+                                <h3 class="text-base font-black text-neutral-900">เกณฑ์การคำนวณและแบ่งรายได้จากการปิดการขายเซ้งร้านค้า</h3>
+                                <p class="text-xs text-neutral-600 mt-1">
+                                    คิดค่าธรรมเนียมรวม 5.0% จากมูลค่าเซ้งร้านที่ตกลงกันจริง (Agreed Price) โดยแบ่งตามผู้ปิดการขาย:
+                                </p>
+                            </div>
+                            <button type="button" id="open-settle-modal-tab7-btn" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition shrink-0 cursor-pointer">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                <span>⚡ บันทึกปิดการขาย (Option A)</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-white/90 rounded-2xl p-4 border border-emerald-100 space-y-2 shadow-xs">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center">1</div>
+                                    <div class="font-bold text-neutral-900 text-xs">กรณีที่ 1: แพลตฟอร์มปิดการขายเอง (Direct Deal)</div>
+                                </div>
+                                <div class="text-xs text-neutral-600 space-y-1 pl-9">
+                                    <div>• แพลตฟอร์มรับเต็ม: <span class="font-black text-emerald-700 text-sm">5.0%</span> ของมูลค่าเซ้ง (100% of Commission)</div>
+                                    <div class="text-[11px] text-neutral-400">ตัวอย่าง: ร้านเซ้ง 500,000 บ. ➔ แพลตฟอร์มรับ 25,000 บ. (นายหน้า 0 บ.)</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/90 rounded-2xl p-4 border border-emerald-100 space-y-2 shadow-xs">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 font-black text-xs flex items-center justify-center">2</div>
+                                    <div class="font-bold text-neutral-900 text-xs">กรณีที่ 2: นายหน้า/โบรกเกอร์ปิดการขาย (Broker Deal)</div>
+                                </div>
+                                <div class="text-xs text-neutral-600 space-y-1 pl-9">
+                                    <div>• แบ่งคนละครึ่ง: แพลตฟอร์ม <span class="font-black text-teal-700 text-sm">2.5%</span> และ นายหน้า <span class="font-black text-teal-700 text-sm">2.5%</span> (50/50 Split)</div>
+                                    <div class="text-[11px] text-neutral-400">ตัวอย่าง: ร้านเซ้ง 500,000 บ. (ค่าคอมรวม 25,000 บ.) ➔ แพลตฟอร์ม 12,500 บ. | นายหน้ารับ 12,500 บ.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settled Deals Ledger Table -->
+                    <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
+                                <i data-lucide="receipt" class="w-5 h-5 text-emerald-600"></i>
+                                <span>รายการดีลที่ปิดสำเร็จ & ส่วนแบ่งค่าคอมมิชชัน (Closed Deals Ledger)</span>
+                            </h2>
+                            <span class="text-xs font-bold text-neutral-500 font-mono">{{ settled_deals.count }} ดีลสำเร็จ</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
+                                <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="py-3 px-4">รหัสดีล</th>
+                                        <th class="py-3 px-4">ร้านค้าเซ้ง</th>
+                                        <th class="py-3 px-4">ผู้ปิดการขาย</th>
+                                        <th class="py-3 px-4 text-right font-mono">ราคาเซ้งจริง (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono">คอมมิชชัน 5% (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono">แพลตฟอร์มรับ (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono">จ่ายนายหน้า (฿)</th>
+                                        <th class="py-3 px-4 text-center">สถานะร้าน</th>
+                                        <th class="py-3 px-4 text-right">วันที่ปิดดีล</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for deal in settled_deals %}
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4 font-mono font-bold text-neutral-900">
+                                            <a href="{% url 'contracts:deal_detail' deal.pk %}" class="text-brand-600 hover:underline">
+                                                {{ deal.deal_code }}
+                                            </a>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="font-bold text-neutral-900 truncate max-w-xs">{{ deal.listing.property.title }}</div>
+                                            <div class="text-[10px] text-neutral-400 font-mono">{{ deal.listing.ref_code }}</div>
+                                        </td>
+                                        <td class="py-3.5 px-4">
+                                            {% if deal.closed_by == 'agent' %}
+                                            <span class="inline-flex items-center gap-1 text-teal-700 font-bold">
+                                                <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                                                <span>{{ deal.assigned_agent_profile.full_name|default:"นายหน้าภายนอก" }}</span>
+                                            </span>
+                                            {% else %}
+                                            <span class="inline-flex items-center gap-1 text-emerald-700 font-bold">
+                                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                                                <span>แพลตฟอร์มปิดเอง</span>
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right font-mono font-bold text-neutral-900">
+                                            ฿{{ deal.agreed_price|floatformat:0 }}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right font-mono font-bold text-brand-600">
+                                            ฿{{ deal.gross_commission|floatformat:0 }}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right font-mono font-black text-emerald-600">
+                                            ฿{{ deal.platform_payout|floatformat:0 }}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right font-mono font-semibold text-neutral-600">
+                                            {% if deal.agent_payout > 0 %}฿{{ deal.agent_payout|floatformat:0 }}{% else %}-{% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-center">
+                                            {% if deal.listing.status == 'closed' %}
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                                                🎉 เซ้งได้แล้ว
+                                            </span>
+                                            {% else %}
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-600">
+                                                {{ deal.listing.get_status_display }}
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3.5 px-4 text-right text-[11px] text-neutral-400 font-mono">
+                                            {{ deal.closed_at|date:"d/m/Y H:i"|default:deal.updated_at|date:"d/m/Y" }}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="9" class="py-8 text-center text-xs text-neutral-400">
+                                            <i data-lucide="inbox" class="w-6 h-6 text-neutral-300 mx-auto mb-1"></i>
+                                            ยังไม่มีประวัติการบันทึกปิดดีลสำเร็จ
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1293,6 +1609,147 @@
     </div>
 </div>
 
+<!-- ========================================================================= -->
+<!-- OPTION A: QUICK DEAL SETTLEMENT MODAL (5% COMMISSION & CLOSED BADGE) -->
+<!-- ========================================================================= -->
+<div id="quick-settle-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm text-neutral-900">บันทึกปิดการขาย & คิดค่าคอม 5% (Settlement)</h4>
+                    <div class="text-[11px] text-neutral-400" id="settle-deal-code-title">รหัสดีล: -</div>
+                </div>
+            </div>
+            <button type="button" id="close-settle-modal-btn" class="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="quick-settle-form" method="post" action="" class="space-y-4">
+            {% csrf_token %}
+            
+            <!-- Deal Select if opened generically -->
+            <div id="settle-deal-select-container" class="hidden">
+                <label class="block text-xs font-bold text-neutral-700 mb-1">เลือกดีลที่ต้องการปิดการขาย *</label>
+                <select id="settle-deal-select" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white">
+                    <option value="">-- เลือกดีลจากกระดาน --</option>
+                    {% for d in deals_list %}
+                    <option value="{{ d.pk }}" data-deal-code="{{ d.deal_code }}" data-shop-title="{{ d.listing.property.title }}" data-price="{{ d.agreed_price|default:d.listing.price|floatformat:0 }}" data-agent-id="{{ d.assigned_agent_profile_id|default:'' }}">
+                        {{ d.deal_code }} - {{ d.listing.property.title|truncatechars:35 }} (฿{{ d.agreed_price|default:d.listing.price|floatformat:0 }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Shop Info Card -->
+            <div class="bg-neutral-50 rounded-2xl p-3.5 border border-neutral-200 space-y-1">
+                <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">ร้านค้าเซ้ง</div>
+                <div class="font-black text-neutral-900 text-xs truncate" id="settle-shop-name">-</div>
+            </div>
+
+            <!-- 1. Agreed Price Input -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    ราคาเซ้งร้านค้าที่ตกลงกันจริง (บาท) *
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-2.5 text-neutral-400 font-bold text-xs">฿</span>
+                    <input type="number" id="settle-agreed-price" name="agreed_price" required min="0" step="1"
+                           placeholder="เช่น 500000"
+                           class="w-full text-sm font-mono font-bold rounded-xl border border-neutral-200 pl-8 pr-3 py-2 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-hidden">
+                </div>
+            </div>
+
+            <!-- 2. Closed By Selector (Platform vs Agent) -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">ผู้ปิดการขาย (คำนวณส่วนแบ่งคอมมิชชั่น)</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-neutral-200 cursor-pointer bg-white has-checked:border-emerald-500 has-checked:bg-emerald-50/40 transition">
+                        <input type="radio" name="closed_by" value="platform" checked class="text-emerald-600 focus:ring-emerald-500 settle-closed-by-radio">
+                        <div class="text-xs">
+                            <div class="font-bold text-neutral-900">แพลตฟอร์มปิดเอง</div>
+                            <div class="text-[10px] text-emerald-700 font-semibold">รับเต็ม 5.0%</div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-neutral-200 cursor-pointer bg-white has-checked:border-teal-500 has-checked:bg-teal-50/40 transition">
+                        <input type="radio" name="closed_by" value="agent" class="text-teal-600 focus:ring-teal-500 settle-closed-by-radio">
+                        <div class="text-xs">
+                            <div class="font-bold text-neutral-900">นายหน้าปิดดีล</div>
+                            <div class="text-[10px] text-teal-700 font-semibold">แบ่งคนละครึ่ง 2.5% / 2.5%</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Agent Profile Dropdown (visible when agent selected) -->
+            <div id="settle-agent-profile-box" class="hidden">
+                <label class="block text-xs font-bold text-neutral-700 mb-1">เลือกนายหน้าที่ปิดการขาย</label>
+                <select name="agent_profile_id" id="settle-agent-profile-id" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-teal-500">
+                    <option value="">-- เลือกนายหน้าจากสมุดรายชื่อ --</option>
+                    {% for ap in approved_agents %}
+                    <option value="{{ ap.pk }}">{{ ap.full_name }} (โทร {{ ap.phone }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Live Realtime Calculation Preview -->
+            <div class="rounded-2xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-teal-50/40 p-4 space-y-2">
+                <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center justify-between">
+                    <span>สรุปการคำนวณแบบ Real-time (อัตรา 5.0%)</span>
+                    <span class="rounded bg-emerald-200/80 px-1.5 py-0.5 text-emerald-900 text-[9px] font-black">Option A</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-1 font-mono text-center">
+                    <div class="bg-white/90 p-2 rounded-xl border border-emerald-100">
+                        <div class="text-[10px] text-neutral-400 font-sans">คอมมิชชันรวม (5%)</div>
+                        <div class="text-xs font-black text-neutral-900" id="live-calc-gross">฿0</div>
+                    </div>
+                    <div class="bg-white/90 p-2 rounded-xl border border-emerald-100">
+                        <div class="text-[10px] text-emerald-600 font-sans font-semibold">แพลตฟอร์มรับ</div>
+                        <div class="text-xs font-black text-emerald-600" id="live-calc-platform">฿0</div>
+                    </div>
+                    <div class="bg-white/90 p-2 rounded-xl border border-emerald-100">
+                        <div class="text-[10px] text-teal-600 font-sans font-semibold">จ่ายนายหน้า</div>
+                        <div class="text-xs font-black text-teal-600" id="live-calc-agent">฿0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Mark Shop Closed Checkbox -->
+            <div class="flex items-start gap-2.5 p-3 rounded-2xl bg-amber-50/60 border border-amber-200">
+                <input type="checkbox" name="mark_shop_closed" id="settle-mark-closed" value="1" checked class="mt-0.5 rounded text-brand-600 focus:ring-brand-500">
+                <label for="settle-mark-closed" class="text-xs text-neutral-800 cursor-pointer">
+                    <span class="font-bold">🎉 ปรับสถานะร้านค้านี้เป็น "เซ้งได้แล้ว" (Closed) ทันที</span>
+                    <p class="text-[11px] text-neutral-500 mt-0.5">
+                        ระบบจะติดป้าย Tag "เซ้งได้แล้ว" เด่นชัดบนการ์ดและหน้ารายละเอียดร้าน โดยไม่ซ่อนออกจากฟีด เพื่อเป็นหลักฐานผลงานปิดการขาย
+                    </p>
+                </label>
+            </div>
+
+            <!-- 4. Notes -->
+            <div>
+                <label class="block text-xs font-bold text-neutral-700 mb-1">บันทึกเพิ่มเติม (ทางเลือก)</label>
+                <textarea name="notes" rows="2" placeholder="เช่น ผู้ซื้อโอนมัดจำแล้ว เซ้งพร้อมโอนสัญญาเช่า..." class="w-full text-xs rounded-xl border border-neutral-200 p-2.5 bg-white focus:ring-1 focus:ring-emerald-500 focus:outline-hidden"></textarea>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+                <button type="button" id="cancel-settle-modal-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>บันทึกปิดการขาย & สรุปยอด</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Admin Dashboard JavaScript (Strict CSP Nonce Compliant) -->
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
@@ -1345,6 +1802,135 @@ document.addEventListener('DOMContentLoaded', function () {
             if (this.form) this.form.submit();
         });
     });
+
+    // 4. Tab 6: Toggle Add Agent Form
+    var toggleAddAgentBtn = document.getElementById('toggle-add-agent-btn');
+    var addAgentContainer = document.getElementById('add-agent-form-container');
+    var cancelAddAgentBtn = document.getElementById('cancel-add-agent-btn');
+    if (toggleAddAgentBtn && addAgentContainer) {
+        toggleAddAgentBtn.addEventListener('click', function () {
+            addAgentContainer.classList.toggle('hidden');
+        });
+    }
+    if (cancelAddAgentBtn && addAgentContainer) {
+        cancelAddAgentBtn.addEventListener('click', function () {
+            addAgentContainer.classList.add('hidden');
+        });
+    }
+
+    // 5. Option A: Quick Deal Settlement Modal Controls & Live Calculator
+    var settleModal = document.getElementById('quick-settle-modal');
+    var settleForm = document.getElementById('quick-settle-form');
+    var settleCodeTitle = document.getElementById('settle-deal-code-title');
+    var settleShopName = document.getElementById('settle-shop-name');
+    var settlePriceInput = document.getElementById('settle-agreed-price');
+    var settleDealSelectContainer = document.getElementById('settle-deal-select-container');
+    var settleDealSelect = document.getElementById('settle-deal-select');
+    var settleAgentBox = document.getElementById('settle-agent-profile-box');
+    var settleAgentSelect = document.getElementById('settle-agent-profile-id');
+    var closeSettleBtn = document.getElementById('close-settle-modal-btn');
+    var cancelSettleBtn = document.getElementById('cancel-settle-modal-btn');
+
+    var liveGross = document.getElementById('live-calc-gross');
+    var livePlatform = document.getElementById('live-calc-platform');
+    var liveAgent = document.getElementById('live-calc-agent');
+
+    function calculateLiveCommission() {
+        var price = parseFloat(settlePriceInput ? settlePriceInput.value : 0) || 0;
+        var gross = price * 0.05;
+        var closedBy = 'platform';
+        var radios = document.querySelectorAll('.settle-closed-by-radio');
+        radios.forEach(function (r) {
+            if (r.checked) closedBy = r.value;
+        });
+
+        var platformPayout = gross;
+        var agentPayout = 0;
+
+        if (closedBy === 'agent') {
+            platformPayout = gross * 0.5;
+            agentPayout = gross * 0.5;
+            if (settleAgentBox) settleAgentBox.classList.remove('hidden');
+        } else {
+            if (settleAgentBox) settleAgentBox.classList.add('hidden');
+        }
+
+        if (liveGross) liveGross.textContent = '฿' + Math.round(gross).toLocaleString();
+        if (livePlatform) livePlatform.textContent = '฿' + Math.round(platformPayout).toLocaleString();
+        if (liveAgent) liveAgent.textContent = '฿' + Math.round(agentPayout).toLocaleString();
+    }
+
+    if (settlePriceInput) {
+        settlePriceInput.addEventListener('input', calculateLiveCommission);
+    }
+    document.querySelectorAll('.settle-closed-by-radio').forEach(function (r) {
+        r.addEventListener('change', calculateLiveCommission);
+    });
+
+    function openSettlementModal(dealId, dealCode, shopTitle, price, agentProfileId) {
+        if (!settleModal) return;
+        if (dealId) {
+            settleForm.action = '/contracts/deals/' + dealId + '/settle/';
+            if (settleCodeTitle) settleCodeTitle.textContent = 'ดีล: ' + dealCode;
+            if (settleShopName) settleShopName.textContent = shopTitle;
+            if (settlePriceInput) settlePriceInput.value = price || '';
+            if (settleAgentSelect && agentProfileId) settleAgentSelect.value = agentProfileId;
+            if (settleDealSelectContainer) settleDealSelectContainer.classList.add('hidden');
+        } else {
+            if (settleDealSelectContainer) settleDealSelectContainer.classList.remove('hidden');
+        }
+        calculateLiveCommission();
+        settleModal.classList.remove('hidden');
+    }
+
+    function closeSettlementModal() {
+        if (settleModal) settleModal.classList.add('hidden');
+    }
+
+    document.querySelectorAll('.open-settle-modal-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var dealId = this.getAttribute('data-deal-id');
+            var dealCode = this.getAttribute('data-deal-code');
+            var shopTitle = this.getAttribute('data-shop-title');
+            var price = this.getAttribute('data-price');
+            var agentProfileId = this.getAttribute('data-agent-profile-id');
+            openSettlementModal(dealId, dealCode, shopTitle, price, agentProfileId);
+        });
+    });
+
+    var tab7SettleBtn = document.getElementById('open-settle-modal-tab7-btn');
+    if (tab7SettleBtn) {
+        tab7SettleBtn.addEventListener('click', function () {
+            var firstDealBtn = document.querySelector('.open-settle-modal-btn');
+            if (firstDealBtn) {
+                firstDealBtn.click();
+            } else {
+                openSettlementModal(null, '-', '-', '', '');
+            }
+        });
+    }
+
+    if (settleDealSelect) {
+        settleDealSelect.addEventListener('change', function () {
+            var selectedOpt = this.options[this.selectedIndex];
+            if (selectedOpt && selectedOpt.value) {
+                var dId = selectedOpt.value;
+                var dCode = selectedOpt.getAttribute('data-deal-code');
+                var sTitle = selectedOpt.getAttribute('data-shop-title');
+                var dPrice = selectedOpt.getAttribute('data-price');
+                var aId = selectedOpt.getAttribute('data-agent-id');
+                settleForm.action = '/contracts/deals/' + dId + '/settle/';
+                if (settleCodeTitle) settleCodeTitle.textContent = 'ดีล: ' + dCode;
+                if (settleShopName) settleShopName.textContent = sTitle;
+                if (settlePriceInput) settlePriceInput.value = dPrice || '';
+                if (settleAgentSelect && aId) settleAgentSelect.value = aId;
+                calculateLiveCommission();
+            }
+        });
+    }
+
+    if (closeSettleBtn) closeSettleBtn.addEventListener('click', closeSettlementModal);
+    if (cancelSettleBtn) cancelSettleBtn.addEventListener('click', closeSettlementModal);
 
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();

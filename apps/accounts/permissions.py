@@ -122,7 +122,7 @@ def _get_object_agent(obj):
 def can_view(user, obj):
     """Object-level view permission check."""
     status = getattr(obj, 'status', None)
-    if status in ['published', 'active']:
+    if status in ['published', 'active', 'closed']:
         return True
     if not user.is_authenticated:
         return False

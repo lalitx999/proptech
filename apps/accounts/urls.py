@@ -24,5 +24,7 @@ urlpatterns = [
     path('dashboard/deals/<int:pk>/action/', admin_views.admin_deal_action_view, name='admin_deal_action'),
     path('dashboard/messages/<int:pk>/resolve/', admin_views.admin_resolve_message_view, name='admin_resolve_message'),
     path('dashboard/telegram/detect/', admin_views.admin_telegram_detect_view, name='admin_telegram_detect'),
+    path('dashboard/agents/create/', admin_views.admin_create_agent_view, name='admin_create_agent'),
+    path('dashboard/agents/<int:pk>/action/', admin_views.admin_agent_action_view, name='admin_agent_action'),
 ]
 

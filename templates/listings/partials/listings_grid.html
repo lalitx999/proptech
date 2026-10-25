@@ -37,8 +37,14 @@
                     {% endif %}
                 </a>
 
-                <!-- Top Left Badges: Ref code & Deal Type & VIP & Verified -->
-                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none">
+                <!-- Top Left Badges: Ref code & Deal Type & VIP & Verified & Closed -->
+                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none z-10">
+                    {% if listing.status == 'closed' %}
+                    <span class="rounded-lg bg-red-600 px-2 py-0.5 text-[10px] font-black text-white shadow flex items-center gap-1">
+                        <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+                        <span>เซ้งได้แล้ว</span>
+                    </span>
+                    {% endif %}
                     {% if listing.is_admin_verified %}
                     <img src="/static/images/admin_verified_gold.png?v=transparent" alt="Admin Verified" class="h-7 sm:h-8 object-contain drop-shadow-md" title="ร้านนี้ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
                     {% endif %}
@@ -60,6 +66,16 @@
                         {{ listing.get_type_display }}
                     </span>
                 </div>
+
+                {% if listing.status == 'closed' %}
+                <!-- Transferred / Sold Out Overlay -->
+                <div class="absolute inset-0 bg-neutral-950/40 backdrop-blur-[1px] pointer-events-none flex items-center justify-center z-10">
+                    <span class="rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-black text-xs sm:text-sm px-4 py-1.5 shadow-xl border-2 border-white/60 tracking-wide flex items-center gap-1.5 transform -rotate-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-white"></i>
+                        <span>🎉 เซ้งได้แล้ว (ปิดการขาย)</span>
+                    </span>
+                </div>
+                {% endif %}
 
                 <!-- Favorite Heart Button (Top Right) -->
                 <button type="button"
