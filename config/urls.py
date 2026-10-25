@@ -1,11 +1,22 @@
 from django.conf import settings
 from django.urls import path, include
 
-from apps.accounts.admin_views import admin_command_center_view
+from apps.accounts import admin_views
 
 urlpatterns = [
     path('', include('apps.core.urls')),
-    path('admin-dashboard/', admin_command_center_view, name='admin_dashboard_root'),
+    path('admin-dashboard/', include([
+        path('', admin_views.admin_command_center_view, name='admin_dashboard_root'),
+        path('shops/<int:pk>/update-owner/', admin_views.admin_update_shop_owner_view, name='admin_update_shop_owner_root'),
+        path('shops/<int:pk>/action/', admin_views.admin_shop_action_view, name='admin_shop_action_root'),
+        path('shops/fast-create/', admin_views.admin_fast_create_shop_view, name='admin_fast_create_shop_root'),
+        path('leads/<int:pk>/action/', admin_views.admin_lead_action_view, name='admin_lead_action_root'),
+        path('deals/<int:pk>/action/', admin_views.admin_deal_action_view, name='admin_deal_action_root'),
+        path('agents/create/', admin_views.admin_create_agent_view, name='admin_create_agent_root'),
+        path('agents/<int:pk>/action/', admin_views.admin_agent_action_view, name='admin_agent_action_root'),
+        path('telegram/detect/', admin_views.admin_telegram_detect_view, name='admin_telegram_detect_root'),
+        path('messages/<int:pk>/resolve/', admin_views.admin_resolve_message_view, name='admin_resolve_message_root'),
+    ])),
     path('accounts/', include('apps.accounts.urls')),
     path('properties/', include('apps.properties.urls')),
     path('listings/', include('apps.listings.urls')),
