@@ -137,6 +137,12 @@ def admin_command_center_view(request):
     avg_price = Listing.objects.filter(status=ListingStatus.PUBLISHED).aggregate(avg=Avg('price'))['avg'] or 0
 
     # -------------------------------------------------------------------------
+    # 9. Fast Post Helper Data
+    # -------------------------------------------------------------------------
+    owners_list = User.objects.filter(role__in=[UserRole.OWNER, UserRole.CUSTOMER, UserRole.STAFF, UserRole.ADMIN]).order_by('username')
+    property_types = PropertyType.choices
+
+    # -------------------------------------------------------------------------
     # 10. Shop Owners & Contacts Directory Data (ข้อ 10)
     # -------------------------------------------------------------------------
     owner_q = request.GET.get('owner_q', '').strip()
