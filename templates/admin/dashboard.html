@@ -1368,6 +1368,11 @@
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">
+                                <button type="button" id="open-add-owner-modal-btn"
+                                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                    <span>+ เพิ่มข้อมูลเจ้าของร้าน</span>
+                                </button>
                                 <span class="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-2 text-xs font-bold font-mono">
                                     รวม {{ owner_directory_list|length }} รหัสประกาศในระบบ
                                 </span>
@@ -1505,19 +1510,54 @@
 
                                         <!-- Actions -->
                                         <td class="py-3.5 px-4 text-right">
-                                            <button type="button"
-                                                    class="open-edit-owner-modal-btn px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs shadow-2xs border border-emerald-200 transition inline-flex items-center gap-1 cursor-pointer"
-                                                    data-pk="{{ item.pk }}"
-                                                    data-ref="{{ item.ref_code }}"
-                                                    data-title="{{ item.property.title }}"
-                                                    data-name="{{ item.owner_name|default:'' }}"
-                                                    data-phone="{{ item.owner_phone|default:item.contact_phone|default:'' }}"
-                                                    data-line="{{ item.owner_line_id|default:item.contact_line_id|default:'' }}"
-                                                    data-fb="{{ item.owner_facebook|default:'' }}"
-                                                    data-notes="{{ item.owner_notes|default:'' }}">
-                                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                                <span>ลง/แก้ข้อมูล</span>
-                                            </button>
+                                            <div class="flex items-center justify-end gap-1.5">
+                                                {% if item.owner_name or item.owner_phone or item.owner_line_id or item.owner_facebook %}
+                                                <!-- ปุ่มแก้ไข -->
+                                                <button type="button"
+                                                        class="open-edit-owner-modal-btn px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs shadow-2xs border border-emerald-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                        data-pk="{{ item.pk }}"
+                                                        data-ref="{{ item.ref_code }}"
+                                                        data-title="{{ item.property.title }}"
+                                                        data-name="{{ item.owner_name|default:'' }}"
+                                                        data-phone="{{ item.owner_phone|default:item.contact_phone|default:'' }}"
+                                                        data-line="{{ item.owner_line_id|default:item.contact_line_id|default:'' }}"
+                                                        data-fb="{{ item.owner_facebook|default:'' }}"
+                                                        data-notes="{{ item.owner_notes|default:'' }}"
+                                                        title="แก้ไขข้อมูลเจ้าของ">
+                                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                                    <span>แก้ไข</span>
+                                                </button>
+
+                                                <!-- ปุ่มลบข้อมูล -->
+                                                <form method="post" action="/admin-dashboard/shops/{{ item.pk }}/delete-owner/"
+                                                      onsubmit="return confirm('ยืนยันลบข้อมูลเจ้าของร้านรหัส {{ item.ref_code }} ({{ item.display_owner_name }}) หรือไม่?');"
+                                                      class="inline-block">
+                                                    {% csrf_token %}
+                                                    <button type="submit"
+                                                            class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs shadow-2xs border border-rose-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                            title="ลบข้อมูลเจ้าของร้านนี้">
+                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                        <span>ลบ</span>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <!-- ปุ่มเพิ่มข้อมูล -->
+                                                <button type="button"
+                                                        class="open-edit-owner-modal-btn px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 cursor-pointer"
+                                                        data-pk="{{ item.pk }}"
+                                                        data-ref="{{ item.ref_code }}"
+                                                        data-title="{{ item.property.title }}"
+                                                        data-name=""
+                                                        data-phone="{{ item.contact_phone|default:'' }}"
+                                                        data-line="{{ item.contact_line_id|default:'' }}"
+                                                        data-fb=""
+                                                        data-notes=""
+                                                        title="ลงข้อมูลเจ้าของร้าน">
+                                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                                    <span>+ เพิ่มข้อมูล</span>
+                                                </button>
+                                                {% endif %}
+                                            </div>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -1966,6 +2006,28 @@
         <form id="edit-owner-form" method="post" action="" class="space-y-4">
             {% csrf_token %}
 
+            <!-- Shop Selector Dropdown (visible when opening via + เพิ่มข้อมูล from header) -->
+            <div id="owner-modal-select-container" class="hidden">
+                <label class="block text-xs font-bold text-neutral-700 mb-1">
+                    เลือกรหัสร้านค้าที่ต้องการลงข้อมูลเจ้าของ <span class="text-rose-500">*</span>
+                </label>
+                <select id="owner-modal-shop-select" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2.5 bg-white font-medium focus:ring-2 focus:ring-emerald-500">
+                    <option value="">-- เลือกรหัสร้านค้า (Ref Code) --</option>
+                    {% for s in owner_directory_list %}
+                    <option value="{{ s.pk }}"
+                            data-ref="{{ s.ref_code }}"
+                            data-title="{{ s.property.title }}"
+                            data-name="{{ s.owner_name|default:'' }}"
+                            data-phone="{{ s.owner_phone|default:s.contact_phone|default:'' }}"
+                            data-line="{{ s.owner_line_id|default:s.contact_line_id|default:'' }}"
+                            data-fb="{{ s.owner_facebook|default:'' }}"
+                            data-notes="{{ s.owner_notes|default:'' }}">
+                        [{{ s.ref_code }}] {{ s.property.title|truncatechars:40 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <!-- Shop Info Card -->
             <div class="bg-neutral-50 rounded-2xl p-3.5 border border-neutral-200 space-y-1">
                 <div class="flex items-center justify-between">
@@ -2040,15 +2102,26 @@
             </div>
 
             <!-- Footer Buttons -->
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
-                <button type="button" id="cancel-owner-modal-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">
-                    ยกเลิก
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-neutral-100">
+                <button type="button" id="modal-delete-owner-btn" class="hidden px-3.5 py-2 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>ลบข้อมูลเจ้าของ</span>
                 </button>
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
-                    <i data-lucide="check" class="w-4 h-4"></i>
-                    <span>บันทึกข้อมูลเจ้าของ</span>
-                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" id="cancel-owner-modal-btn" class="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>บันทึกข้อมูลเจ้าของ</span>
+                    </button>
+                </div>
             </div>
+        </form>
+
+        <!-- Hidden form for deleting owner via modal -->
+        <form id="modal-delete-owner-form" method="post" action="" class="hidden">
+            {% csrf_token %}
         </form>
     </div>
 </div>
@@ -2235,9 +2308,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeSettleBtn) closeSettleBtn.addEventListener('click', closeSettlementModal);
     if (cancelSettleBtn) cancelSettleBtn.addEventListener('click', closeSettlementModal);
 
-    // 6. Tab 10: Shop Owner Directory Modal Controls
+    // 6. Tab 10: Shop Owner Directory Modal Controls (เพิ่ม/แก้ไข/ลบ ข้อมูลเจ้าของร้าน)
     var ownerModal = document.getElementById('edit-owner-modal');
     var ownerForm = document.getElementById('edit-owner-form');
+    var openAddOwnerBtn = document.getElementById('open-add-owner-modal-btn');
+    var ownerModalSelectContainer = document.getElementById('owner-modal-select-container');
+    var ownerModalShopSelect = document.getElementById('owner-modal-shop-select');
     var ownerModalRefCode = document.getElementById('owner-modal-ref-code');
     var ownerModalBadge = document.getElementById('owner-modal-badge');
     var ownerModalShopTitle = document.getElementById('owner-modal-shop-title');
@@ -2246,11 +2322,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var ownerLineInput = document.getElementById('owner-line-input');
     var ownerFbInput = document.getElementById('owner-fb-input');
     var ownerNotesInput = document.getElementById('owner-notes-input');
+    var modalDeleteOwnerBtn = document.getElementById('modal-delete-owner-btn');
+    var modalDeleteOwnerForm = document.getElementById('modal-delete-owner-form');
     var closeOwnerBtn = document.getElementById('close-owner-modal-btn');
     var cancelOwnerBtn = document.getElementById('cancel-owner-modal-btn');
 
+    var currentOwnerPk = null;
+    var currentOwnerRef = '';
+
     function openOwnerModal(pk, ref, title, name, phone, line, fb, notes) {
         if (!ownerModal || !ownerForm) return;
+        currentOwnerPk = pk;
+        currentOwnerRef = ref || '-';
+
+        if (ownerModalSelectContainer) ownerModalSelectContainer.classList.add('hidden');
         ownerForm.action = '/admin-dashboard/shops/' + pk + '/update-owner/';
         if (ownerModalRefCode) ownerModalRefCode.textContent = 'รหัสประกาศ: ' + (ref || '-');
         if (ownerModalBadge) ownerModalBadge.textContent = ref || '-';
@@ -2260,12 +2345,99 @@ document.addEventListener('DOMContentLoaded', function () {
         if (ownerLineInput) ownerLineInput.value = line || '';
         if (ownerFbInput) ownerFbInput.value = fb || '';
         if (ownerNotesInput) ownerNotesInput.value = notes || '';
+
+        if (modalDeleteOwnerBtn) {
+            if (name || phone || line || fb) {
+                modalDeleteOwnerBtn.classList.remove('hidden');
+            } else {
+                modalDeleteOwnerBtn.classList.add('hidden');
+            }
+        }
+
         ownerModal.classList.remove('hidden');
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function closeOwnerModal() {
         if (ownerModal) ownerModal.classList.add('hidden');
+    }
+
+    // เปิด Modal แบบ "+ เพิ่มข้อมูลเจ้าของร้าน" จากปุ่มด้านบน
+    if (openAddOwnerBtn) {
+        openAddOwnerBtn.addEventListener('click', function () {
+            if (!ownerModal || !ownerForm) return;
+            currentOwnerPk = null;
+            currentOwnerRef = '';
+
+            if (ownerModalSelectContainer) ownerModalSelectContainer.classList.remove('hidden');
+            if (ownerModalShopSelect) ownerModalShopSelect.value = '';
+            ownerForm.action = '';
+            if (ownerModalRefCode) ownerModalRefCode.textContent = 'รหัสประกาศ: กรุณาเลือกร้านค้าด้านล่าง';
+            if (ownerModalBadge) ownerModalBadge.textContent = 'NEW';
+            if (ownerModalShopTitle) ownerModalShopTitle.textContent = 'กรุณาเลือกรหัสร้านค้าที่ต้องการลงข้อมูลเจ้าของ';
+            if (ownerNameInput) ownerNameInput.value = '';
+            if (ownerPhoneInput) ownerPhoneInput.value = '';
+            if (ownerLineInput) ownerLineInput.value = '';
+            if (ownerFbInput) ownerFbInput.value = '';
+            if (ownerNotesInput) ownerNotesInput.value = '';
+            if (modalDeleteOwnerBtn) modalDeleteOwnerBtn.classList.add('hidden');
+
+            ownerModal.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    }
+
+    // เมื่อเลือกรายการร้านค้าจาก Dropdown ใน Modal
+    if (ownerModalShopSelect) {
+        ownerModalShopSelect.addEventListener('change', function () {
+            var selectedOpt = this.options[this.selectedIndex];
+            if (selectedOpt && selectedOpt.value) {
+                var pk = selectedOpt.value;
+                var ref = selectedOpt.getAttribute('data-ref');
+                var title = selectedOpt.getAttribute('data-title');
+                var name = selectedOpt.getAttribute('data-name');
+                var phone = selectedOpt.getAttribute('data-phone');
+                var line = selectedOpt.getAttribute('data-line');
+                var fb = selectedOpt.getAttribute('data-fb');
+                var notes = selectedOpt.getAttribute('data-notes');
+
+                currentOwnerPk = pk;
+                currentOwnerRef = ref;
+                ownerForm.action = '/admin-dashboard/shops/' + pk + '/update-owner/';
+                if (ownerModalRefCode) ownerModalRefCode.textContent = 'รหัสประกาศ: ' + (ref || '-');
+                if (ownerModalBadge) ownerModalBadge.textContent = ref || '-';
+                if (ownerModalShopTitle) ownerModalShopTitle.textContent = title || '-';
+                if (ownerNameInput) ownerNameInput.value = name || '';
+                if (ownerPhoneInput) ownerPhoneInput.value = phone || '';
+                if (ownerLineInput) ownerLineInput.value = line || '';
+                if (ownerFbInput) ownerFbInput.value = fb || '';
+                if (ownerNotesInput) ownerNotesInput.value = notes || '';
+
+                if (modalDeleteOwnerBtn) {
+                    if (name || phone || line || fb) {
+                        modalDeleteOwnerBtn.classList.remove('hidden');
+                    } else {
+                        modalDeleteOwnerBtn.classList.add('hidden');
+                    }
+                }
+            }
+        });
+    }
+
+    // ปุ่มลบข้อมูลเจ้าของร้านจากใน Modal
+    if (modalDeleteOwnerBtn) {
+        modalDeleteOwnerBtn.addEventListener('click', function () {
+            if (!currentOwnerPk) {
+                alert('กรุณาเลือกร้านค้าก่อนทำการลบ');
+                return;
+            }
+            if (confirm('ยืนยันลบข้อมูลเจ้าของร้านรหัส ' + currentOwnerRef + ' หรือไม่?')) {
+                if (modalDeleteOwnerForm) {
+                    modalDeleteOwnerForm.action = '/admin-dashboard/shops/' + currentOwnerPk + '/delete-owner/';
+                    modalDeleteOwnerForm.submit();
+                }
+            }
+        });
     }
 
     document.querySelectorAll('.open-edit-owner-modal-btn').forEach(function (btn) {

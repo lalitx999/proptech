@@ -646,3 +646,36 @@ def admin_update_shop_owner_view(request, pk):
     messages.success(request, f'✅ บันทึกข้อมูลเจ้าของร้านรหัส "{listing.ref_code}" ({listing.property.title}) เรียบร้อยแล้ว')
     return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=owners'))
 
+
+@login_required
+@role_required(UserRole.STAFF, UserRole.ADMIN)
+@require_http_methods(["POST"])
+def admin_delete_shop_owner_view(request, pk):
+    """
+    Clear/delete owner contact records (Name, Phone, LINE, Facebook, Notes) for a specific shop code (Ref Code).
+    """
+    listing = get_object_or_404(Listing.objects.select_related('property'), pk=pk)
+    ref_code = listing.ref_code
+    shop_title = listing.property.title if listing.property else ''
+
+    listing.owner_name = ''
+    listing.owner_phone = ''
+    listing.owner_line_id = ''
+    listing.owner_facebook = ''
+    listing.owner_notes = ''
+    listing.save(update_fields=['owner_name', 'owner_phone', 'owner_line_id', 'owner_facebook', 'owner_notes'])
+
+    AuditService.log(
+        action='DELETE',
+        model_name='Listing',
+        object_id=listing.pk,
+        changes={
+            'action': 'DELETE_OWNER_CONTACT',
+            'ref_code': ref_code,
+        },
+        request=request
+    )
+
+    messages.success(request, f'🗑️ ลบข้อมูลเจ้าของร้านรหัส "{ref_code}" ({shop_title}) เรียบร้อยแล้ว')
+    return redirect(request.META.get('HTTP_REFERER', '/admin-dashboard/?tab=owners'))
+

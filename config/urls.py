@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin-dashboard/', include([
         path('', admin_views.admin_command_center_view, name='admin_dashboard_root'),
         path('shops/<int:pk>/update-owner/', admin_views.admin_update_shop_owner_view, name='admin_update_shop_owner_root'),
+        path('shops/<int:pk>/delete-owner/', admin_views.admin_delete_shop_owner_view, name='admin_delete_shop_owner_root'),
         path('shops/<int:pk>/action/', admin_views.admin_shop_action_view, name='admin_shop_action_root'),
         path('shops/fast-create/', admin_views.admin_fast_create_shop_view, name='admin_fast_create_shop_root'),
         path('leads/<int:pk>/action/', admin_views.admin_lead_action_view, name='admin_lead_action_root'),

@@ -27,5 +27,6 @@ urlpatterns = [
     path('dashboard/agents/create/', admin_views.admin_create_agent_view, name='admin_create_agent'),
     path('dashboard/agents/<int:pk>/action/', admin_views.admin_agent_action_view, name='admin_agent_action'),
     path('dashboard/shops/<int:pk>/update-owner/', admin_views.admin_update_shop_owner_view, name='admin_update_shop_owner'),
+    path('dashboard/shops/<int:pk>/delete-owner/', admin_views.admin_delete_shop_owner_view, name='admin_delete_shop_owner'),
 ]
 
