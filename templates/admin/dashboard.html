@@ -429,9 +429,8 @@
                                                             {{ shop.property.title }}
                                                         </a>
                                                         {% if shop.is_admin_verified %}
-                                                        <span class="inline-flex items-center gap-1 text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs" title="ผ่านการตรวจสอบจากแอดมินแล้ว (Admin Verified)">
-                                                            <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-3 object-contain">
-                                                            <span>VERIFIED</span>
+                                                        <span class="inline-flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-300 shadow-2xs" title="ผ่านการตรวจสอบจากแอดมินแล้ว (Admin Verified)">
+                                                            <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-4 object-contain">
                                                         </span>
                                                         {% endif %}
                                                     </div>
@@ -522,10 +521,29 @@
                                                     </button>
                                                 </form>
 
+                                                <!-- Edit Property Link -->
+                                                {% if shop.property %}
+                                                <a href="{% url 'properties:property_update' shop.property.pk %}" target="_blank" title="แก้ไขข้อมูลร้านค้า"
+                                                   class="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition cursor-pointer">
+                                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                                </a>
+                                                {% endif %}
+
                                                 <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank" title="เปิดดูหน้าร้าน"
                                                    class="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition cursor-pointer">
                                                     <i data-lucide="external-link" class="w-4 h-4"></i>
                                                 </a>
+
+                                                <!-- Delete Listing & Property -->
+                                                <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}"
+                                                      onsubmit="return confirm('⚠️ ยืนยันการลบประกาศร้าน &quot;{{ shop.property.title|default:shop.ref_code|escapejs }}&quot; หรือไม่?\nข้อมูลประกาศและข้อมูลร้านจะถูกลบออกจากระบบอย่างถาวร');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <button type="submit" title="ลบประกาศร้านนี้ถาวร"
+                                                            class="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition cursor-pointer">
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>

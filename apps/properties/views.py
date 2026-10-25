@@ -99,3 +99,27 @@ def property_update_view(request, pk):
         form = PropertyForm(instance=property_obj)
 
     return render(request, 'properties/property_form.html', {'form': form, 'title': 'แก้ไขข้อมูลทรัพย์สิน'})
+
+@login_required
+@require_http_methods(["POST"])
+def property_delete_view(request, pk):
+    """
+    WHY SECURE:
+    Enforces object-level can_delete check.
+    Only the owner or admin/staff can delete.
+    """
+    property_obj = get_object_or_404(Property, pk=pk)
+    if not can_delete(request.user, property_obj):
+        raise PermissionDenied("คุณไม่มีสิทธิ์ในการลบข้อมูลทรัพย์สินนี้")
+
+    title = property_obj.title
+    AuditService.log(
+        action='DELETE',
+        model_name='Property',
+        object_id=property_obj.pk,
+        changes={'title': title},
+        request=request
+    )
+    property_obj.delete()
+    messages.success(request, f'ลบข้อมูลทรัพย์สินร้านค้า "{title}" เรียบร้อยแล้ว')
+    return redirect('properties:property_list')

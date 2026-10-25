@@ -40,7 +40,7 @@
                 <!-- Top Left Badges: Ref code & Deal Type & VIP & Verified -->
                 <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none">
                     {% if listing.is_admin_verified %}
-                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-6 object-contain drop-shadow" title="ร้านนี้ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
+                    <img src="/static/images/admin_verified_badge.png" alt="Admin Verified" class="h-7 sm:h-8 object-contain drop-shadow-md" title="ร้านนี้ผ่านการตรวจสอบและยืนยันโดยแอดมินแล้ว (Admin Verified)">
                     {% endif %}
                     {% if listing.property.owner.membership_tier == 'SUPER_VIP' and listing.property.owner.is_vip_active %}
                     <span class="rounded-lg bg-gradient-to-r from-amber-400 via-rose-400 to-brand-500 px-2 py-0.5 text-[10px] font-black text-white shadow-sm flex items-center gap-1">

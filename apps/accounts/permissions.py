@@ -142,23 +142,25 @@ def can_edit(user, obj):
         return False
     if user.is_admin() or user.is_staff_member():
         return True
-    status = getattr(obj, 'status', 'draft')
     owner = _get_object_owner(obj)
     if owner and owner == user:
-        return status in ['draft', 'pending']
+        if hasattr(obj, 'status'):
+            return obj.status in ['draft', 'pending', 'published']
+        return True
     agent = _get_object_agent(obj)
     if agent and agent == user:
-        return status in ['draft', 'pending']
+        if hasattr(obj, 'status'):
+            return obj.status in ['draft', 'pending', 'published']
+        return True
     return False
 
 def can_delete(user, obj):
     """Object-level delete permission check."""
     if not user.is_authenticated:
         return False
-    if user.is_admin():
+    if user.is_admin() or user.is_staff_member():
         return True
-    status = getattr(obj, 'status', 'draft')
     owner = _get_object_owner(obj)
     if owner and owner == user:
-        return status == 'draft'
+        return True
     return False

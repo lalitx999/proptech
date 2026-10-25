@@ -253,9 +253,19 @@ def admin_shop_action_view(request, pk):
             messages.success(request, f'✅ อัปเดตรหัสประกาศเป็น "{new_code}" สำเร็จ')
 
     elif action == 'delete':
-        title = listing.property.title
+        prop = listing.property
+        title = prop.title if prop else listing.ref_code
+        AuditService.log(
+            action='DELETE',
+            model_name='Listing',
+            object_id=listing.pk,
+            changes={'title': title, 'ref_code': listing.ref_code},
+            request=request
+        )
         listing.delete()
-        messages.error(request, f'ลบประกาศร้าน "{title}" เรียบร้อยแล้ว')
+        if prop and not prop.listings.exists():
+            prop.delete()
+        messages.success(request, f'🗑️ ลบประกาศร้าน "{title}" เรียบร้อยแล้ว')
 
     return redirect('/admin-dashboard/?tab=shops')
 
