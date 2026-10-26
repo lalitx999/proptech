@@ -97,6 +97,74 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" nonce="{{ request.csp_nonce }}"></script>
     {% endif %}
 {% endfor %}
+
+<style>
+/* Lively Review Button Pulse & Shimmer Animations */
+@keyframes review-pulse-tiktok {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(254, 44, 85, 0.55), 0 0 0 0 rgba(37, 244, 238, 0.55);
+    }
+    50% {
+        transform: scale(1.025);
+        box-shadow: 0 0 0 6px rgba(254, 44, 85, 0), 0 0 0 14px rgba(37, 244, 238, 0);
+    }
+}
+
+@keyframes review-pulse-youtube {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+    }
+    50% {
+        transform: scale(1.025);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+}
+
+@keyframes review-pulse-facebook {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+    }
+    50% {
+        transform: scale(1.025);
+        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    }
+}
+
+@keyframes review-shimmer {
+    0% {
+        transform: translateX(-150%) skewX(-20deg);
+    }
+    30%, 100% {
+        transform: translateX(250%) skewX(-20deg);
+    }
+}
+
+.btn-review-tiktok {
+    animation: review-pulse-tiktok 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.btn-review-youtube {
+    animation: review-pulse-youtube 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.btn-review-facebook {
+    animation: review-pulse-facebook 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.review-shimmer-sweep {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    animation: review-shimmer 3.2s infinite ease-in-out;
+    pointer-events: none;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -178,13 +246,21 @@
                     </span>
                     {% endif %}
                     {% if listing.youtube_url %}
-                    <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg bg-red-600/90 hover:bg-red-600 backdrop-blur-md px-2.5 py-1 text-xs font-bold text-white inline-flex items-center gap-1 transition">
+                    <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer" class="rounded-xl bg-red-600/90 hover:bg-red-600 backdrop-blur-md px-3 py-1.5 text-xs font-bold text-white inline-flex items-center gap-1.5 transition shadow-xs">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-80"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
                         <i data-lucide="youtube" class="w-3.5 h-3.5"></i>
                         <span>มีคลิป YouTube</span>
                     </a>
                     {% endif %}
                     {% if listing.tiktok_url %}
-                    <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg bg-neutral-900/90 hover:bg-black backdrop-blur-md px-2.5 py-1 text-xs font-bold text-white inline-flex items-center gap-1 transition">
+                    <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer" class="rounded-xl bg-neutral-900/90 hover:bg-black backdrop-blur-md px-3 py-1.5 text-xs font-bold text-white inline-flex items-center gap-1.5 transition shadow-xs">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fe2c55] opacity-80"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#25f4ee]"></span>
+                        </span>
                         <span class="w-3.5 h-3.5 rounded bg-white text-black text-[8px] font-black flex items-center justify-center">TT</span>
                         <span>มีคลิป TikTok</span>
                     </a>
@@ -348,8 +424,12 @@
                             <i data-lucide="video" class="w-5 h-5 text-red-600"></i>
                             <span>วิดีโอรีวิวและคลิปพาชมสถานที่จริง</span>
                         </h2>
-                        <span class="text-[10px] font-bold bg-red-50 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                            <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-black bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded-full shadow-2xs">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                            </span>
+                            <i data-lucide="play" class="w-3 h-3 fill-current"></i>
                             <span>คลิปรีวิว</span>
                         </span>
                     </div>
@@ -367,28 +447,48 @@
                     {% endif %}
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
-                        {% if listing.youtube_url %}
-                        <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-xs">
-                            <i data-lucide="youtube" class="w-4 h-4"></i>
-                            <span>เปิดดูบน YouTube</span>
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                        {% if listing.tiktok_url %}
+                        <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer"
+                           class="btn-review-tiktok relative overflow-hidden inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-neutral-950 hover:bg-black text-white text-xs sm:text-sm font-black transition-all shadow-md group active:scale-95">
+                            <span class="review-shimmer-sweep"></span>
+                            <span class="relative flex h-2.5 w-2.5 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25f4ee] opacity-80"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#fe2c55]"></span>
+                            </span>
+                            <span class="w-5 h-5 rounded-lg bg-gradient-to-tr from-[#fe2c55] to-[#25f4ee] p-[1.5px] flex items-center justify-center shrink-0 shadow-xs">
+                                <span class="w-full h-full bg-black rounded-[6px] flex items-center justify-center text-[9px] font-black text-white">TT</span>
+                            </span>
+                            <span>เปิดดูคลิปรีวิวบน TikTok</span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors"></i>
                         </a>
                         {% endif %}
 
-                        {% if listing.tiktok_url %}
-                        <a href="{{ listing.tiktok_url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-black text-white text-xs font-bold transition shadow-xs">
-                            <span class="w-4 h-4 rounded bg-white text-black text-[9px] font-black flex items-center justify-center">TT</span>
-                            <span>เปิดดูคลิปรีวิวบน TikTok</span>
+                        {% if listing.youtube_url %}
+                        <a href="{{ listing.youtube_url }}" target="_blank" rel="noopener noreferrer"
+                           class="btn-review-youtube relative overflow-hidden inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white text-xs sm:text-sm font-black transition-all shadow-md group active:scale-95">
+                            <span class="review-shimmer-sweep"></span>
+                            <span class="relative flex h-2.5 w-2.5 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-80"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                            </span>
+                            <i data-lucide="youtube" class="w-5 h-5 fill-current shrink-0"></i>
+                            <span>เปิดดูรีวิวบน YouTube</span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-200 group-hover:text-white transition-colors"></i>
                         </a>
                         {% endif %}
 
                         {% if listing.facebook_post_url %}
                         <a href="{{ listing.facebook_post_url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
-                            <i data-lucide="facebook" class="w-4 h-4"></i>
-                            <span>เปิดดูบน Facebook</span>
+                           class="btn-review-facebook relative overflow-hidden inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black transition-all shadow-md group active:scale-95">
+                            <span class="review-shimmer-sweep"></span>
+                            <span class="relative flex h-2.5 w-2.5 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-200 opacity-80"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                            </span>
+                            <i data-lucide="facebook" class="w-5 h-5 fill-current shrink-0"></i>
+                            <span>เปิดดูโพสต์บน Facebook</span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-blue-200 group-hover:text-white transition-colors"></i>
                         </a>
                         {% endif %}
                     </div>
