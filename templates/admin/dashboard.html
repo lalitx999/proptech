@@ -3,6 +3,21 @@
 
 {% block title %}ศูนย์ควบคุมระบบหลังบ้าน — เซ้งร้านด่วน.com (Admin Command Center){% endblock %}
 
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+    /* Bound column widths so long listing titles cannot push actions off screen. */
+    .admin-shops-table { table-layout: fixed; min-width: 900px; }
+    .admin-shops-table th:nth-child(2) { width: 120px; }
+    .admin-shops-table th:nth-child(3) { width: 150px; }
+    .admin-shops-table th:nth-child(4) { width: 110px; }
+    .admin-shops-table th:nth-child(5) { width: 140px; }
+    .admin-shops-table .shop-title { white-space: normal; overflow-wrap: anywhere; }
+    .admin-shops-table .shop-info { flex: 1; overflow-wrap: anywhere; }
+    .admin-shops-table td:nth-child(2) { white-space: normal; overflow-wrap: anywhere; }
+    .admin-table-scroll:focus-visible { outline: 2px solid #db2777; outline-offset: -2px; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-[#f8fafc] text-neutral-900 pb-16 overflow-x-hidden">
 
@@ -45,12 +60,12 @@
         <div class="flex flex-col lg:flex-row gap-6 items-start">
             
             <!-- Left Command Sidebar Navigation (Fixed optimal width, does not squeeze table) -->
-            <div class="w-full lg:w-56 xl:w-60 shrink-0 space-y-2 bg-white rounded-3xl p-3 border border-neutral-200 shadow-2xs sticky top-20">
+            <div class="w-full lg:w-56 xl:w-60 shrink-0 space-y-2 bg-white rounded-3xl p-3 border border-neutral-200 shadow-2xs lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto">
                 <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-3 pt-2 pb-1">
                     ระบบจัดการหลัก
                 </div>
 
-                <nav class="space-y-1" id="admin-nav-tabs">
+                <nav class="grid grid-cols-1 sm:grid-cols-2 lg:block gap-1 lg:space-y-1" id="admin-nav-tabs">
                     <a href="?tab=overview" data-tab="overview"
                        class="tab-link flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition {% if active_tab == 'overview' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
                         <div class="flex items-center gap-2.5">
@@ -380,7 +395,7 @@
                             </button>
                         </div>
 
-                        <form method="get" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
                             <input type="hidden" name="tab" value="shops">
                             <input type="text" name="shop_q" value="{{ request.GET.shop_q|default:'' }}"
                                    placeholder="ค้นหาชื่อร้าน รหัสทรัพย์ ทำเล..."
@@ -408,8 +423,9 @@
 
                     <!-- Shops Table -->
                     <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                        <p id="shops-scroll-help" class="px-4 pt-3 pb-2 text-xs text-neutral-500">หากตารางกว้างกว่าหน้าจอ เลื่อนตารางไปทางขวาเพื่อดูปุ่มจัดการร้าน</p>
+                        <div class="admin-table-scroll w-full max-w-full overflow-x-auto" tabindex="0" role="region" aria-label="ตารางจัดการร้านค้า" aria-describedby="shops-scroll-help">
+                            <table class="admin-shops-table w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3.5 pl-4 sm:pl-6 pr-2">ร้านค้า / ข้อมูล</th>
@@ -435,10 +451,10 @@
                                                     <i data-lucide="image" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                                                 </div>
                                                 {% endif %}
-                                                <div class="min-w-0">
+                                                <div class="shop-info min-w-0">
                                                     <div class="flex items-center gap-1.5 flex-wrap">
                                                         <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank"
-                                                           class="font-black text-neutral-900 group-hover:text-brand-600 transition-colors duration-150 block truncate max-w-[170px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                                                           class="shop-title font-black text-neutral-900 group-hover:text-brand-600 transition-colors duration-150 block max-w-full">
                                                             {{ shop.property.title }}
                                                         </a>
                                                         {% if shop.is_admin_verified %}
@@ -500,8 +516,8 @@
                                             {% endif %}
                                         </td>
                                         <td class="py-3.5 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">
-                                            <!-- Responsive Action Buttons: 3x2 grid on laptop screens, 1 row on widescreen 2xl -->
-                                            <div class="grid grid-cols-3 gap-1 w-max ml-auto 2xl:flex 2xl:flex-nowrap">
+                                            <!-- Keep actions in three columns within the fixed-width management cell -->
+                                            <div class="grid grid-cols-3 gap-1 w-max ml-auto">
                                                 {% if shop.status != 'published' %}
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
