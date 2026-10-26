@@ -15,6 +15,26 @@
     .admin-shops-table .shop-info { flex: 1; overflow-wrap: anywhere; }
     .admin-shops-table td:nth-child(2) { white-space: normal; overflow-wrap: anywhere; }
     .admin-table-scroll:focus-visible { outline: 2px solid #db2777; outline-offset: -2px; }
+
+    /* Shared containment for every dashboard tab, including long contacts and URLs. */
+    .admin-content { overflow-wrap: anywhere; }
+    .admin-content .flex > *, .admin-content .inline-flex > *, .admin-content .grid > *,
+    .admin-dialog .flex > *, .admin-dialog .grid > * { min-width: 0; }
+    .admin-content :is(input, select, textarea),
+    .admin-dialog :is(input, select, textarea) { min-width: 0; max-width: 100%; }
+    .admin-content .flex.justify-between:not(.flex-col),
+    .admin-content .flex.justify-end:not(.flex-col) { flex-wrap: wrap; gap: .5rem; }
+    .admin-content :is(h2, h3) > svg { flex-shrink: 0; }
+    .admin-card-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+    .admin-stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+    .admin-table-scroll { width: 100%; max-width: 100%; max-height: 65vh; overflow: auto; }
+    .admin-data-table { width: 100%; table-layout: fixed; }
+    .admin-data-table :is(th, td) { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+    .admin-data-table .truncate, .admin-data-table .inline-flex { max-width: 100%; }
+    .admin-data-table thead { position: sticky; top: 0; z-index: 1; background: #fafafa; }
+    .admin-data-table td:last-child > .flex { flex-wrap: wrap; }
+    .admin-data-table select { width: 100%; }
+    .admin-dialog { overflow-wrap: anywhere; }
 </style>
 {% endblock %}
 
@@ -180,13 +200,13 @@
             </div>
 
             <!-- Right Content Panels (Fills all remaining width) -->
-            <div class="flex-1 min-w-0 space-y-6 w-full">
+            <div class="admin-content flex-1 min-w-0 space-y-6 w-full">
 
                 <!-- TAB 1: OVERVIEW & KPIS -->
                 {% if active_tab == 'overview' %}
                 <div class="space-y-6">
                     <!-- 4 Big Stat Cards -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="admin-stat-grid grid gap-4">
                         <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
                             <div class="text-[11px] font-bold text-neutral-400">ทรัพย์ทั้งหมดในระบบ</div>
                             <div class="text-2xl sm:text-3xl font-black text-neutral-900 font-mono">{{ total_shops }}</div>
@@ -425,7 +445,7 @@
                     <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
                         <p id="shops-scroll-help" class="px-4 pt-3 pb-2 text-xs text-neutral-500">หากตารางกว้างกว่าหน้าจอ เลื่อนตารางไปทางขวาเพื่อดูปุ่มจัดการร้าน</p>
                         <div class="admin-table-scroll w-full max-w-full overflow-x-auto" tabindex="0" role="region" aria-label="ตารางจัดการร้านค้า" aria-describedby="shops-scroll-help">
-                            <table class="admin-shops-table w-full text-left text-xs text-neutral-600">
+                            <table class="admin-data-table admin-shops-table w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3.5 pl-4 sm:pl-6 pr-2">ร้านค้า / ข้อมูล</th>
@@ -705,8 +725,10 @@
                     <!-- Past Transactions History -->
                     <div class="bg-white rounded-3xl border border-neutral-200 p-6 shadow-xs space-y-4">
                         <h3 class="text-sm font-black text-neutral-900">ประวัติการตรวจสอบย้อนหลัง (30 รายการล่าสุด)</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางประวัติการตรวจสลิป (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 800px">
+                                <colgroup><col style="width: 160px"><col style="width: 190px"><col style="width: 130px"><col style="width: 150px"><col style="width: 170px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 px-4">รหัสอ้างอิง</th>
@@ -768,8 +790,10 @@
                             <span class="text-xs text-neutral-400">ลีดใหม่: {{ new_leads_count }} • ด่วนที่สุด: {{ immediate_leads_count }}</span>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางลูกค้าผู้สนใจ (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 980px">
+                                <colgroup><col style="width: 180px"><col style="width: 180px"><col style="width: 160px"><col style="width: 190px"><col style="width: 120px"><col style="width: 150px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 px-4">ผู้สนใจ</th>
@@ -873,8 +897,10 @@
                                class="text-xs font-bold text-brand-600 hover:underline">เปิดมุมมอง Kanban CRM ➔</a>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางติดตามดีล (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1030px">
+                                <colgroup><col style="width: 130px"><col style="width: 210px"><col style="width: 170px"><col style="width: 180px"><col style="width: 150px"><col style="width: 190px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 px-4">รหัสดีล</th>
@@ -978,7 +1004,7 @@
                             </h3>
                             <form method="post" action="{% url 'accounts:admin_create_agent' %}" enctype="multipart/form-data" class="space-y-4">
                                 {% csrf_token %}
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3">
                                     <div>
                                         <label class="block text-[11px] font-bold text-neutral-700 mb-1">ชื่อ-นามสกุล *</label>
                                         <input type="text" name="full_name" required placeholder="เช่น สมชาย ใจซื่อ" class="w-full text-xs rounded-xl border border-neutral-200 px-3 py-2 bg-white focus:ring-1 focus:ring-brand-500 focus:outline-hidden">
@@ -1019,7 +1045,7 @@
                         <!-- Agents Profiles Directory Grid -->
                         <div class="mt-6">
                             <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">รายชื่อนายหน้าในระบบ ({{ agent_profiles.count }} ท่าน)</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="admin-card-grid grid gap-4">
                                 {% for ap in agent_profiles %}
                                 <div class="rounded-2xl border border-neutral-200 p-4 bg-white hover:border-amber-300 transition shadow-xs flex flex-col justify-between space-y-3">
                                     <div class="flex items-start gap-3">
@@ -1108,7 +1134,7 @@
                             <span>บัญชีผู้ใช้งานทีมงานและแอดมิน (Staff & Internal Users)</span>
                         </h2>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="admin-card-grid grid gap-4">
                             {% for agent in agents_list %}
                             <div class="rounded-2xl border border-neutral-200 p-4 bg-neutral-50/50 space-y-3">
                                 <div class="flex items-center gap-3">
@@ -1142,7 +1168,7 @@
                 {% if active_tab == 'revenue' %}
                 <div class="space-y-6">
                     <!-- Top Stat Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="admin-stat-grid grid gap-4">
                         <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-2">
                             <div class="text-xs font-bold text-neutral-400">รายได้ค่าสมาชิก VIP รวม</div>
                             <div class="text-3xl font-black text-neutral-900 font-mono">฿{{ month_vip_revenue|floatformat:2 }}</div>
@@ -1216,8 +1242,10 @@
                             <span class="text-xs font-bold text-neutral-500 font-mono">{{ settled_deals.count }} ดีลสำเร็จ</span>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางรายได้และค่าคอมมิชชัน (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1350px">
+                                <colgroup><col style="width: 120px"><col style="width: 200px"><col style="width: 170px"><col style="width: 150px"><col style="width: 150px"><col style="width: 150px"><col style="width: 150px"><col style="width: 120px"><col style="width: 140px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 px-4">รหัสดีล</th>
@@ -1452,8 +1480,10 @@
                             </span>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600 min-w-full lg:min-w-[760px]">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางข้อมูลดิบเจ้าของร้าน (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1100px">
+                                <colgroup><col style="width: 110px"><col style="width: 180px"><col style="width: 190px"><col style="width: 150px"><col style="width: 160px"><col style="width: 160px"><col style="width: 150px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap min-w-[90px]">วันที่บันทึก</th>
@@ -1667,8 +1697,10 @@
                                 รวม {{ owner_directory_list|length }} รหัสประกาศ
                             </span>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600 min-w-full lg:min-w-[800px]" id="owner-directory-table">
+                        <p class="text-xs text-neutral-500 px-4 py-2">เลื่อนตารางซ้าย–ขวาเพื่อดูข้อมูลและปุ่มจัดการครบทุกคอลัมน์</p>
+                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางทะเบียนเจ้าของร้านตามรหัสประกาศ (เลื่อนซ้าย–ขวาได้)">
+                            <table class="admin-data-table w-full text-left text-xs text-neutral-600" id="owner-directory-table" style="min-width: 1220px">
+                                <colgroup><col style="width: 110px"><col style="width: 200px"><col style="width: 180px"><col style="width: 150px"><col style="width: 150px"><col style="width: 120px"><col style="width: 160px"><col style="width: 150px"></colgroup>
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
                                         <th class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap min-w-[80px]">รหัสร้าน</th>
@@ -1850,7 +1882,7 @@
 <!-- ========================================================================= -->
 <!-- FAST SHOP CREATOR MODAL (ALL-IN-ONE FOR ADMINS - HORIZONTAL 2-COLUMN) -->
 <!-- ========================================================================= -->
-<div id="fast-post-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-hidden">
+<div id="fast-post-modal" class="admin-dialog fixed inset-0 z-50 hidden bg-neutral-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-hidden">
     <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-neutral-200 overflow-hidden my-auto">
         
         <form method="post" action="{% url 'accounts:admin_fast_create_shop' %}" enctype="multipart/form-data" class="flex flex-col h-full max-h-[92vh]">
@@ -2177,7 +2209,7 @@
 <!-- ========================================================================= -->
 <!-- SLIP ZOOM MODAL -->
 <!-- ========================================================================= -->
-<div id="slip-zoom-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+<div id="slip-zoom-modal" class="admin-dialog fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
         <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div>
@@ -2199,7 +2231,7 @@
 <!-- ========================================================================= -->
 <!-- OPTION A: QUICK DEAL SETTLEMENT MODAL (5% COMMISSION & CLOSED BADGE) -->
 <!-- ========================================================================= -->
-<div id="quick-settle-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+<div id="quick-settle-modal" class="admin-dialog fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div class="flex items-center gap-2.5">
@@ -2340,7 +2372,7 @@
 <!-- ========================================================================= -->
 <!-- EDIT SHOP OWNER MODAL (ข้อ 10: ทะเบียนข้อมูลเจ้าของร้านแต่ละรหัส) -->
 <!-- ========================================================================= -->
-<div id="edit-owner-modal" class="fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+<div id="edit-owner-modal" class="admin-dialog fixed inset-0 z-50 hidden bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div class="flex items-center gap-2.5">
@@ -2481,7 +2513,7 @@
 </div>
 
 <!-- RAW OWNER MODAL (ข้อ 10: บันทึกข้อมูลดิบเจ้าของร้านโดยไม่ต้องอิงโพสต์) -->
-<div id="raw-owner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden">
+<div id="raw-owner-modal" class="admin-dialog fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-neutral-100 max-h-[90vh] overflow-y-auto space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-neutral-100">
             <div class="flex items-center gap-2.5">
