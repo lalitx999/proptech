@@ -255,7 +255,7 @@
                                 <!-- Editable Content Area -->
                                 <div contenteditable="true" id="desc-rich-editor"
                                      class="min-h-[180px] max-h-[380px] overflow-y-auto p-3.5 text-xs sm:text-sm leading-relaxed focus:outline-none whitespace-pre-wrap select-text text-neutral-800"
-                                     placeholder="เล่าจุดเด่นของร้าน ทำเล ฐานลูกค้าประจำ รายได้ และเหตุผลที่ปล่อยเซ้ง..."></div>
+                                     placeholder="เล่าจุดเด่นของร้าน ทำเล ฐานลูกค้าประจำ รายได้ และเหตุผลที่ปล่อยเซ้ง...">{{ property.desc|safe }}</div>
                                 
                                 <!-- Hidden textarea that syncs and sends with standard form submit -->
                                 <textarea name="desc" id="desc-hidden-input" class="hidden">{{ property.desc|default:'' }}</textarea>
@@ -534,7 +534,8 @@
                             {% for img in images %}
                             <div class="sortable-image-card group relative rounded-2xl overflow-hidden border-2 {% if img.is_cover %}border-amber-400 ring-2 ring-amber-300/80 shadow-md is-cover-card{% else %}border-neutral-200 hover:border-neutral-300{% endif %} bg-neutral-100 aspect-4/3 cursor-grab active:cursor-grabbing select-none transition-all duration-200"
                                  data-id="{{ img.pk }}"
-                                 id="img-card-{{ img.pk }}">
+                                 id="img-card-{{ img.pk }}"
+                                 draggable="true">
                                 <img src="{{ img.image.url }}" alt="รูปถ่ายร้าน" class="w-full h-full object-cover pointer-events-none">
 
                                 <!-- Drag Handle Grip Indicator -->
@@ -639,8 +640,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ request.csp_nonce }}"></script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
     const grid = document.getElementById('sortable-image-grid');
     const orderInput = document.getElementById('image-order-input');
@@ -735,21 +736,54 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (grid) {
-        // Initialize SortableJS
+        // 1. Initialize SortableJS if available
         if (typeof Sortable !== 'undefined') {
-            new Sortable(grid, {
-                animation: 200,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                handle: '.drag-handle, .sortable-image-card',
-                filter: 'button, a',
-                preventOnFilter: false,
-                onEnd: function () {
-                    updateVisualOrder(true);
+            try {
+                new Sortable(grid, {
+                    animation: 200,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    handle: '.drag-handle, .sortable-image-card',
+                    filter: 'button, a',
+                    preventOnFilter: false,
+                    onEnd: function () {
+                        updateVisualOrder(true);
+                    }
+                });
+            } catch (err) {
+                console.warn('SortableJS init skipped, fallback to HTML5 drag & drop:', err);
+            }
+        }
+
+        // 2. Native HTML5 Drag & Drop Fallback (zero external dependencies)
+        let draggedCard = null;
+        grid.querySelectorAll('.sortable-image-card').forEach(card => {
+            card.setAttribute('draggable', 'true');
+            card.addEventListener('dragstart', function (e) {
+                draggedCard = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.getAttribute('data-id'));
+                setTimeout(() => this.classList.add('opacity-40'), 0);
+            });
+            card.addEventListener('dragend', function () {
+                this.classList.remove('opacity-40');
+                draggedCard = null;
+                updateVisualOrder(true);
+            });
+            card.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (!draggedCard || draggedCard === this) return;
+                const bounding = this.getBoundingClientRect();
+                const offset = e.clientX - bounding.left;
+                if (offset > bounding.width / 2) {
+                    this.after(draggedCard);
+                } else {
+                    this.before(draggedCard);
                 }
             });
-        }
+        });
 
         // Delegate Quick Move Buttons
         grid.addEventListener('click', function (e) {
@@ -972,7 +1006,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-<style>
+<style nonce="{{ request.csp_nonce }}">
+#desc-rich-editor:empty:before {
+    content: attr(placeholder);
+    color: #9ca3af;
+    pointer-events: none;
+    display: block;
+}
 .sortable-ghost {
     opacity: 0.35;
     border: 2px dashed #f59e0b !important;
