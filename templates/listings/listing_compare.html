@@ -128,7 +128,7 @@
                         <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">ค่าเปลี่ยนสัญญา</td>
                         {% for listing in listings %}
                         <td class="p-4 text-center border-l border-neutral-100 text-neutral-700">
-                            <div>฿{{ listing.lease_transfer_fee|floatformat:0 }}</div>
+                            <div>฿{{ listing.lease_transfer_fee|floatformat:0|intcomma }}</div>
                             <span class="text-[10px] text-neutral-400">({{ listing.get_lease_transfer_fee_payer_display }})</span>
                         </td>
                         {% endfor %}
@@ -139,7 +139,7 @@
                         <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">ยอดขายเฉลี่ย (3 เดือน)</td>
                         {% for listing in listings %}
                         <td class="p-4 text-center border-l border-neutral-100 font-semibold text-neutral-800">
-                            {% if listing.avg_revenue_3m %}฿{{ listing.avg_revenue_3m|floatformat:0 }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
+                            {% if listing.avg_revenue_3m %}฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
                         </td>
                         {% endfor %}
                     </tr>
@@ -149,17 +149,17 @@
                         <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">กำไรสุทธิเฉลี่ย (3 เดือน)</td>
                         {% for listing in listings %}
                         <td class="p-4 text-center border-l border-neutral-100 font-bold text-emerald-600">
-                            {% if listing.avg_profit_3m %}฿{{ listing.avg_profit_3m|floatformat:0 }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
+                            {% if listing.avg_profit_3m %}฿{{ listing.avg_profit_3m|floatformat:0|intcomma }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
                         </td>
                         {% endfor %}
                     </tr>
 
-                    <!-- Usable Area & Floors -->
+                    <!-- Floors -->
                     <tr class="hover:bg-neutral-50/50 transition">
-                        <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">พื้นที่และจำนวนชั้น</td>
+                        <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">จำนวนชั้น</td>
                         {% for listing in listings %}
                         <td class="p-4 text-center border-l border-neutral-100 text-neutral-700 font-semibold">
-                            {{ listing.property.area_sqm }} ตร.ม. ({{ listing.property.floors }} ชั้น)
+                            {{ listing.property.floors }} ชั้น
                         </td>
                         {% endfor %}
                     </tr>

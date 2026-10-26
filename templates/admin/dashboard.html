@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}ศูนย์ควบคุมระบบหลังบ้าน — เซ้งร้านด่วน.com (Admin Command Center){% endblock %}
 
@@ -186,7 +187,7 @@
                             <div class="text-[11px] font-bold text-neutral-400">สมาชิก VIP (1,000 บ.)</div>
                             <div class="text-2xl sm:text-3xl font-black text-amber-500 font-mono">{{ active_vip_users }}</div>
                             <div class="text-[11px] text-neutral-500">
-                                รายได้ VIP เดือนนี้: <strong>฿{{ month_vip_revenue|floatformat:0 }}</strong>
+                                รายได้ VIP เดือนนี้: <strong>฿{{ month_vip_revenue|floatformat:0|intcomma }}</strong>
                             </div>
                         </div>
 
@@ -206,9 +207,9 @@
 
                         <div class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-xs space-y-1">
                             <div class="text-[11px] font-bold text-neutral-400">มูลค่าดีลใน Pipeline</div>
-                            <div class="text-2xl sm:text-3xl font-black text-brand-600 font-mono">฿{{ pipeline_volume|floatformat:0 }}</div>
+                            <div class="text-2xl sm:text-3xl font-black text-brand-600 font-mono">฿{{ pipeline_volume|floatformat:0|intcomma }}</div>
                             <div class="text-[11px] text-neutral-500">
-                                ประมาณการคอม 5%: <strong>฿{{ pipeline_commission_est|floatformat:0 }}</strong>
+                                ประมาณการคอม 5%: <strong>฿{{ pipeline_commission_est|floatformat:0|intcomma }}</strong>
                             </div>
                         </div>
                     </div>
@@ -256,7 +257,7 @@
                                     <div class="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
                                         <div class="space-y-0.5 max-w-xs md:max-w-sm xl:max-w-md truncate">
                                             <div class="font-bold text-neutral-900 truncate">{{ shop.property.title }}</div>
-                                            <div class="text-[11px] text-neutral-500">{{ shop.property.district }} • ฿{{ shop.price|floatformat:0 }}</div>
+                                            <div class="text-[11px] text-neutral-500">{{ shop.property.district }} • ฿{{ shop.price|floatformat:0|intcomma }}</div>
                                         </div>
                                         <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                             {% csrf_token %}
@@ -288,7 +289,7 @@
                                 <div class="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
                                     <div class="space-y-0.5">
                                         <div class="font-bold text-neutral-900">{{ slip.user.username }}</div>
-                                        <div class="text-[11px] text-neutral-500 font-mono">{{ slip.ref_number }} • ฿{{ slip.amount|floatformat:0 }}</div>
+                                        <div class="text-[11px] text-neutral-500 font-mono">{{ slip.ref_number }} • ฿{{ slip.amount|floatformat:0|intcomma }}</div>
                                     </div>
                                     <a href="?tab=slips" class="rounded-xl bg-neutral-900 hover:bg-brand-600 text-white px-3 py-1 text-xs font-bold transition">
                                         ตรวจสลิป
@@ -471,8 +472,8 @@
                                             <div class="text-[11px] text-neutral-400">{{ shop.property.district }}, {{ shop.property.province }}</div>
                                         </td>
                                         <td class="py-3.5 px-4 font-mono">
-                                            <div class="font-black text-brand-600 text-sm">฿{{ shop.price|floatformat:0 }}</div>
-                                            <div class="text-[11px] text-neutral-400">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0 }}/ด.</div>
+                                            <div class="font-black text-brand-600 text-sm">฿{{ shop.price|floatformat:0|intcomma }}</div>
+                                            <div class="text-[11px] text-neutral-400">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0|intcomma }}/ด.</div>
                                         </td>
                                         <td class="py-3.5 px-4">
                                             {% if shop.status == 'published' %}
@@ -629,7 +630,7 @@
 
                                     <div class="text-xs space-y-1">
                                         <div>ผู้ใช้: <strong class="text-brand-600">{{ tx.user.username }}</strong> ({{ tx.user.get_full_name|default:"-" }})</div>
-                                        <div>โทร: {{ tx.user.phone|default:"-" }} • ยอดชำระ: <strong class="text-emerald-700 font-mono">฿{{ tx.amount|floatformat:2 }}</strong></div>
+                                        <div>โทร: {{ tx.user.phone|default:"-" }} • ยอดชำระ: <strong class="text-emerald-700 font-mono">฿{{ tx.amount|floatformat:0|intcomma }}</strong></div>
                                     </div>
 
                                     <!-- Slip Image Thumbnail with Zoom Button -->
@@ -694,7 +695,7 @@
                                     <tr>
                                         <td class="py-3 px-4 font-mono font-bold text-neutral-900">{{ tx.ref_number }}</td>
                                         <td class="py-3 px-4">{{ tx.user.username }}</td>
-                                        <td class="py-3 px-4 font-mono font-bold text-brand-600">฿{{ tx.amount|floatformat:2 }}</td>
+                                        <td class="py-3 px-4 font-mono font-bold text-brand-600">฿{{ tx.amount|floatformat:0|intcomma }}</td>
                                         <td class="py-3 px-4">
                                             {% if tx.status == 'AUTO_VERIFIED' %}
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-black">
@@ -774,7 +775,7 @@
                                         </td>
                                         <td class="py-3.5 px-4 font-mono">
                                             <div class="font-bold text-neutral-800">
-                                                {% if lead.budget_max %}฿{{ lead.budget_max|floatformat:0 }}{% else %}ไม่ระบุงบ{% endif %}
+                                                {% if lead.budget_max %}฿{{ lead.budget_max|floatformat:0|intcomma }}{% else %}ไม่ระบุงบ{% endif %}
                                             </div>
                                             <div class="text-[10px] text-brand-600 font-sans">{{ lead.get_urgency_display }}</div>
                                         </td>
@@ -874,8 +875,8 @@
                                             {% if deal.lead %}{{ deal.lead.full_name }} ({{ deal.lead.phone }}){% else %}-{% endif %}
                                         </td>
                                         <td class="py-3.5 px-4 font-mono">
-                                            <div class="font-black text-neutral-900">฿{{ deal.agreed_price|default:deal.listing.price|floatformat:0 }}</div>
-                                            <div class="text-[10px] text-brand-600 font-bold">คอมมิชชั่น: ฿{{ deal.gross_commission|floatformat:0 }}</div>
+                                            <div class="font-black text-neutral-900">฿{{ deal.agreed_price|default:deal.listing.price|floatformat:0|intcomma }}</div>
+                                            <div class="text-[10px] text-brand-600 font-bold">คอมมิชชั่น: ฿{{ deal.gross_commission|floatformat:0|intcomma }}</div>
                                         </td>
                                         <td class="py-3.5 px-4">
                                             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
@@ -1100,7 +1101,7 @@
                                     </div>
                                     <div class="bg-white p-2 rounded-xl border border-neutral-100 text-center">
                                         <div class="text-[10px] text-neutral-400 font-sans">คอมมิชชั่นสะสม</div>
-                                        <div class="font-black text-emerald-600 text-base">฿{{ agent.total_payout|default:0|floatformat:0 }}</div>
+                                        <div class="font-black text-emerald-600 text-base">฿{{ agent.total_payout|default:0|floatformat:0|intcomma }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -1230,16 +1231,16 @@
                                             {% endif %}
                                         </td>
                                         <td class="py-3.5 px-4 text-right font-mono font-bold text-neutral-900">
-                                            ฿{{ deal.agreed_price|floatformat:0 }}
+                                            ฿{{ deal.agreed_price|floatformat:0|intcomma }}
                                         </td>
                                         <td class="py-3.5 px-4 text-right font-mono font-bold text-brand-600">
-                                            ฿{{ deal.gross_commission|floatformat:0 }}
+                                            ฿{{ deal.gross_commission|floatformat:0|intcomma }}
                                         </td>
                                         <td class="py-3.5 px-4 text-right font-mono font-black text-emerald-600">
-                                            ฿{{ deal.platform_payout|floatformat:0 }}
+                                            ฿{{ deal.platform_payout|floatformat:0|intcomma }}
                                         </td>
                                         <td class="py-3.5 px-4 text-right font-mono font-semibold text-neutral-600">
-                                            {% if deal.agent_payout > 0 %}฿{{ deal.agent_payout|floatformat:0 }}{% else %}-{% endif %}
+                                            {% if deal.agent_payout > 0 %}฿{{ deal.agent_payout|floatformat:0|intcomma }}{% else %}-{% endif %}
                                         </td>
                                         <td class="py-3.5 px-4 text-center">
                                             {% if deal.listing.status == 'closed' %}
@@ -1506,14 +1507,14 @@
                                         <td class="py-3 px-4 font-mono">
                                             {% if rec.expected_price %}
                                             <div class="font-black text-brand-600">
-                                                ฿{{ rec.expected_price|floatformat:0 }}
+                                                ฿{{ rec.expected_price|floatformat:0|intcomma }}
                                             </div>
                                             {% else %}
                                             <span class="text-neutral-300">-</span>
                                             {% endif %}
                                             {% if rec.monthly_rent %}
                                             <div class="text-[11px] text-neutral-500 mt-0.5">
-                                                ค่าเช่า: ฿{{ rec.monthly_rent|floatformat:0 }}/ด.
+                                                ค่าเช่า: ฿{{ rec.monthly_rent|floatformat:0|intcomma }}/ด.
                                             </div>
                                             {% endif %}
                                         </td>
@@ -1877,8 +1878,8 @@
                             </div>
 
                             <!-- Category & Space/Floors -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div class="space-y-1 sm:col-span-1">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">หมวดหมู่ร้านค้า <span class="text-red-500">*</span></label>
                                     <select name="category" id="fast-create-category" class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
                                         {% for val, label in property_types %}
@@ -1886,12 +1887,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="space-y-1 sm:col-span-1">
-                                    <label class="block font-bold text-neutral-700">พื้นที่ใช้สอย (ตร.ม.)</label>
-                                    <input type="number" step="0.01" name="area_sqm" placeholder="เช่น 60.00"
-                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
-                                </div>
-                                <div class="space-y-1 sm:col-span-1">
+                                <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">จำนวนชั้น</label>
                                     <input type="number" min="1" name="floors" value="1"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
@@ -2202,7 +2198,7 @@
                     <option value="">-- เลือกดีลจากกระดาน --</option>
                     {% for d in deals_list %}
                     <option value="{{ d.pk }}" data-deal-code="{{ d.deal_code }}" data-shop-title="{{ d.listing.property.title }}" data-price="{{ d.agreed_price|default:d.listing.price|floatformat:0 }}" data-agent-id="{{ d.assigned_agent_profile_id|default:'' }}">
-                        {{ d.deal_code }} - {{ d.listing.property.title|truncatechars:35 }} (฿{{ d.agreed_price|default:d.listing.price|floatformat:0 }})
+                        {{ d.deal_code }} - {{ d.listing.property.title|truncatechars:35 }} (฿{{ d.agreed_price|default:d.listing.price|floatformat:0|intcomma }})
                     </option>
                     {% endfor %}
                 </select>

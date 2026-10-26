@@ -1,3 +1,4 @@
+{% load humanize %}
 <div id="listings-container">
     <!-- Results Header -->
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-200/80">
@@ -76,19 +77,19 @@
                 <div>
                     <!-- Price & Rent / Revenue -->
                     <div class="flex flex-wrap items-baseline gap-1">
-                        <span class="text-xs sm:text-sm md:text-base font-black text-neutral-900 tracking-tight">฿{{ listing.price|floatformat:0 }}</span>
+                        <span class="text-xs sm:text-sm md:text-base font-black text-neutral-900 tracking-tight">฿{{ listing.price|floatformat:0|intcomma }}</span>
                         {% if listing.monthly_rent %}
-                        <span class="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">· เช่า ฿{{ listing.monthly_rent|floatformat:0 }}/ด.</span>
+                        <span class="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate">· เช่า ฿{{ listing.monthly_rent|floatformat:0|intcomma }}/ด.</span>
                         {% endif %}
                     </div>
 
                     {% if listing.avg_revenue_3m %}
                     <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        รายได้ ฿{{ listing.avg_revenue_3m|floatformat:0 }} บ. เดือนล่าสุด
+                        รายได้ ฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
                     </div>
                     {% elif listing.avg_profit_3m %}
                     <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        กำไร ฿{{ listing.avg_profit_3m|floatformat:0 }} บ. เดือนล่าสุด
+                        กำไร ฿{{ listing.avg_profit_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
                     </div>
                     {% endif %}
 

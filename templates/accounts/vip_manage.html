@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}จัดการสลิปและสิทธิ์สมาชิก VIP — เซ้งร้านด่วน.com{% endblock %}
 
@@ -57,7 +58,7 @@
                                 อีเมล: {{ tx.user.email|default:"-" }} | โทร: {{ tx.user.phone|default:"-" }}
                             </div>
                             <div class="text-neutral-500">
-                                ยอดชำระ: <strong class="text-brand-600 text-sm">฿{{ tx.amount|floatformat:2 }}</strong>
+                                ยอดชำระ: <strong class="text-brand-600 text-sm">฿{{ tx.amount|floatformat:0|intcomma }}</strong>
                             </div>
                         </div>
 
@@ -133,7 +134,7 @@
                             <td class="py-3 px-4 font-mono font-bold text-neutral-900">{{ tx.ref_number }}</td>
                             <td class="py-3 px-4 font-semibold text-neutral-800">{{ tx.user.username }}</td>
                             <td class="py-3 px-4">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
-                            <td class="py-3 px-4 font-bold text-neutral-900">฿{{ tx.amount|floatformat:2 }}</td>
+                            <td class="py-3 px-4 font-bold text-neutral-900">฿{{ tx.amount|floatformat:0|intcomma }}</td>
                             <td class="py-3 px-4">
                                 {% if tx.status == 'MANUAL_APPROVED' or tx.status == 'AUTO_VERIFIED' %}
                                     <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-bold">

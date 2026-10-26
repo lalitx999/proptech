@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}ทรัพย์สินและร้านค้าของฉัน — เซ้งร้านด่วน{% endblock %}
 
@@ -69,7 +70,7 @@
             <h3 class="text-base font-bold text-neutral-900 line-clamp-1">{{ prop.title }}</h3>
             <p class="text-xs text-neutral-500 flex items-center gap-1">
                 <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-400"></i>
-                <span>{{ prop.district }}, {{ prop.province }} ({{ prop.area_sqm }} ตร.ม.)</span>
+                <span>{{ prop.district }}, {{ prop.province }}</span>
             </p>
             <div class="flex items-center justify-between pt-3 border-t text-xs">
                 <div class="flex items-center gap-2">
@@ -85,7 +86,7 @@
                 {% with listing=prop.listings.first %}
                 {% if listing %}
                     <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 font-bold text-white hover:bg-emerald-700 shadow-2xs">
-                        <span>ดูประกาศบนเว็บ (฿{{ listing.price|floatformat:0 }})</span>
+                        <span>ดูประกาศบนเว็บ (฿{{ listing.price|floatformat:0|intcomma }})</span>
                         <i data-lucide="external-link" class="w-3 h-3"></i>
                     </a>
                 {% else %}

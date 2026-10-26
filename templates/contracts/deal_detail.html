@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}ดีล {{ deal.deal_code }} — เซ้งร้านด่วน{% endblock %}
 
@@ -137,25 +138,25 @@
                     <div class="p-3 bg-neutral-50 rounded-lg border border-neutral-100">
                         <span class="text-xs text-neutral-400 block">ราคาเซ้งตกลง</span>
                         <span class="text-lg font-extrabold text-neutral-900">
-                            ฿{{ deal.agreed_price|default_if_none:deal.listing.price|floatformat:0 }}
+                            ฿{{ deal.agreed_price|default_if_none:deal.listing.price|floatformat:0|intcomma }}
                         </span>
                     </div>
                     <div class="p-3 bg-neutral-50 rounded-lg border border-neutral-100">
                         <span class="text-xs text-neutral-400 block">ค่าคอมรวม ({{ deal.commission_rate }}%)</span>
                         <span class="text-lg font-extrabold text-brand-600">
-                            ฿{{ deal.gross_commission|floatformat:0 }}
+                            ฿{{ deal.gross_commission|floatformat:0|intcomma }}
                         </span>
                     </div>
                     <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
                         <span class="text-xs text-emerald-700 block">นายหน้า ({{ deal.agent_commission_share }}%)</span>
                         <span class="text-lg font-extrabold text-emerald-800">
-                            ฿{{ deal.agent_payout|floatformat:0 }}
+                            ฿{{ deal.agent_payout|floatformat:0|intcomma }}
                         </span>
                     </div>
                     <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
                         <span class="text-xs text-blue-700 block">แพลตฟอร์ม</span>
                         <span class="text-lg font-extrabold text-blue-800">
-                            ฿{{ deal.platform_payout|floatformat:0 }}
+                            ฿{{ deal.platform_payout|floatformat:0|intcomma }}
                         </span>
                     </div>
                 </div>

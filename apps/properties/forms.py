@@ -11,13 +11,12 @@ class PropertyForm(forms.ModelForm):
     """
     floors = forms.IntegerField(required=False, initial=1, min_value=1, label="จำนวนชั้น")
     postal = forms.CharField(required=False, initial='10000', label="รหัสไปรษณีย์")
-    area_sqm = forms.DecimalField(required=False, initial=0.0, label="พื้นที่ (ตร.ม.)")
 
     class Meta:
         model = Property
         fields = [
             'type', 'title', 'desc', 'address', 'province',
-            'district', 'postal', 'google_maps_url', 'lat', 'lng', 'area_sqm', 'floors'
+            'district', 'postal', 'google_maps_url', 'lat', 'lng', 'floors'
         ]
 
     def clean_title(self):
@@ -37,16 +36,6 @@ class PropertyForm(forms.ModelForm):
         if not postal:
             return '10000'
         return postal
-
-    def clean_area_sqm(self):
-        area = self.cleaned_data.get('area_sqm')
-        if not area:
-            if self.instance and self.instance.pk and self.instance.area_sqm:
-                return self.instance.area_sqm
-            return 0.0
-        if area < 0:
-            raise forms.ValidationError("พื้นที่ใช้สอยต้องมากกว่าหรือเท่ากับ 0 ตารางเมตร")
-        return area
 
     def clean(self):
         cleaned_data = super().clean()

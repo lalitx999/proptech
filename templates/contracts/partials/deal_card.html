@@ -1,3 +1,4 @@
+{% load humanize %}
 <div class="bg-white rounded-lg border border-neutral-200 p-4 shadow-sm hover:shadow-md transition-shadow">
     <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-mono font-bold text-neutral-500">{{ deal.deal_code }}</span>
@@ -20,9 +21,9 @@
             <div class="text-[10px] text-neutral-400">ราคาเซ้ง</div>
             <div class="font-bold text-neutral-900">
                 {% if deal.agreed_price %}
-                    ฿{{ deal.agreed_price|floatformat:0 }}
+                    ฿{{ deal.agreed_price|floatformat:0|intcomma }}
                 {% else %}
-                    ฿{{ deal.listing.price|floatformat:0 }}
+                    ฿{{ deal.listing.price|floatformat:0|intcomma }}
                 {% endif %}
             </div>
         </div>

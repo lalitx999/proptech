@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}แพ็กเกจการลงประกาศเซ้งร้าน & สมาชิก VIP / Super VIP — เซ้งร้านด่วน.com{% endblock %}
 
@@ -597,7 +597,7 @@
                                 {% endif %}
                             </td>
                             <td class="py-3 px-4">{{ tx.created_at|date:"d/m/Y H:i" }}</td>
-                            <td class="py-3 px-4 font-bold text-brand-600">฿{{ tx.amount|floatformat:2 }}</td>
+                            <td class="py-3 px-4 font-bold text-brand-600">฿{{ tx.amount|floatformat:0|intcomma }}</td>
                             <td class="py-3 px-4">
                                 {% if tx.status == 'PENDING' %}
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">
