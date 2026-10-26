@@ -57,8 +57,8 @@
                 <dd class="font-semibold text-neutral-900">{{ property.postal }}</dd>
             </div>
         </div>
-        <div class="border-t pt-4 text-sm text-neutral-700 whitespace-pre-line">
-            {{ property.desc }}
+        <div class="border-t pt-4 text-sm text-neutral-700 whitespace-pre-wrap break-words">
+            {{ property.desc|safe }}
         </div>
     </div>
 

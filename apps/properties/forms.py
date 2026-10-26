@@ -37,6 +37,25 @@ class PropertyForm(forms.ModelForm):
             return '10000'
         return postal
 
+    def clean_desc(self):
+        desc = self.cleaned_data.get('desc', '').strip()
+        if desc:
+            import bleach
+            from bleach.css_sanitizer import CSSSanitizer
+            css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
+            allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
+            allowed_attrs = {
+                'a': ['href', 'title', 'target', 'rel', 'class'],
+                'span': ['style', 'class'],
+                'font': ['color'],
+                '*': ['style', 'class']
+            }
+            try:
+                desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
+            except Exception:
+                pass
+        return desc
+
     def clean(self):
         cleaned_data = super().clean()
         maps_url = cleaned_data.get('google_maps_url')

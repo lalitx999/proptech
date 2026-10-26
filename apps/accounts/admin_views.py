@@ -327,8 +327,22 @@ def admin_fast_create_shop_view(request):
     avg_revenue_3m = request.POST.get('avg_revenue_3m', '')
     district = request.POST.get('district', '').strip()
     province = request.POST.get('province', 'กรุงเทพมหานคร').strip()
-    address = request.POST.get('address', '').strip()
     description = request.POST.get('description', '').strip()
+    if description:
+        import bleach
+        from bleach.css_sanitizer import CSSSanitizer
+        css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
+        allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
+        allowed_attrs = {
+            'a': ['href', 'title', 'target', 'rel', 'class'],
+            'span': ['style', 'class'],
+            'font': ['color'],
+            '*': ['style', 'class']
+        }
+        try:
+            description = bleach.clean(description, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
+        except Exception:
+            pass
     equipment_included = request.POST.get('equipment_included', '').strip()
     sqm = request.POST.get('sqm', request.POST.get('area_sqm', '50.00'))
     floors = int(request.POST.get('floors', '1') or '1')

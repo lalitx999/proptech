@@ -132,7 +132,20 @@ def property_update_view(request, pk):
         if prop_type:
             property_obj.type = prop_type
         if desc:
-            property_obj.desc = desc
+            import bleach
+            from bleach.css_sanitizer import CSSSanitizer
+            css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
+            allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
+            allowed_attrs = {
+                'a': ['href', 'title', 'target', 'rel', 'class'],
+                'span': ['style', 'class'],
+                'font': ['color'],
+                '*': ['style', 'class']
+            }
+            try:
+                property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
+            except Exception:
+                property_obj.desc = desc
         if province:
             property_obj.province = province
         if district:

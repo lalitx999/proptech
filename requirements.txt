@@ -18,6 +18,7 @@ qrcode==8.0                  # TOTP QR generation for 2FA enrollment
 django-csp==3.8              # Content Security Policy (Nonce-based) - 4.x changes config format
 django-ratelimit==4.1.0      # Endpoint-level request rate limiting
 bleach==6.4.0                # Safe HTML sanitization (Patched against XSS)
+tinycss2==1.5.1              # CSS Sanitizer support for bleach
 
 # File & Media Security
 Pillow==13.0.0               # Image sanitization & EXIF stripping (Pinned for Python 3.14+)
