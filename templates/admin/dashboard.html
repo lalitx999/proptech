@@ -5,76 +5,40 @@
 
 {% block extra_head %}
 <style nonce="{{ request.csp_nonce }}">
-    /* Bound column widths so long listing titles cannot push actions off screen. */
-    .admin-shops-table { table-layout: fixed; min-width: 900px; }
-    .admin-shops-table th:nth-child(2) { width: 120px; }
-    .admin-shops-table th:nth-child(3) { width: 150px; }
-    .admin-shops-table th:nth-child(4) { width: 110px; }
-    .admin-shops-table th:nth-child(5) { width: 140px; }
-    .admin-shops-table .shop-title { white-space: normal; overflow-wrap: anywhere; }
-    .admin-shops-table .shop-info { flex: 1; overflow-wrap: anywhere; }
-    .admin-shops-table td:nth-child(2) { white-space: normal; overflow-wrap: anywhere; }
-    .admin-table-scroll:focus-visible { outline: 2px solid #db2777; outline-offset: -2px; }
+    /* Clean, smooth horizontal scroll container for tables */
+    .admin-table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .admin-table-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+    .admin-table-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 9999px;
+    }
+    .admin-table-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+    }
+    .admin-table-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
 
-    /* Shared containment for every dashboard tab, including long contacts and URLs. */
-    .admin-content { container: admin-panel / inline-size; overflow-wrap: anywhere; }
+    /* Content wrapping & resilience */
+    .admin-content { overflow-wrap: anywhere; }
     .admin-content .flex > *, .admin-content .inline-flex > *, .admin-content .grid > *,
     .admin-dialog .flex > *, .admin-dialog .grid > * { min-width: 0; }
     .admin-content :is(input, select, textarea),
     .admin-dialog :is(input, select, textarea) { min-width: 0; max-width: 100%; }
-    .admin-content .flex.justify-between:not(.flex-col),
-    .admin-content .flex.justify-end:not(.flex-col) { flex-wrap: wrap; gap: .5rem; }
     .admin-content :is(h2, h3) > svg { flex-shrink: 0; }
     .admin-card-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
     .admin-stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
-    .admin-table-scroll { width: 100%; max-width: 100%; max-height: 65vh; overflow: auto; }
-    .admin-data-table { width: 100%; table-layout: fixed; }
-    .admin-data-table :is(th, td) { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
-    .admin-data-table .truncate, .admin-data-table .inline-flex { max-width: 100%; }
-    .admin-data-table thead { position: sticky; top: 0; z-index: 1; background: #fafafa; }
-    .admin-data-table td:last-child > .flex { flex-wrap: wrap; }
-    .admin-data-table select { width: 100%; }
-    .admin-dialog { overflow-wrap: anywhere; }
 
-    /* Use available panel width, not device width: never hide actions off-screen. */
-    .admin-field-label { display: none; }
-    @container admin-panel (max-width: 1350px) {
-        .admin-table-scroll { max-height: none; overflow: visible; }
-        .admin-data-table { display: block; width: 100%; min-width: 0 !important; }
-        .admin-data-table colgroup { display: none; }
-        .admin-data-table thead {
-            position: absolute; width: 1px; height: 1px; padding: 0;
-            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
-        }
-        .admin-data-table tbody { display: grid; gap: 1rem; padding: 1rem; }
-        .admin-data-table tbody tr {
-            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: .75rem 1rem; padding: 1rem; border: 1px solid #e5e5e5;
-            border-radius: 1rem; background: white;
-        }
-        .admin-data-table tbody td {
-            display: block; width: auto; min-width: 0; max-width: none;
-            padding: 0; text-align: left; white-space: normal;
-        }
-        .admin-data-table tbody td:first-child,
-        .admin-data-table tbody td:last-child,
-        .admin-data-table tbody td[colspan] { grid-column: 1 / -1; }
-        .admin-data-table tbody td:last-child:not([colspan]) {
-            border-top: 1px solid #f0f0f0; padding-top: .75rem;
-        }
-        .admin-data-table .admin-field-label {
-            display: block; margin-bottom: .375rem; color: #737373;
-            font: 600 .6875rem/1.5 sans-serif;
-        }
-        .admin-data-table td:last-child > .flex { justify-content: flex-start; }
-        .admin-data-table td:last-child > .grid { margin-left: 0; }
-        .admin-data-table .truncate { white-space: normal; overflow-wrap: anywhere; }
-        .admin-data-table .line-clamp-2 { display: block; -webkit-line-clamp: unset; }
-    }
-    @container admin-panel (max-width: 480px) {
-        .admin-data-table tbody { padding: .75rem; }
-        .admin-data-table tbody tr { grid-template-columns: minmax(0, 1fr); }
-    }
+    /* Hide any field label permanently - tables always stay real tables */
+    .admin-field-label { display: none !important; }
 </style>
 {% endblock %}
 
@@ -483,22 +447,21 @@
 
                     <!-- Shops Table -->
                     <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
-                        <p id="shops-scroll-help" class="px-4 pt-3 pb-2 text-xs text-neutral-500">ข้อมูลร้านค้าและปุ่มจัดการแสดงครบในแต่ละรายการ</p>
-                        <div class="admin-table-scroll w-full max-w-full overflow-x-auto" tabindex="0" role="region" aria-label="ตารางจัดการร้านค้า" aria-describedby="shops-scroll-help">
-                            <table role="table" class="admin-data-table admin-shops-table w-full text-left text-xs text-neutral-600">
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3.5 pl-4 sm:pl-6 pr-2">ร้านค้า / ข้อมูล</th>
-                                        <th role="columnheader" class="py-3.5 px-2.5 whitespace-nowrap">หมวดหมู่ & ทำเล</th>
-                                        <th role="columnheader" class="py-3.5 px-2.5 whitespace-nowrap">ราคาเซ้ง & ค่าเช่า</th>
-                                        <th role="columnheader" class="py-3.5 px-2.5 whitespace-nowrap text-center">สถานะ</th>
-                                        <th role="columnheader" class="py-3.5 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">การจัดการ</th>
+                                    <tr>
+                                        <th class="py-3.5 pl-4 sm:pl-6 pr-3">ร้านค้า / ข้อมูล</th>
+                                        <th class="py-3.5 px-3 whitespace-nowrap">หมวดหมู่ & ทำเล</th>
+                                        <th class="py-3.5 px-3 whitespace-nowrap">ราคาเซ้ง & ค่าเช่า</th>
+                                        <th class="py-3.5 px-3 whitespace-nowrap text-center">สถานะ</th>
+                                        <th class="py-3.5 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">การจัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for shop in shops_list %}
-                                    <tr role="row" class="group hover:bg-neutral-50/90 transition-all duration-200">
-                                        <td role="cell" class="py-3.5 pl-4 sm:pl-6 pr-2 relative"><span class="admin-field-label" aria-hidden="true">ร้านค้า / ข้อมูล</span>
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200">
+                                        <td class="py-3.5 pl-4 sm:pl-6 pr-3 relative">
                                             <!-- Row Hover Left Accent Bar -->
                                             <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-brand-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
 
@@ -552,30 +515,30 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-2.5 whitespace-nowrap"><span class="admin-field-label" aria-hidden="true">หมวดหมู่ & ทำเล</span>
+                                        <td class="py-3.5 px-3 whitespace-nowrap">
                                             <div class="font-semibold text-neutral-800 text-[11px]">{{ shop.property.get_type_display }}</div>
-                                            <div class="text-[10px] text-neutral-400 mt-0.5 truncate max-w-[100px]" title="{{ shop.property.district }}, {{ shop.property.province }}">{{ shop.property.district }}</div>
+                                            <div class="text-[10px] text-neutral-400 mt-0.5 truncate max-w-[120px]" title="{{ shop.property.district }}, {{ shop.property.province }}">{{ shop.property.district }}</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-2.5 font-mono whitespace-nowrap"><span class="admin-field-label" aria-hidden="true">ราคาเซ้ง & ค่าเช่า</span>
+                                        <td class="py-3.5 px-3 font-mono whitespace-nowrap">
                                             <div class="font-black text-brand-600 text-xs sm:text-sm">฿{{ shop.price|floatformat:0|intcomma }}</div>
                                             <div class="text-[10px] text-neutral-400 mt-0.5">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0|intcomma }}/ด.</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-2.5 whitespace-nowrap text-center"><span class="admin-field-label" aria-hidden="true">สถานะ</span>
+                                        <td class="py-3.5 px-3 whitespace-nowrap text-center">
                                             {% if shop.status == 'published' %}
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เผยแพร่
                                                 </span>
                                             {% elif shop.status == 'pending' %}
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse shadow-2xs">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse shadow-2xs">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> รออนุมัติ
                                                 </span>
                                             {% else %}
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-600 shadow-2xs">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-600 shadow-2xs">
                                                     {{ shop.get_status_display }}
                                                 </span>
                                             {% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap"><span class="admin-field-label" aria-hidden="true">การจัดการ</span>
+                                        <td class="py-3.5 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">
                                             <!-- Keep actions in three columns within the fixed-width management cell -->
                                             <div class="grid grid-cols-3 gap-1 w-max ml-auto">
                                                 {% if shop.status != 'published' %}
@@ -644,8 +607,8 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row">
-                                        <td role="cell" colspan="5" class="py-8 text-center text-xs text-neutral-400">
+                                    <tr>
+                                        <td colspan="5" class="py-8 text-center text-xs text-neutral-400">
                                             ไม่พบรายการร้านค้าตามเงื่อนไข
                                         </td>
                                     </tr>
@@ -765,26 +728,24 @@
                     <!-- Past Transactions History -->
                     <div class="bg-white rounded-3xl border border-neutral-200 p-6 shadow-xs space-y-4">
                         <h3 class="text-sm font-black text-neutral-900">ประวัติการตรวจสอบย้อนหลัง (30 รายการล่าสุด)</h3>
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางประวัติการตรวจสลิป">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 800px">
-                                <colgroup><col style="width: 160px"><col style="width: 190px"><col style="width: 130px"><col style="width: 150px"><col style="width: 170px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 px-4">รหัสอ้างอิง</th>
-                                        <th role="columnheader" class="py-3 px-4">ผู้ใช้งาน</th>
-                                        <th role="columnheader" class="py-3 px-4">ยอดเงิน</th>
-                                        <th role="columnheader" class="py-3 px-4">สถานะการตรวจ</th>
-                                        <th role="columnheader" class="py-3 px-4">ผู้ตรวจสอบ</th>
+                                    <tr>
+                                        <th class="py-3 px-4 whitespace-nowrap">รหัสอ้างอิง</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ผู้ใช้งาน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ยอดเงิน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">สถานะการตรวจ</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ผู้ตรวจสอบ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for tx in recent_slips %}
-                                    <tr role="row">
-                                        <td role="cell" class="py-3 px-4 font-mono font-bold text-neutral-900"><span class="admin-field-label" aria-hidden="true">รหัสอ้างอิง</span>{{ tx.ref_number }}</td>
-                                        <td role="cell" class="py-3 px-4"><span class="admin-field-label" aria-hidden="true">ผู้ใช้งาน</span>{{ tx.user.username }}</td>
-                                        <td role="cell" class="py-3 px-4 font-mono font-bold text-brand-600"><span class="admin-field-label" aria-hidden="true">ยอดเงิน</span>฿{{ tx.amount|floatformat:0|intcomma }}</td>
-                                        <td role="cell" class="py-3 px-4"><span class="admin-field-label" aria-hidden="true">สถานะการตรวจ</span>
+                                    <tr>
+                                        <td class="py-3 px-4 font-mono font-bold text-neutral-900 whitespace-nowrap">{{ tx.ref_number }}</td>
+                                        <td class="py-3 px-4 whitespace-nowrap">{{ tx.user.username }}</td>
+                                        <td class="py-3 px-4 font-mono font-bold text-brand-600 whitespace-nowrap">฿{{ tx.amount|floatformat:0|intcomma }}</td>
+                                        <td class="py-3 px-4 whitespace-nowrap">
                                             {% if tx.status == 'AUTO_VERIFIED' %}
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-black">
                                                     ⚡ EasySlip Auto
@@ -803,12 +764,12 @@
                                                 </span>
                                             {% endif %}
                                         </td>
-                                        <td role="cell" class="py-3 px-4 text-neutral-400"><span class="admin-field-label" aria-hidden="true">ผู้ตรวจสอบ</span>
+                                        <td class="py-3 px-4 text-neutral-400 whitespace-nowrap">
                                             {% if tx.reviewed_by %}{{ tx.reviewed_by.username }}{% else %}EasySlip System{% endif %}
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row"><td role="cell" colspan="5" class="py-4 text-center text-xs text-neutral-400">ยังไม่มีประวัติ</td></tr>
+                                    <tr><td colspan="5" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีประวัติการตรวจสลิป</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -830,30 +791,28 @@
                             <span class="text-xs text-neutral-400">ลีดใหม่: {{ new_leads_count }} • ด่วนที่สุด: {{ immediate_leads_count }}</span>
                         </div>
 
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางลูกค้าผู้สนใจ">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 980px">
-                                <colgroup><col style="width: 180px"><col style="width: 180px"><col style="width: 160px"><col style="width: 190px"><col style="width: 120px"><col style="width: 150px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 px-4">ผู้สนใจ</th>
-                                        <th role="columnheader" class="py-3 px-4">ร้านค้าที่สนใจ</th>
-                                        <th role="columnheader" class="py-3 px-4">งบประมาณ & ความเร่งด่วน</th>
-                                        <th role="columnheader" class="py-3 px-4">นายหน้าที่ดูแล</th>
-                                        <th role="columnheader" class="py-3 px-4">สถานะ</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right">จัดการ</th>
+                                    <tr>
+                                        <th class="py-3 px-4 whitespace-nowrap">ผู้สนใจ</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ร้านค้าที่สนใจ</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">งบประมาณ & ความเร่งด่วน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">นายหน้าที่ดูแล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">สถานะ</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for lead in leads_list %}
-                                    <tr role="row" class="hover:bg-neutral-50/70 transition">
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ผู้สนใจ</span>
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="font-bold text-neutral-900">{{ lead.full_name }}</div>
                                             <div class="text-[11px] text-neutral-400 font-mono">
                                                 โทร: {{ lead.phone }} {% if lead.line_id %}| LINE: {{ lead.line_id }}{% endif %}
                                             </div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ร้านค้าที่สนใจ</span>
+                                        <td class="py-3.5 px-4 min-w-[160px] max-w-xs">
                                             {% if lead.listing %}
                                                 <a href="{% url 'listings:listing_detail' lead.listing.pk %}" target="_blank" class="font-semibold text-brand-600 hover:underline">
                                                     {{ lead.listing.property.title|truncatechars:25 }}
@@ -863,13 +822,13 @@
                                                 <span class="text-neutral-400">-</span>
                                             {% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 font-mono"><span class="admin-field-label" aria-hidden="true">งบประมาณ & ความเร่งด่วน</span>
+                                        <td class="py-3.5 px-4 font-mono whitespace-nowrap">
                                             <div class="font-bold text-neutral-800">
                                                 {% if lead.budget_max %}฿{{ lead.budget_max|floatformat:0|intcomma }}{% else %}ไม่ระบุงบ{% endif %}
                                             </div>
                                             <div class="text-[10px] text-brand-600 font-sans">{{ lead.get_urgency_display }}</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">นายหน้าที่ดูแล</span>
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             <form method="post" action="{% url 'accounts:admin_lead_action' lead.pk %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="action" value="assign">
@@ -896,12 +855,12 @@
                                                 </select>
                                             </form>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">สถานะ</span>
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold {% if lead.status == 'new' %}bg-blue-100 text-blue-800{% elif lead.status == 'site_visit' %}bg-purple-100 text-purple-800{% elif lead.status == 'closed' %}bg-emerald-100 text-emerald-800{% else %}bg-neutral-100 text-neutral-700{% endif %}">
                                                 {{ lead.get_status_display }}
                                             </span>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right"><span class="admin-field-label" aria-hidden="true">จัดการ</span>
+                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                             <form method="post" action="{% url 'accounts:admin_lead_action' lead.pk %}" class="inline-block">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="action" value="status">
@@ -914,7 +873,7 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row"><td role="cell" colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีลีดลูกค้า</td></tr>
+                                    <tr><td colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีลีดลูกค้า</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -937,45 +896,43 @@
                                class="text-xs font-bold text-brand-600 hover:underline">เปิดมุมมอง Kanban CRM ➔</a>
                         </div>
 
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางติดตามดีล">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1030px">
-                                <colgroup><col style="width: 130px"><col style="width: 210px"><col style="width: 170px"><col style="width: 180px"><col style="width: 150px"><col style="width: 190px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 px-4">รหัสดีล</th>
-                                        <th role="columnheader" class="py-3 px-4">ร้านค้าเซ้ง</th>
-                                        <th role="columnheader" class="py-3 px-4">ผู้สนใจ (Lead)</th>
-                                        <th role="columnheader" class="py-3 px-4">ราคาตกลง / ค่าคอม 5%</th>
-                                        <th role="columnheader" class="py-3 px-4">ขั้นตอนปัจจุบัน</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right">เปลี่ยนขั้นตอน</th>
+                                    <tr>
+                                        <th class="py-3 px-4 whitespace-nowrap">รหัสดีล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ร้านค้าเซ้ง</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ผู้สนใจ (Lead)</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ราคาตกลง / ค่าคอม 5%</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ขั้นตอนปัจจุบัน</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap">เปลี่ยนขั้นตอน</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for deal in deals_list %}
-                                    <tr role="row" class="hover:bg-neutral-50/70 transition">
-                                        <td role="cell" class="py-3.5 px-4 font-mono font-bold text-neutral-900"><span class="admin-field-label" aria-hidden="true">รหัสดีล</span>
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4 font-mono font-bold text-neutral-900 whitespace-nowrap">
                                             <a href="{% url 'contracts:deal_detail' deal.pk %}" class="text-brand-600 hover:underline">
                                                 {{ deal.deal_code }}
                                             </a>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ร้านค้าเซ้ง</span>
-                                            <div class="font-bold text-neutral-900 truncate max-w-xs xl:max-w-md">{{ deal.listing.property.title }}</div>
+                                        <td class="py-3.5 px-4 min-w-[160px] max-w-xs xl:max-w-md">
+                                            <div class="font-bold text-neutral-900 truncate">{{ deal.listing.property.title }}</div>
                                             <div class="text-[10px] text-neutral-400 font-mono">{{ deal.listing.ref_code }}</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ผู้สนใจ (Lead)</span>
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             {% if deal.lead %}{{ deal.lead.full_name }} ({{ deal.lead.phone }}){% else %}-{% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 font-mono"><span class="admin-field-label" aria-hidden="true">ราคาตกลง / ค่าคอม 5%</span>
+                                        <td class="py-3.5 px-4 font-mono whitespace-nowrap">
                                             <div class="font-black text-neutral-900">฿{{ deal.agreed_price|default:deal.listing.price|floatformat:0|intcomma }}</div>
                                             <div class="text-[10px] text-brand-600 font-bold">คอมมิชชั่น: ฿{{ deal.gross_commission|floatformat:0|intcomma }}</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ขั้นตอนปัจจุบัน</span>
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                                 {{ deal.get_stage_display }}
                                             </span>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right"><span class="admin-field-label" aria-hidden="true">เปลี่ยนขั้นตอน</span>
+                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5">
                                                 {% if deal.stage != 'closed_won' and deal.stage != 'closed_lost' %}
                                                 <button type="button"
@@ -1005,7 +962,7 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row"><td role="cell" colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีดีลในกระดาน</td></tr>
+                                    <tr><td colspan="6" class="py-6 text-center text-xs text-neutral-400">ยังไม่มีดีลในกระดาน</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -1282,36 +1239,34 @@
                             <span class="text-xs font-bold text-neutral-500 font-mono">{{ settled_deals.count }} ดีลสำเร็จ</span>
                         </div>
 
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางรายได้และค่าคอมมิชชัน">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1300px">
-                                <colgroup><col style="width: 120px"><col style="width: 190px"><col style="width: 170px"><col style="width: 140px"><col style="width: 140px"><col style="width: 140px"><col style="width: 140px"><col style="width: 120px"><col style="width: 140px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 px-4">รหัสดีล</th>
-                                        <th role="columnheader" class="py-3 px-4">ร้านค้าเซ้ง</th>
-                                        <th role="columnheader" class="py-3 px-4">ผู้ปิดการขาย</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right font-mono">ราคาเซ้งจริง (฿)</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right font-mono">คอมมิชชัน 5% (฿)</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right font-mono">แพลตฟอร์มรับ (฿)</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right font-mono">จ่ายนายหน้า (฿)</th>
-                                        <th role="columnheader" class="py-3 px-4 text-center">สถานะร้าน</th>
-                                        <th role="columnheader" class="py-3 px-4 text-right">วันที่ปิดดีล</th>
+                                    <tr>
+                                        <th class="py-3 px-4 whitespace-nowrap">รหัสดีล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ร้านค้าเซ้ง</th>
+                                        <th class="py-3 px-4 whitespace-nowrap">ผู้ปิดการขาย</th>
+                                        <th class="py-3 px-4 text-right font-mono whitespace-nowrap">ราคาเซ้งจริง (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono whitespace-nowrap">คอมมิชชัน 5% (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono whitespace-nowrap">แพลตฟอร์มรับ (฿)</th>
+                                        <th class="py-3 px-4 text-right font-mono whitespace-nowrap">จ่ายนายหน้า (฿)</th>
+                                        <th class="py-3 px-4 text-center whitespace-nowrap">สถานะร้าน</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap">วันที่ปิดดีล</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for deal in settled_deals %}
-                                    <tr role="row" class="hover:bg-neutral-50/70 transition">
-                                        <td role="cell" class="py-3.5 px-4 font-mono font-bold text-neutral-900"><span class="admin-field-label" aria-hidden="true">รหัสดีล</span>
+                                    <tr class="hover:bg-neutral-50/70 transition">
+                                        <td class="py-3.5 px-4 font-mono font-bold text-neutral-900 whitespace-nowrap">
                                             <a href="{% url 'contracts:deal_detail' deal.pk %}" class="text-brand-600 hover:underline">
                                                 {{ deal.deal_code }}
                                             </a>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ร้านค้าเซ้ง</span>
-                                            <div class="font-bold text-neutral-900 truncate max-w-xs">{{ deal.listing.property.title }}</div>
+                                        <td class="py-3.5 px-4 min-w-[150px] max-w-xs">
+                                            <div class="font-bold text-neutral-900 truncate">{{ deal.listing.property.title }}</div>
                                             <div class="text-[10px] text-neutral-400 font-mono">{{ deal.listing.ref_code }}</div>
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ผู้ปิดการขาย</span>
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             {% if deal.closed_by == 'agent' %}
                                             <span class="inline-flex items-center gap-1 text-teal-700 font-bold">
                                                 <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
@@ -1324,19 +1279,19 @@
                                             </span>
                                             {% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right font-mono font-bold text-neutral-900"><span class="admin-field-label" aria-hidden="true">ราคาเซ้งจริง (฿)</span>
+                                        <td class="py-3.5 px-4 text-right font-mono font-bold text-neutral-900 whitespace-nowrap">
                                             ฿{{ deal.agreed_price|floatformat:0|intcomma }}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right font-mono font-bold text-brand-600"><span class="admin-field-label" aria-hidden="true">คอมมิชชัน 5% (฿)</span>
+                                        <td class="py-3.5 px-4 text-right font-mono font-bold text-brand-600 whitespace-nowrap">
                                             ฿{{ deal.gross_commission|floatformat:0|intcomma }}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right font-mono font-black text-emerald-600"><span class="admin-field-label" aria-hidden="true">แพลตฟอร์มรับ (฿)</span>
+                                        <td class="py-3.5 px-4 text-right font-mono font-black text-emerald-600 whitespace-nowrap">
                                             ฿{{ deal.platform_payout|floatformat:0|intcomma }}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right font-mono font-semibold text-neutral-600"><span class="admin-field-label" aria-hidden="true">จ่ายนายหน้า (฿)</span>
+                                        <td class="py-3.5 px-4 text-right font-mono font-semibold text-neutral-600 whitespace-nowrap">
                                             {% if deal.agent_payout > 0 %}฿{{ deal.agent_payout|floatformat:0|intcomma }}{% else %}-{% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-center"><span class="admin-field-label" aria-hidden="true">สถานะร้าน</span>
+                                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                             {% if deal.listing.status == 'closed' %}
                                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
                                                 🎉 เซ้งได้แล้ว
@@ -1347,13 +1302,13 @@
                                             </span>
                                             {% endif %}
                                         </td>
-                                        <td role="cell" class="py-3.5 px-4 text-right text-[11px] text-neutral-400 font-mono"><span class="admin-field-label" aria-hidden="true">วันที่ปิดดีล</span>
+                                        <td class="py-3.5 px-4 text-right text-[11px] text-neutral-400 font-mono whitespace-nowrap">
                                             {{ deal.closed_at|date:"d/m/Y H:i"|default:deal.updated_at|date:"d/m/Y" }}
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row">
-                                        <td role="cell" colspan="9" class="py-8 text-center text-xs text-neutral-400">
+                                    <tr>
+                                        <td colspan="9" class="py-8 text-center text-xs text-neutral-400">
                                             <i data-lucide="inbox" class="w-6 h-6 text-neutral-300 mx-auto mb-1"></i>
                                             ยังไม่มีประวัติการบันทึกปิดดีลสำเร็จ
                                         </td>
@@ -1520,33 +1475,31 @@
                             </span>
                         </div>
 
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางข้อมูลดิบเจ้าของร้าน">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" style="min-width: 1100px">
-                                <colgroup><col style="width: 110px"><col style="width: 180px"><col style="width: 190px"><col style="width: 150px"><col style="width: 160px"><col style="width: 160px"><col style="width: 150px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap min-w-[90px]">วันที่บันทึก</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[140px]">ข้อมูลเจ้าของร้าน</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[150px]">ชื่อร้าน & ทำเล</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[120px]">ราคาเซ้ง / ค่าเช่า</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[120px]">หมายเหตุ / การคุย</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[110px]">สถานะโพสต์</th>
-                                        <th role="columnheader" class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap min-w-[130px]">จัดการ</th>
+                                    <tr>
+                                        <th class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap">วันที่บันทึก</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">ข้อมูลเจ้าของร้าน</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">ชื่อร้าน & ทำเล</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">ราคาเซ้ง / ค่าเช่า</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">หมายเหตุ / การคุย</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">สถานะโพสต์</th>
+                                        <th class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for rec in raw_owner_records %}
-                                    <tr role="row" class="group hover:bg-neutral-50/90 transition-all duration-200">
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200">
                                         <!-- Created Date -->
-                                        <td role="cell" class="py-4 pl-6 pr-4 font-mono text-[11px] text-neutral-400 whitespace-nowrap relative"><span class="admin-field-label" aria-hidden="true">วันที่บันทึก</span>
+                                        <td class="py-4 pl-4 sm:pl-6 pr-2 font-mono text-[11px] text-neutral-400 whitespace-nowrap relative">
                                             <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                             {{ rec.created_at|date:"d M Y" }}<br>
                                             <span class="text-[10px] text-neutral-400">{{ rec.created_at|date:"H:i" }} น.</span>
                                         </td>
 
                                         <!-- Owner Contact -->
-                                        <td role="cell" class="py-3 px-4"><span class="admin-field-label" aria-hidden="true">ข้อมูลเจ้าของร้าน</span>
+                                        <td class="py-3 px-3 whitespace-nowrap">
                                             <div class="font-bold text-neutral-900 flex items-center gap-1.5">
                                                 <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
                                                 <span>{{ rec.owner_name }}</span>
@@ -1581,8 +1534,8 @@
                                         </td>
 
                                         <!-- Shop Name & Location -->
-                                        <td role="cell" class="py-3 px-4"><span class="admin-field-label" aria-hidden="true">ชื่อร้าน & ทำเล</span>
-                                            <div class="font-bold text-neutral-900">
+                                        <td class="py-3 px-3 min-w-[150px] max-w-[220px]">
+                                            <div class="font-bold text-neutral-900 truncate">
                                                 {{ rec.shop_name|default:"(ยังไม่ระบุชื่อร้าน)" }}
                                             </div>
                                             <div class="text-[11px] text-neutral-500 mt-0.5 flex flex-wrap items-center gap-1.5">
@@ -1601,7 +1554,7 @@
                                         </td>
 
                                         <!-- Price & Rent -->
-                                        <td role="cell" class="py-3 px-4 font-mono"><span class="admin-field-label" aria-hidden="true">ราคาเซ้ง / ค่าเช่า</span>
+                                        <td class="py-3 px-3 font-mono whitespace-nowrap">
                                             {% if rec.expected_price %}
                                             <div class="font-black text-brand-600">
                                                 ฿{{ rec.expected_price|floatformat:0|intcomma }}
@@ -1617,7 +1570,7 @@
                                         </td>
 
                                         <!-- Notes -->
-                                        <td role="cell" class="py-3 px-4 max-w-[180px]"><span class="admin-field-label" aria-hidden="true">หมายเหตุ / การคุย</span>
+                                        <td class="py-3 px-3 min-w-[140px] max-w-[200px]">
                                             {% if rec.notes %}
                                             <span class="text-[11px] text-neutral-600 line-clamp-3 italic" title="{{ rec.notes }}">
                                                 "{{ rec.notes }}"
@@ -1628,7 +1581,7 @@
                                         </td>
 
                                         <!-- Post Status & Convert to Post -->
-                                        <td role="cell" class="py-3 px-4"><span class="admin-field-label" aria-hidden="true">สถานะโพสต์</span>
+                                        <td class="py-3 px-3 whitespace-nowrap">
                                             {% if rec.listing %}
                                             <div class="space-y-1">
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono">
@@ -1669,11 +1622,11 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td role="cell" class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap"><span class="admin-field-label" aria-hidden="true">จัดการ</span>
+                                        <td class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 <!-- Edit Raw Owner -->
                                                 <button type="button"
-                                                         class="open-edit-raw-owner-btn px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-900 text-neutral-800 hover:text-white font-bold text-xs shadow-2xs hover:shadow-xs transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
+                                                        class="open-edit-raw-owner-btn px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-900 text-neutral-800 hover:text-white font-bold text-xs shadow-2xs hover:shadow-xs transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                                                         data-pk="{{ rec.pk }}"
                                                         data-name="{{ rec.owner_name }}"
                                                         data-phone="{{ rec.owner_phone|default:'' }}"
@@ -1706,8 +1659,8 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row">
-                                        <td role="cell" colspan="7" class="py-10 text-center text-xs text-neutral-400">
+                                    <tr>
+                                        <td colspan="7" class="py-10 text-center text-xs text-neutral-400">
                                             <i data-lucide="folder-plus" class="w-8 h-8 text-neutral-300 mx-auto mb-2"></i>
                                             <div>ยังไม่มีข้อมูลดิบเจ้าของร้านในระบบ</div>
                                             <div class="mt-1 text-[11px] text-neutral-400">สามารถกดปุ่ม "+ บันทึกข้อมูลดิบเจ้าของร้าน" ด้านบนเพื่อลงข้อมูลได้ทันที</div>
@@ -1737,27 +1690,25 @@
                                 รวม {{ owner_directory_list|length }} รหัสประกาศ
                             </span>
                         </div>
-                        <p class="text-xs text-neutral-500 px-4 py-2">ข้อมูลแสดงครบในแต่ละรายการ และจัดเรียงตามพื้นที่หน้าจอ</p>
-                        <div class="admin-table-scroll" tabindex="0" role="region" aria-label="ตารางทะเบียนเจ้าของร้านตามรหัสประกาศ">
-                            <table role="table" class="admin-data-table w-full text-left text-xs text-neutral-600" id="owner-directory-table" style="min-width: 1220px">
-                                <colgroup><col style="width: 110px"><col style="width: 200px"><col style="width: 180px"><col style="width: 150px"><col style="width: 150px"><col style="width: 120px"><col style="width: 160px"><col style="width: 150px"></colgroup>
+                        <div class="admin-table-scroll w-full overflow-x-auto">
+                            <table class="w-full text-left text-xs text-neutral-600" id="owner-directory-table">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
-                                    <tr role="row">
-                                        <th role="columnheader" class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap min-w-[80px]">รหัสร้าน</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[160px]">ชื่อร้านค้า & ทำเล</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[130px]">ชื่อเจ้าของร้าน</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[110px]">เบอร์โทรศัพท์</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[100px]">LINE ID</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[90px]">Facebook</th>
-                                        <th role="columnheader" class="py-3 px-3 whitespace-nowrap min-w-[110px]">หมายเหตุ</th>
-                                        <th role="columnheader" class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap min-w-[130px]">จัดการข้อมูล</th>
+                                    <tr>
+                                        <th class="py-3 pl-4 sm:pl-6 pr-2 whitespace-nowrap">รหัสร้าน</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">ชื่อร้านค้า & ทำเล</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">ชื่อเจ้าของร้าน</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">เบอร์โทรศัพท์</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">LINE ID</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">Facebook</th>
+                                        <th class="py-3 px-3 whitespace-nowrap">หมายเหตุ</th>
+                                        <th class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">จัดการข้อมูล</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for item in owner_directory_list %}
-                                    <tr role="row" class="group hover:bg-neutral-50/90 transition-all duration-200 owner-row">
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200 owner-row">
                                         <!-- Ref Code -->
-                                        <td role="cell" class="py-4 pl-6 pr-4 font-mono font-bold relative"><span class="admin-field-label" aria-hidden="true">รหัสร้าน</span>
+                                        <td class="py-4 pl-4 sm:pl-6 pr-2 font-mono font-bold whitespace-nowrap relative">
                                             <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-200">
@@ -1770,8 +1721,8 @@
                                         </td>
 
                                         <!-- Shop Title & District -->
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ชื่อร้านค้า & ทำเล</span>
-                                            <a href="{% url 'listings:listing_detail' item.pk %}" target="_blank" class="font-bold text-neutral-900 hover:text-brand-600 transition truncate max-w-xs block">
+                                        <td class="py-3.5 px-3 min-w-[160px] max-w-xs">
+                                            <a href="{% url 'listings:listing_detail' item.pk %}" target="_blank" class="font-bold text-neutral-900 hover:text-brand-600 transition truncate block">
                                                 {{ item.property.title }}
                                             </a>
                                             <div class="text-[11px] text-neutral-400 flex items-center gap-1 mt-0.5">
@@ -1781,7 +1732,7 @@
                                         </td>
 
                                         <!-- Owner Name -->
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">ชื่อเจ้าของร้าน</span>
+                                        <td class="py-3.5 px-3 whitespace-nowrap">
                                             <div class="font-bold text-neutral-900 flex items-center gap-1.5">
                                                 <i data-lucide="user" class="w-3.5 h-3.5 text-neutral-400 shrink-0"></i>
                                                 <span>{{ item.display_owner_name }}</span>
@@ -1794,7 +1745,7 @@
                                         </td>
 
                                         <!-- Owner Phone -->
-                                        <td role="cell" class="py-3.5 px-4 font-mono"><span class="admin-field-label" aria-hidden="true">เบอร์โทรศัพท์</span>
+                                        <td class="py-3.5 px-3 font-mono whitespace-nowrap">
                                             {% if item.display_owner_phone != '-' %}
                                             <a href="tel:{{ item.display_owner_phone }}" class="inline-flex items-center gap-1.5 text-neutral-800 hover:text-brand-600 font-semibold transition">
                                                 <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
@@ -1806,7 +1757,7 @@
                                         </td>
 
                                         <!-- Owner LINE ID -->
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">LINE ID</span>
+                                        <td class="py-3.5 px-3 whitespace-nowrap">
                                             {% if item.display_owner_line_id != '-' %}
                                             <div class="inline-flex items-center gap-1.5 text-neutral-800">
                                                 <span class="w-3.5 h-3.5 rounded-xs bg-[#06C755] text-white text-[8px] font-black flex items-center justify-center shrink-0">L</span>
@@ -1818,7 +1769,7 @@
                                         </td>
 
                                         <!-- Owner Facebook -->
-                                        <td role="cell" class="py-3.5 px-4"><span class="admin-field-label" aria-hidden="true">Facebook</span>
+                                        <td class="py-3.5 px-3 whitespace-nowrap">
                                             {% if item.owner_facebook %}
                                             {% if 'http' in item.owner_facebook %}
                                             <a href="{{ item.owner_facebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-600 hover:underline truncate max-w-[120px]">
@@ -1837,7 +1788,7 @@
                                         </td>
 
                                         <!-- Notes -->
-                                        <td role="cell" class="py-3.5 px-4 max-w-[150px]"><span class="admin-field-label" aria-hidden="true">หมายเหตุ</span>
+                                        <td class="py-3.5 px-3 min-w-[120px] max-w-[200px]">
                                             {% if item.owner_notes %}
                                             <span class="text-[11px] text-neutral-600 italic line-clamp-2" title="{{ item.owner_notes }}">
                                                 "{{ item.owner_notes }}"
@@ -1848,7 +1799,7 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td role="cell" class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap"><span class="admin-field-label" aria-hidden="true">จัดการข้อมูล</span>
+                                        <td class="py-3 pl-2 pr-4 sm:pr-6 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 {% if item.owner_name or item.owner_phone or item.owner_line_id or item.owner_facebook %}
                                                 <!-- ปุ่มแก้ไข -->
@@ -1900,8 +1851,8 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr role="row">
-                                        <td role="cell" colspan="8" class="py-12 text-center text-xs text-neutral-400">
+                                    <tr>
+                                        <td colspan="8" class="py-12 text-center text-xs text-neutral-400">
                                             <i data-lucide="inbox" class="w-8 h-8 text-neutral-300 mx-auto mb-2"></i>
                                             <div>ไม่พบรายการร้านค้าตามเงื่อนไขที่ระบุ</div>
                                         </td>
