@@ -4,7 +4,7 @@
 {% block title %}ศูนย์ควบคุมระบบหลังบ้าน — เซ้งร้านด่วน.com (Admin Command Center){% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-[#f8fafc] text-neutral-900 pb-16">
+<div class="min-h-screen bg-[#f8fafc] text-neutral-900 pb-16 overflow-x-hidden">
 
     <!-- Top Command Header Bar -->
     <div class="bg-neutral-900 text-white border-b border-neutral-800 sticky top-14 sm:top-16 z-30 shadow-md">
@@ -165,7 +165,7 @@
             </div>
 
             <!-- Right Content Panels (9 cols on lg, 10 cols on xl) -->
-            <div class="lg:col-span-9 xl:col-span-10 space-y-6">
+            <div class="lg:col-span-9 xl:col-span-10 space-y-6 min-w-0">
 
                 <!-- TAB 1: OVERVIEW & KPIS -->
                 {% if active_tab == 'overview' %}
@@ -409,14 +409,14 @@
                     <!-- Shops Table -->
                     <div class="bg-white rounded-3xl border border-neutral-200 shadow-xs overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                            <table class="w-full text-left text-xs text-neutral-600 min-w-[860px]">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4">ร้านค้า / ข้อมูล</th>
-                                        <th class="py-3 px-4">หมวดหมู่ & ทำเล</th>
-                                        <th class="py-3 px-4">ราคาเซ้ง & ค่าเช่า</th>
-                                        <th class="py-3 px-4">สถานะ</th>
-                                        <th class="py-3 px-4 text-right">การจัดการ</th>
+                                        <th class="py-3 px-4 min-w-[280px]">ร้านค้า / ข้อมูล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">หมวดหมู่ & ทำเล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">ราคาเซ้ง & ค่าเช่า</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[100px]">สถานะ</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[210px]">การจัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
@@ -435,7 +435,7 @@
                                                 <div>
                                                     <div class="flex items-center gap-1.5 flex-wrap">
                                                         <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank"
-                                                           class="font-black text-neutral-900 hover:text-brand-600 transition block truncate max-w-xs md:max-w-md xl:max-w-xl">
+                                                           class="font-black text-neutral-900 hover:text-brand-600 transition block truncate max-w-[240px] sm:max-w-xs md:max-w-sm xl:max-w-md">
                                                             {{ shop.property.title }}
                                                         </a>
                                                         {% if shop.is_admin_verified %}
@@ -467,15 +467,15 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-4">
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="font-semibold text-neutral-800">{{ shop.property.get_type_display }}</div>
                                             <div class="text-[11px] text-neutral-400">{{ shop.property.district }}, {{ shop.property.province }}</div>
                                         </td>
-                                        <td class="py-3.5 px-4 font-mono">
+                                        <td class="py-3.5 px-4 font-mono whitespace-nowrap">
                                             <div class="font-black text-brand-600 text-sm">฿{{ shop.price|floatformat:0|intcomma }}</div>
                                             <div class="text-[11px] text-neutral-400">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0|intcomma }}/ด.</div>
                                         </td>
-                                        <td class="py-3.5 px-4">
+                                        <td class="py-3.5 px-4 whitespace-nowrap">
                                             {% if shop.status == 'published' %}
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> เผยแพร่แล้ว
@@ -490,8 +490,8 @@
                                                 </span>
                                             {% endif %}
                                         </td>
-                                        <td class="py-3.5 px-4 text-right">
-                                            <div class="flex items-center justify-end gap-1.5">
+                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 {% if shop.status != 'published' %}
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
@@ -1358,7 +1358,7 @@
                 <div class="space-y-6">
                     <!-- Top Summary & Action Buttons Header -->
                     <div class="bg-white rounded-3xl p-6 border border-neutral-200 shadow-xs space-y-4">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                             <div>
                                 <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
                                     <i data-lucide="contact-2" class="w-5 h-5 text-emerald-600"></i>
@@ -1427,16 +1427,16 @@
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600">
+                            <table class="w-full text-left text-xs text-neutral-600 min-w-[920px]">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4">วันที่บันทึก</th>
-                                        <th class="py-3 px-4">ข้อมูลเจ้าของร้าน</th>
-                                        <th class="py-3 px-4">ชื่อร้าน & ทำเล</th>
-                                        <th class="py-3 px-4">ราคาเซ้ง / ค่าเช่า</th>
-                                        <th class="py-3 px-4">หมายเหตุ / การคุย</th>
-                                        <th class="py-3 px-4">สถานะโพสต์</th>
-                                        <th class="py-3 px-4 text-right">จัดการ</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[100px]">วันที่บันทึก</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">ข้อมูลเจ้าของร้าน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้าน & ทำเล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">ราคาเซ้ง / ค่าเช่า</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">หมายเหตุ / การคุย</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">สถานะโพสต์</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[150px]">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
@@ -1572,8 +1572,8 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="py-3 px-4 text-right">
-                                            <div class="flex items-center justify-end gap-1.5">
+                                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 <!-- Edit Raw Owner -->
                                                 <button type="button"
                                                         class="open-edit-raw-owner-btn px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 cursor-pointer"
@@ -1641,17 +1641,17 @@
                             </span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-neutral-600" id="owner-directory-table">
+                            <table class="w-full text-left text-xs text-neutral-600 min-w-[960px]" id="owner-directory-table">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4">รหัสร้าน</th>
-                                        <th class="py-3 px-4">ชื่อร้านค้า & ทำเล</th>
-                                        <th class="py-3 px-4">ชื่อเจ้าของร้าน</th>
-                                        <th class="py-3 px-4">เบอร์โทรศัพท์</th>
-                                        <th class="py-3 px-4">LINE ID</th>
-                                        <th class="py-3 px-4">Facebook</th>
-                                        <th class="py-3 px-4">หมายเหตุ</th>
-                                        <th class="py-3 px-4 text-right">จัดการข้อมูล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[90px]">รหัสร้าน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้านค้า & ทำเล</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">ชื่อเจ้าของร้าน</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">เบอร์โทรศัพท์</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">LINE ID</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">Facebook</th>
+                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">หมายเหตุ</th>
+                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[150px]">จัดการข้อมูล</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
@@ -1748,8 +1748,8 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="py-3.5 px-4 text-right">
-                                            <div class="flex items-center justify-end gap-1.5">
+                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 {% if item.owner_name or item.owner_phone or item.owner_line_id or item.owner_facebook %}
                                                 <!-- ปุ่มแก้ไข -->
                                                 <button type="button"
