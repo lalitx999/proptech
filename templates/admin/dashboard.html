@@ -1611,6 +1611,7 @@
                                                             data-rent="{{ rec.monthly_rent|default:'' }}"
                                                             data-phone="{{ rec.owner_phone|default:'' }}"
                                                             data-line="{{ rec.owner_line_id|default:'' }}"
+                                                            data-facebook="{{ rec.owner_facebook|default:'' }}"
                                                             data-notes="{{ rec.notes|default:'' }}"
                                                             title="นำข้อมูลนี้ไปเปิดฟอร์มสร้างโพสต์ด่วน">
                                                         <i data-lucide="zap" class="w-3 h-3"></i>
@@ -2008,8 +2009,8 @@
                                 <p class="text-[10px] text-neutral-400">คัดลอกลิงก์แชร์จาก Google Maps นำมาวาง ระบบจะดึงพิกัดเพื่อปักหมุดบนแผนที่ให้อัตโนมัติ</p>
                             </div>
 
-                            <!-- Contact Phone & LINE -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/60">
+                            <!-- Contact Phone, LINE & Facebook -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 border-t border-neutral-200/60">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">เบอร์โทรติดต่อ</label>
                                     <input type="text" name="contact_phone" id="fast-create-phone" placeholder="เช่น 0812345678"
@@ -2018,6 +2019,14 @@
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">LINE ID</label>
                                     <input type="text" name="contact_line_id" id="fast-create-line" placeholder="เช่น @myshopline"
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700 flex items-center gap-1">
+                                        <i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-600"></i>
+                                        <span>Facebook เจ้าของร้าน</span>
+                                    </label>
+                                    <input type="text" name="owner_facebook" id="fast-create-facebook" placeholder="เช่น https://facebook.com/..."
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                             </div>
@@ -2042,12 +2051,12 @@
                                        class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                             </div>
 
-                            <!-- Video Review Links (YouTube, TikTok) -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/60">
+                            <!-- Video Review & Social Links (YouTube, TikTok, Facebook Page/Post) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 border-t border-neutral-200/60">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700 flex items-center gap-1">
                                         <i data-lucide="youtube" class="w-3.5 h-3.5 text-red-600"></i>
-                                        <span>ลิงก์ YouTube รีวิวร้าน</span>
+                                        <span>YouTube รีวิวร้าน</span>
                                     </label>
                                     <input type="url" name="youtube_url" id="fast-create-youtube" placeholder="https://www.youtube.com/watch?v=..."
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
@@ -2055,9 +2064,17 @@
                                 <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700 flex items-center gap-1">
                                         <span class="w-3.5 h-3.5 rounded bg-black text-white text-[8px] font-black flex items-center justify-center">TT</span>
-                                        <span>ลิงก์ TikTok รีวิวร้าน</span>
+                                        <span>TikTok รีวิวร้าน</span>
                                     </label>
                                     <input type="url" name="tiktok_url" id="fast-create-tiktok" placeholder="https://www.tiktok.com/@.../video/..."
+                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="block font-bold text-neutral-700 flex items-center gap-1">
+                                        <i data-lucide="facebook" class="w-3.5 h-3.5 text-blue-600"></i>
+                                        <span>ลิงก์เฟสบุ๊ค / เพจร้าน</span>
+                                    </label>
+                                    <input type="url" name="facebook_post_url" id="fast-create-facebook-post" placeholder="https://www.facebook.com/..."
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500">
                                 </div>
                             </div>
@@ -3062,6 +3079,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var rent = this.getAttribute('data-rent');
             var phone = this.getAttribute('data-phone');
             var line = this.getAttribute('data-line');
+            var facebook = this.getAttribute('data-facebook') || this.getAttribute('data-fb');
             var notes = this.getAttribute('data-notes');
 
             // Populate Fast Post Modal inputs
@@ -3071,6 +3089,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var rentInput = document.getElementById('fast-create-monthly-rent');
             var phoneInput = document.getElementById('fast-create-phone');
             var lineInput = document.getElementById('fast-create-line');
+            var fbInput = document.getElementById('fast-create-facebook');
             var districtInput = document.getElementById('fast-create-district');
             var descInput = document.getElementById('fast-create-description');
 
@@ -3088,8 +3107,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (rentInput) rentInput.value = rent ? Math.round(parseFloat(rent)) : '';
             if (phoneInput) phoneInput.value = phone || '';
             if (lineInput) lineInput.value = line || '';
+            if (fbInput) fbInput.value = facebook || '';
             if (districtInput && location) districtInput.value = location;
-            if (descInput) descInput.value = (notes ? notes + '\n\n' : '') + 'ติดต่อเจ้าของ: ' + (name || '-') + (phone ? ' โทร ' + phone : '') + (line ? ' LINE: ' + line : '');
+            if (descInput) descInput.value = (notes ? notes + '\n\n' : '') + 'ติดต่อเจ้าของ: ' + (name || '-') + (phone ? ' โทร ' + phone : '') + (line ? ' LINE: ' + line : '') + (facebook ? ' FB: ' + facebook : '');
 
             // Open Fast Post Modal
             if (fastPostModal) {

@@ -446,7 +446,10 @@ def admin_fast_create_shop_view(request):
 
         # Link raw owner record if created from raw owner lead
         if raw_owner_id:
-            ShopOwnerRecord.objects.filter(pk=raw_owner_id).update(listing=listing)
+            raw_updates = {'listing': listing}
+            if owner_facebook:
+                raw_updates['owner_facebook'] = owner_facebook
+            ShopOwnerRecord.objects.filter(pk=raw_owner_id).update(**raw_updates)
 
         # 3. Handle Multi-Image Upload
         image_files = request.FILES.getlist('images')
