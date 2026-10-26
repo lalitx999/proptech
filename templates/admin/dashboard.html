@@ -6,8 +6,8 @@
 {% block content %}
 <div class="min-h-screen bg-[#f8fafc] text-neutral-900 pb-16 overflow-x-hidden">
 
-    <!-- Top Command Header Bar -->
-    <div class="bg-neutral-900 text-white border-b border-neutral-800 sticky top-14 sm:top-16 z-30 shadow-md">
+    <!-- Top Command Header Bar (Static in page flow, does not stick or overlap content) -->
+    <div class="bg-neutral-900 text-white border-b border-neutral-800 shadow-md">
         <div class="mx-auto max-w-[1720px] w-full px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-xs">
@@ -45,7 +45,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- Left Command Sidebar Navigation (3 cols on lg, 2 cols on xl) -->
-            <div class="lg:col-span-3 xl:col-span-2 space-y-2 bg-white rounded-3xl p-3 border border-neutral-200 shadow-2xs sticky top-36">
+            <div class="lg:col-span-3 xl:col-span-2 space-y-2 bg-white rounded-3xl p-3 border border-neutral-200 shadow-2xs sticky top-20">
                 <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-3 pt-2 pb-1">
                     ระบบจัดการหลัก
                 </div>
