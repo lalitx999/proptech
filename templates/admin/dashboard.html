@@ -412,30 +412,33 @@
                             <table class="w-full text-left text-xs text-neutral-600 min-w-[860px]">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4 min-w-[280px]">ร้านค้า / ข้อมูล</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">หมวดหมู่ & ทำเล</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">ราคาเซ้ง & ค่าเช่า</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[100px]">สถานะ</th>
-                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[210px]">การจัดการ</th>
+                                        <th class="py-3.5 pl-6 pr-4 min-w-[320px]">ร้านค้า / ข้อมูล</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">หมวดหมู่ & ทำเล</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">ราคาเซ้ง & ค่าเช่า</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">สถานะ</th>
+                                        <th class="py-3.5 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap min-w-[230px]">การจัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for shop in shops_list %}
-                                    <tr class="hover:bg-neutral-50/70 transition">
-                                        <td class="py-3.5 px-4">
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200">
+                                        <td class="py-4 pl-6 pr-4 relative">
+                                            <!-- Row Hover Left Accent Bar -->
+                                            <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-brand-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+
                                             <div class="flex items-center gap-3">
                                                 {% if shop.property.cover_image %}
                                                 <img src="{{ shop.property.cover_image.image.url }}" alt="{{ shop.property.title }}"
-                                                     class="w-12 h-12 rounded-xl object-cover shrink-0 border border-neutral-200">
+                                                     class="w-12 h-12 rounded-xl object-cover shrink-0 border border-neutral-200 group-hover:shadow-sm group-hover:scale-105 transition-all duration-200">
                                                 {% else %}
-                                                <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 shrink-0">
+                                                <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 shrink-0 group-hover:bg-neutral-200 transition-colors">
                                                     <i data-lucide="image" class="w-5 h-5"></i>
                                                 </div>
                                                 {% endif %}
                                                 <div>
                                                     <div class="flex items-center gap-1.5 flex-wrap">
                                                         <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank"
-                                                           class="font-black text-neutral-900 hover:text-brand-600 transition block truncate max-w-[240px] sm:max-w-xs md:max-w-sm xl:max-w-md">
+                                                           class="font-black text-neutral-900 group-hover:text-brand-600 transition-colors duration-150 block truncate max-w-sm lg:max-w-md xl:max-w-lg">
                                                             {{ shop.property.title }}
                                                         </a>
                                                         {% if shop.is_admin_verified %}
@@ -444,7 +447,7 @@
                                                         </span>
                                                         {% endif %}
                                                     </div>
-                                                    <div class="text-[11px] text-neutral-400 font-mono flex items-center gap-1.5 flex-wrap">
+                                                    <div class="text-[11px] text-neutral-400 font-mono flex items-center gap-1.5 flex-wrap mt-0.5">
                                                         <span>รหัส <span class="font-bold text-neutral-800 bg-neutral-100 px-1.5 py-0.5 rounded border border-neutral-200">{{ shop.ref_code }}</span></span>
                                                         <button type="button" onclick="editShopRefCode('{{ shop.pk }}', '{{ shop.ref_code }}')"
                                                                 class="inline-flex items-center gap-0.5 text-neutral-400 hover:text-brand-600 transition px-1 py-0.5 rounded hover:bg-neutral-100 cursor-pointer"
@@ -467,37 +470,37 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-4 whitespace-nowrap">
+                                        <td class="py-4 px-4 whitespace-nowrap">
                                             <div class="font-semibold text-neutral-800">{{ shop.property.get_type_display }}</div>
-                                            <div class="text-[11px] text-neutral-400">{{ shop.property.district }}, {{ shop.property.province }}</div>
+                                            <div class="text-[11px] text-neutral-400 mt-0.5">{{ shop.property.district }}, {{ shop.property.province }}</div>
                                         </td>
-                                        <td class="py-3.5 px-4 font-mono whitespace-nowrap">
+                                        <td class="py-4 px-4 font-mono whitespace-nowrap">
                                             <div class="font-black text-brand-600 text-sm">฿{{ shop.price|floatformat:0|intcomma }}</div>
-                                            <div class="text-[11px] text-neutral-400">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0|intcomma }}/ด.</div>
+                                            <div class="text-[11px] text-neutral-400 mt-0.5">ค่าเช่า ฿{{ shop.monthly_rent|floatformat:0|intcomma }}/ด.</div>
                                         </td>
-                                        <td class="py-3.5 px-4 whitespace-nowrap">
+                                        <td class="py-4 px-4 whitespace-nowrap">
                                             {% if shop.status == 'published' %}
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> เผยแพร่แล้ว
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เผยแพร่แล้ว
                                                 </span>
                                             {% elif shop.status == 'pending' %}
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse shadow-2xs">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> รออนุมัติ
                                                 </span>
                                             {% else %}
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-neutral-100 text-neutral-600">
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-neutral-100 text-neutral-600 shadow-2xs">
                                                     {{ shop.get_status_display }}
                                                 </span>
                                             {% endif %}
                                         </td>
-                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                        <td class="py-4 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 {% if shop.status != 'published' %}
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="approve">
                                                     <button type="submit" title="อนุมัติเผยแพร่"
-                                                            class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition cursor-pointer">
+                                                            class="w-8 h-8 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="check" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
@@ -506,7 +509,7 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="reject">
                                                     <button type="submit" title="ระงับประกาศ"
-                                                            class="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition cursor-pointer">
+                                                            class="w-8 h-8 rounded-xl bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="pause" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
@@ -517,7 +520,7 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="toggle_verified">
                                                     <button type="submit" title="{% if shop.is_admin_verified %}ถอดป้าย Admin Verified{% else %}มอบป้าย Admin Verified (ผ่านการตรวจสอบแล้ว){% endif %}"
-                                                            class="p-1.5 rounded-lg {% if shop.is_admin_verified %}bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs{% else %}bg-neutral-100 hover:bg-emerald-50 text-neutral-500 hover:text-emerald-700{% endif %} transition cursor-pointer">
+                                                            class="w-8 h-8 rounded-xl {% if shop.is_admin_verified %}bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs hover:shadow-sm{% else %}bg-neutral-100 hover:bg-emerald-50 text-neutral-400 hover:text-emerald-600 shadow-2xs{% endif %} flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="shield-check" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
@@ -526,7 +529,7 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="toggle_vip">
                                                     <button type="submit" title="สลับสิทธิ์ VIP ของเจ้าของร้าน"
-                                                            class="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 transition cursor-pointer">
+                                                            class="w-8 h-8 rounded-xl bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="crown" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
@@ -534,13 +537,13 @@
                                                 <!-- Edit Property Link -->
                                                 {% if shop.property %}
                                                 <a href="{% url 'properties:property_update' shop.property.pk %}" target="_blank" title="แก้ไขข้อมูลร้านค้า"
-                                                   class="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition cursor-pointer">
+                                                   class="w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                     <i data-lucide="edit-3" class="w-4 h-4"></i>
                                                 </a>
                                                 {% endif %}
 
                                                 <a href="{% url 'listings:listing_detail' shop.pk %}" target="_blank" title="เปิดดูหน้าร้าน"
-                                                   class="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition cursor-pointer">
+                                                   class="w-8 h-8 rounded-xl bg-neutral-100 hover:bg-neutral-800 text-neutral-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                     <i data-lucide="external-link" class="w-4 h-4"></i>
                                                 </a>
 
@@ -550,7 +553,7 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="delete">
                                                     <button type="submit" title="ลบประกาศร้านนี้ถาวร"
-                                                            class="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition cursor-pointer">
+                                                            class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
@@ -1430,20 +1433,21 @@
                             <table class="w-full text-left text-xs text-neutral-600 min-w-[920px]">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[100px]">วันที่บันทึก</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">ข้อมูลเจ้าของร้าน</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้าน & ทำเล</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">ราคาเซ้ง / ค่าเช่า</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">หมายเหตุ / การคุย</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">สถานะโพสต์</th>
-                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[150px]">จัดการ</th>
+                                        <th class="py-3.5 pl-6 pr-4 whitespace-nowrap min-w-[110px]">วันที่บันทึก</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[170px]">ข้อมูลเจ้าของร้าน</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้าน & ทำเล</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[140px]">ราคาเซ้ง / ค่าเช่า</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[140px]">หมายเหตุ / การคุย</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">สถานะโพสต์</th>
+                                        <th class="py-3.5 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap min-w-[160px]">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for rec in raw_owner_records %}
-                                    <tr class="hover:bg-neutral-50/70 transition">
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200">
                                         <!-- Created Date -->
-                                        <td class="py-3 px-4 font-mono text-[11px] text-neutral-400 whitespace-nowrap">
+                                        <td class="py-4 pl-6 pr-4 font-mono text-[11px] text-neutral-400 whitespace-nowrap relative">
+                                            <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                             {{ rec.created_at|date:"d M Y" }}<br>
                                             <span class="text-[10px] text-neutral-400">{{ rec.created_at|date:"H:i" }} น.</span>
                                         </td>
@@ -1572,11 +1576,11 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                                        <td class="py-4 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 <!-- Edit Raw Owner -->
                                                 <button type="button"
-                                                        class="open-edit-raw-owner-btn px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 cursor-pointer"
+                                                         class="open-edit-raw-owner-btn px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-900 text-neutral-800 hover:text-white font-bold text-xs shadow-2xs hover:shadow-xs transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                                                         data-pk="{{ rec.pk }}"
                                                         data-name="{{ rec.owner_name }}"
                                                         data-phone="{{ rec.owner_phone|default:'' }}"
@@ -1599,7 +1603,7 @@
                                                       class="inline-block">
                                                     {% csrf_token %}
                                                     <button type="submit"
-                                                            class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                            class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white font-bold text-xs border border-rose-200 hover:border-transparent transition-all duration-200 hover:scale-105 active:scale-95 shadow-2xs hover:shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
                                                             title="ลบข้อมูลดิบเจ้าของร้านนี้">
                                                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                                         <span>ลบ</span>
@@ -1644,21 +1648,22 @@
                             <table class="w-full text-left text-xs text-neutral-600 min-w-[960px]" id="owner-directory-table">
                                 <thead class="bg-neutral-50 text-neutral-700 font-bold border-b border-neutral-200">
                                     <tr>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[90px]">รหัสร้าน</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้านค้า & ทำเล</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">ชื่อเจ้าของร้าน</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">เบอร์โทรศัพท์</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">LINE ID</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">Facebook</th>
-                                        <th class="py-3 px-4 whitespace-nowrap min-w-[130px]">หมายเหตุ</th>
-                                        <th class="py-3 px-4 text-right whitespace-nowrap min-w-[150px]">จัดการข้อมูล</th>
+                                        <th class="py-3.5 pl-6 pr-4 whitespace-nowrap min-w-[90px]">รหัสร้าน</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">ชื่อร้านค้า & ทำเล</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[140px]">ชื่อเจ้าของร้าน</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">เบอร์โทรศัพท์</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">LINE ID</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">Facebook</th>
+                                        <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">หมายเหตุ</th>
+                                        <th class="py-3.5 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap min-w-[160px]">จัดการข้อมูล</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
                                     {% for item in owner_directory_list %}
-                                    <tr class="hover:bg-neutral-50/70 transition owner-row">
+                                    <tr class="group hover:bg-neutral-50/90 transition-all duration-200 owner-row">
                                         <!-- Ref Code -->
-                                        <td class="py-3.5 px-4 font-mono font-bold">
+                                        <td class="py-4 pl-6 pr-4 font-mono font-bold relative">
+                                            <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-200">
                                                     {{ item.ref_code }}
@@ -1748,12 +1753,12 @@
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                        <td class="py-4 pl-4 pr-6 sm:pr-8 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                 {% if item.owner_name or item.owner_phone or item.owner_line_id or item.owner_facebook %}
                                                 <!-- ปุ่มแก้ไข -->
                                                 <button type="button"
-                                                        class="open-edit-owner-modal-btn px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs shadow-2xs border border-emerald-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                        class="open-edit-owner-modal-btn px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white font-bold text-xs shadow-2xs hover:shadow-xs border border-emerald-200 hover:border-transparent transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                                                         data-pk="{{ item.pk }}"
                                                         data-ref="{{ item.ref_code }}"
                                                         data-title="{{ item.property.title }}"
@@ -1773,7 +1778,7 @@
                                                       class="inline-block">
                                                     {% csrf_token %}
                                                     <button type="submit"
-                                                            class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs shadow-2xs border border-rose-200 transition inline-flex items-center gap-1 cursor-pointer"
+                                                            class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white font-bold text-xs shadow-2xs hover:shadow-xs border border-rose-200 hover:border-transparent transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"
                                                             title="ลบข้อมูลเจ้าของร้านนี้">
                                                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                                         <span>ลบ</span>
