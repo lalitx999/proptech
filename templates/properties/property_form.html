@@ -416,47 +416,80 @@
                         </div>
                     </div>
 
-                    <!-- Section 7: การจัดการรูปถ่ายร้านค้า (Complete Photo Management) -->
+                    <!-- Section 7: การจัดการรูปถ่ายร้านค้า (Complete Photo Management with Drag & Drop) -->
                     <div class="rounded-3xl border border-neutral-200 bg-white p-6 shadow-xs space-y-4">
-                        <div class="flex items-center justify-between pb-2 border-b border-neutral-100">
-                            <div class="flex items-center gap-2 text-neutral-900 font-black text-sm">
-                                <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-                                    <i data-lucide="images" class="w-4 h-4"></i>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-neutral-100 gap-2">
+                            <div>
+                                <div class="flex items-center gap-2 text-neutral-900 font-black text-sm">
+                                    <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                                        <i data-lucide="images" class="w-4 h-4"></i>
+                                    </div>
+                                    <span>6. จัดการและเรียงลำดับรูปถ่ายร้านค้า ({{ images|length }} รูป)</span>
                                 </div>
-                                <span>6. จัดการรูปถ่ายร้านค้า ({{ images|length }} รูป)</span>
+                                <p class="text-xs text-neutral-500 mt-1 flex items-center gap-1.5">
+                                    <i data-lucide="move" class="w-3.5 h-3.5 text-brand-600 shrink-0"></i>
+                                    <span><strong>กดค้างแล้วลาก (Drag & Drop)</strong> เพื่อเรียงลำดับรูปภาพได้ทันที โดย<strong>รูปแรกจะถูกตั้งเป็นภาพหน้าปกหลัก</strong>อัตโนมัติ</span>
+                                </p>
+                            </div>
+                            <div id="reorder-status-badge" class="hidden text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 items-center gap-1.5 shrink-0 self-start sm:self-auto transition-all">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                                <span>บันทึกลำดับรูปภาพแล้ว</span>
                             </div>
                         </div>
 
-                        <!-- Existing Photos Grid -->
+                        <!-- Hidden input to store image order for regular form submit -->
+                        <input type="hidden" name="image_order" id="image-order-input" value="{% for img in images %}{{ img.pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+
+                        <!-- Existing Photos Grid (Sortable Drag & Drop) -->
                         {% if images %}
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div id="sortable-image-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                             {% for img in images %}
-                            <div class="group relative rounded-2xl overflow-hidden border-2 {% if img.is_cover %}border-amber-400 ring-2 ring-amber-300{% else %}border-neutral-200{% endif %} bg-neutral-100 aspect-4/3">
-                                <img src="{{ img.image.url }}" alt="รูปถ่ายร้าน" class="w-full h-full object-cover">
+                            <div class="sortable-image-card group relative rounded-2xl overflow-hidden border-2 {% if img.is_cover %}border-amber-400 ring-2 ring-amber-300/80 shadow-md is-cover-card{% else %}border-neutral-200 hover:border-neutral-300{% endif %} bg-neutral-100 aspect-4/3 cursor-grab active:cursor-grabbing select-none transition-all duration-200"
+                                 data-id="{{ img.pk }}"
+                                 id="img-card-{{ img.pk }}">
+                                <img src="{{ img.image.url }}" alt="รูปถ่ายร้าน" class="w-full h-full object-cover pointer-events-none">
 
-                                <!-- Badge: Is Cover -->
-                                {% if img.is_cover %}
-                                <div class="absolute top-2 left-2 z-10 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow flex items-center gap-0.5">
-                                    <i data-lucide="star" class="w-3 h-3 fill-current"></i>
-                                    <span>หน้าปกหลัก</span>
+                                <!-- Drag Handle Grip Indicator -->
+                                <div class="drag-handle absolute top-2 right-2 z-10 w-7 h-7 rounded-xl bg-neutral-900/70 hover:bg-neutral-900 text-white flex items-center justify-center shadow-xs backdrop-blur-xs cursor-grab active:cursor-grabbing transition" title="กดค้างแล้วลากเพื่อเปลี่ยนลำดับ">
+                                    <i data-lucide="grip-vertical" class="w-4 h-4"></i>
                                 </div>
-                                {% endif %}
 
-                                <!-- Overlay Action Buttons -->
-                                <div class="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2 p-2">
-                                    {% if not img.is_cover %}
-                                    <button type="submit" formaction="{% url 'properties:property_image_set_cover' property.pk img.pk %}"
-                                            title="ตั้งเป็นภาพหน้าปกหลัก"
-                                            class="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-md transition cursor-pointer">
-                                        <i data-lucide="star" class="w-4 h-4"></i>
-                                    </button>
+                                <!-- Order & Cover Badge -->
+                                <div class="image-order-badge absolute top-2 left-2 z-10 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow flex items-center gap-1 transition-all {% if img.is_cover %}bg-amber-500 text-white shadow-amber-500/20{% else %}bg-neutral-900/80 text-white backdrop-blur-xs{% endif %}">
+                                    {% if img.is_cover %}
+                                    <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                                    <span class="badge-text">หน้าปกหลัก (รูปที่ 1)</span>
+                                    {% else %}
+                                    <span class="badge-text">รูปที่ {{ forloop.counter }}</span>
                                     {% endif %}
-                                    <button type="submit" formaction="{% url 'properties:property_image_delete' property.pk img.pk %}"
-                                            onclick="return confirm('ยืนยันการลบรูปภาพนี้หรือไม่?');"
-                                            title="ลบรูปภาพนี้"
-                                            class="p-2 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-md transition cursor-pointer">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
+                                </div>
+
+                                <!-- Action Buttons Overlay (Quick Move & Set Cover & Delete) -->
+                                <div class="absolute inset-0 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2 gap-1.5">
+                                    <div class="flex items-center justify-between gap-1 w-full">
+                                        <!-- Quick Shift Buttons -->
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" class="btn-move-left p-1.5 rounded-lg bg-white/20 hover:bg-white text-white hover:text-black shadow transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer" title="เลื่อนไปข้างหน้า (◀)">
+                                                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                            <button type="button" class="btn-move-right p-1.5 rounded-lg bg-white/20 hover:bg-white text-white hover:text-black shadow transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer" title="เลื่อนไปข้างหลัง (▶)">
+                                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Set Cover & Delete -->
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" class="btn-set-cover-quick p-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white shadow transition cursor-pointer {% if img.is_cover %}hidden{% endif %}" title="ตั้งรูปนี้เป็นหน้าปก">
+                                                <i data-lucide="star" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                            <button type="submit" formaction="{% url 'properties:property_image_delete' property.pk img.pk %}"
+                                                    onclick="return confirm('ยืนยันการลบรูปภาพนี้หรือไม่?');"
+                                                    title="ลบรูปภาพนี้"
+                                                    class="p-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow transition cursor-pointer">
+                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             {% endfor %}
@@ -467,15 +500,24 @@
                         </div>
                         {% endif %}
 
-                        <!-- Upload New Photos -->
+                        <!-- Upload New Photos with Instant Thumbnail Preview -->
                         <div class="pt-2">
                             <label class="block text-xs font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
                                 <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-600"></i>
                                 <span>อัปโหลดรูปถ่ายเพิ่มเติม (เลือกหลายรูปพร้อมกันได้)</span>
                             </label>
-                            <input type="file" name="images" multiple accept="image/*"
+                            <input type="file" name="images" id="new-images-input" multiple accept="image/*"
                                    class="w-full text-xs text-neutral-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
                             <p class="text-[10px] text-neutral-400 mt-1.5">รองรับไฟล์ JPG, PNG, WEBP ขนาดไม่เกิน 10MB ต่อภาพ</p>
+
+                            <!-- New Photos Preview Grid -->
+                            <div id="new-photos-preview-container" class="hidden mt-3 p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+                                <div class="text-[11px] font-bold text-neutral-600 flex items-center justify-between">
+                                    <span>รูปที่กำลังจะอัปโหลดเพิ่ม (<span id="new-photos-count">0</span> รูป):</span>
+                                    <span class="text-[10px] text-brand-600 font-semibold">*รูปเหล่านี้จะถูกเพิ่มต่อท้ายเมื่อกดบันทึก</span>
+                                </div>
+                                <div id="new-photos-preview-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -506,4 +548,206 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const grid = document.getElementById('sortable-image-grid');
+    const orderInput = document.getElementById('image-order-input');
+    const statusBadge = document.getElementById('reorder-status-badge');
+    let statusTimeout = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+    function updateVisualOrder(saveRemote = true) {
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.sortable-image-card'));
+        const orderIds = cards.map(c => c.getAttribute('data-id'));
+
+        // Update hidden input
+        if (orderInput) {
+            orderInput.value = orderIds.join(',');
+        }
+
+        // Update visual badges and buttons on cards
+        cards.forEach((card, idx) => {
+            const badge = card.querySelector('.image-order-badge');
+            const setCoverBtn = card.querySelector('.btn-set-cover-quick');
+            const moveLeftBtn = card.querySelector('.btn-move-left');
+            const moveRightBtn = card.querySelector('.btn-move-right');
+
+            // Quick shift buttons state
+            if (moveLeftBtn) moveLeftBtn.disabled = (idx === 0);
+            if (moveRightBtn) moveRightBtn.disabled = (idx === cards.length - 1);
+
+            if (idx === 0) {
+                // Main Cover
+                card.classList.add('border-amber-400', 'ring-2', 'ring-amber-300/80', 'shadow-md', 'is-cover-card');
+                card.classList.remove('border-neutral-200');
+                if (badge) {
+                    badge.className = 'image-order-badge absolute top-2 left-2 z-10 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow flex items-center gap-1 bg-amber-500 text-white shadow-amber-500/20';
+                    badge.innerHTML = '<i data-lucide="star" class="w-3 h-3 fill-current"></i><span class="badge-text">หน้าปกหลัก (รูปที่ 1)</span>';
+                }
+                if (setCoverBtn) setCoverBtn.classList.add('hidden');
+            } else {
+                card.classList.remove('border-amber-400', 'ring-2', 'ring-amber-300/80', 'shadow-md', 'is-cover-card');
+                card.classList.add('border-neutral-200');
+                if (badge) {
+                    badge.className = 'image-order-badge absolute top-2 left-2 z-10 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow flex items-center gap-1 bg-neutral-900/80 text-white backdrop-blur-xs';
+                    badge.innerHTML = `<span class="badge-text">รูปที่ ${idx + 1}</span>`;
+                }
+                if (setCoverBtn) setCoverBtn.classList.remove('hidden');
+            }
+        });
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Remote Ajax Save (if property has pk)
+        {% if property and property.pk %}
+        if (saveRemote && orderIds.length > 0) {
+            fetch("{% url 'properties:property_image_reorder' property.pk %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ order: orderIds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && statusBadge) {
+                    statusBadge.classList.remove('hidden');
+                    statusBadge.classList.add('flex');
+                    if (statusTimeout) clearTimeout(statusTimeout);
+                    statusTimeout = setTimeout(() => {
+                        statusBadge.classList.add('hidden');
+                        statusBadge.classList.remove('flex');
+                    }, 2500);
+                }
+            })
+            .catch(err => console.error('Image reorder error:', err));
+        }
+        {% endif %}
+    }
+
+    if (grid) {
+        // Initialize SortableJS
+        if (typeof Sortable !== 'undefined') {
+            new Sortable(grid, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                handle: '.drag-handle, .sortable-image-card',
+                filter: 'button, a',
+                preventOnFilter: false,
+                onEnd: function () {
+                    updateVisualOrder(true);
+                }
+            });
+        }
+
+        // Delegate Quick Move Buttons
+        grid.addEventListener('click', function (e) {
+            const moveLeftBtn = e.target.closest('.btn-move-left');
+            const moveRightBtn = e.target.closest('.btn-move-right');
+            const setCoverBtn = e.target.closest('.btn-set-cover-quick');
+
+            if (moveLeftBtn) {
+                e.preventDefault();
+                const card = moveLeftBtn.closest('.sortable-image-card');
+                const prev = card.previousElementSibling;
+                if (prev) {
+                    grid.insertBefore(card, prev);
+                    updateVisualOrder(true);
+                }
+            } else if (moveRightBtn) {
+                e.preventDefault();
+                const card = moveRightBtn.closest('.sortable-image-card');
+                const next = card.nextElementSibling;
+                if (next) {
+                    grid.insertBefore(next, card);
+                    updateVisualOrder(true);
+                }
+            } else if (setCoverBtn) {
+                e.preventDefault();
+                const card = setCoverBtn.closest('.sortable-image-card');
+                grid.prepend(card);
+                updateVisualOrder(true);
+            }
+        });
+
+        // Initialize shift button states on load
+        updateVisualOrder(false);
+    }
+
+    // New Images Instant Preview
+    const newImagesInput = document.getElementById('new-images-input');
+    const previewContainer = document.getElementById('new-photos-preview-container');
+    const previewGrid = document.getElementById('new-photos-preview-grid');
+    const previewCount = document.getElementById('new-photos-count');
+
+    if (newImagesInput && previewContainer && previewGrid) {
+        newImagesInput.addEventListener('change', function () {
+            previewGrid.innerHTML = '';
+            const files = Array.from(this.files || []);
+            if (files.length > 0) {
+                previewCount.textContent = files.length;
+                previewContainer.classList.remove('hidden');
+
+                files.forEach((file, i) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            const div = document.createElement('div');
+                            div.className = 'relative rounded-xl overflow-hidden border border-neutral-200 bg-white aspect-4/3 shadow-2xs';
+                            div.innerHTML = `
+                                <img src="${evt.target.result}" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 right-1 text-[9px] font-bold bg-black/70 text-white px-1.5 py-0.2 rounded-md">+${i + 1}</span>
+                            `;
+                            previewGrid.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            } else {
+                previewContainer.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>
+<style>
+.sortable-ghost {
+    opacity: 0.35;
+    border: 2px dashed #f59e0b !important;
+    background-color: #fef3c7 !important;
+    transform: scale(0.96);
+}
+.sortable-chosen {
+    cursor: grabbing !important;
+}
+.sortable-drag {
+    opacity: 0.95;
+    transform: rotate(2deg) scale(1.04);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+}
+</style>
 {% endblock %}

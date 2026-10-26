@@ -11,4 +11,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.property_delete_view, name='property_delete'),
     path('<int:pk>/images/<int:img_pk>/delete/', views.property_image_delete_view, name='property_image_delete'),
     path('<int:pk>/images/<int:img_pk>/cover/', views.property_image_set_cover_view, name='property_image_set_cover'),
+    path('<int:pk>/images/reorder/', views.property_image_reorder_view, name='property_image_reorder'),
 ]

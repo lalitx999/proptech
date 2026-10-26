@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -173,6 +174,19 @@ def property_update_view(request, pk):
                     )
                 except Exception as e:
                     logger.warning(f"Failed to upload image {img_file.name}: {e}")
+
+        # Update existing images order if provided
+        image_order_raw = request.POST.get('image_order', '').strip()
+        if image_order_raw:
+            try:
+                order_list = [int(x) for x in image_order_raw.split(',') if x.strip()]
+                for idx, img_id in enumerate(order_list):
+                    PropertyImage.objects.filter(pk=img_id, property=property_obj).update(order=idx)
+                if order_list:
+                    property_obj.images.update(is_cover=False)
+                    PropertyImage.objects.filter(pk=order_list[0], property=property_obj).update(is_cover=True)
+            except Exception as e:
+                logger.warning(f"Failed to update image order: {e}")
 
         # 3. Listing Fields Management
         try:
@@ -352,6 +366,55 @@ def property_image_set_cover_view(request, pk, img_pk):
     property_obj.images.filter(pk=img_pk).update(is_cover=True)
     messages.success(request, 'ตั้งเป็นภาพหน้าปกหลักเรียบร้อยแล้ว')
     return redirect('properties:property_update', pk=property_obj.pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def property_image_reorder_view(request, pk):
+    """
+    Reorder images for a property via Drag & Drop.
+    First image in the list is automatically assigned as the main cover photo (is_cover=True).
+    """
+    property_obj = get_object_or_404(Property, pk=pk)
+    if not can_edit(request.user, property_obj):
+        raise PermissionDenied("คุณไม่มีสิทธิ์ในการจัดลำดับรูปภาพนี้")
+
+    import json
+    try:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body.decode('utf-8'))
+            order_ids = data.get('order', [])
+        else:
+            raw_order = request.POST.get('order', '')
+            order_ids = [int(x) for x in raw_order.split(',') if x.strip()]
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Invalid data: {e}'}, status=400)
+
+    if not order_ids:
+        return JsonResponse({'status': 'error', 'message': 'No image IDs provided'}, status=400)
+
+    # 1. Update order for each image
+    for idx, img_id in enumerate(order_ids):
+        PropertyImage.objects.filter(pk=img_id, property=property_obj).update(order=idx)
+
+    # 2. Automatically set the 1st image as main cover
+    first_id = order_ids[0]
+    property_obj.images.update(is_cover=False)
+    PropertyImage.objects.filter(pk=first_id, property=property_obj).update(is_cover=True)
+
+    AuditService.log(
+        action='UPDATE',
+        model_name='PropertyImage (Reorder)',
+        object_id=property_obj.pk,
+        changes={'order': order_ids, 'cover_id': first_id},
+        request=request
+    )
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'จัดลำดับและตั้งรูปแรกเป็นหน้าปกหลักเรียบร้อยแล้ว',
+        'cover_id': first_id
+    })
 
 
 @login_required
