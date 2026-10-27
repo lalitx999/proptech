@@ -56,6 +56,10 @@ def property_create_view(request):
             )
             messages.success(request, 'เพิ่มข้อมูลสถานที่เรียบร้อยแล้ว! กรุณาระบุราคาเซ้งและรายละเอียดเพื่อลงประกาศ')
             return redirect('listings:listing_create_property', property_pk=property_obj.pk)
+        else:
+            for field, err_list in form.errors.items():
+                for err in err_list:
+                    messages.error(request, f"ข้อมูลไม่ถูกต้อง ({field}): {err}")
     else:
         form = PropertyForm()
 
@@ -132,9 +136,6 @@ def property_update_view(request, pk):
         if prop_type:
             property_obj.type = prop_type
         if desc:
-            import bleach
-            from bleach.css_sanitizer import CSSSanitizer
-            css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
             allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
             allowed_attrs = {
                 'a': ['href', 'title', 'target', 'rel', 'class'],
@@ -143,7 +144,13 @@ def property_update_view(request, pk):
                 '*': ['style', 'class']
             }
             try:
-                property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
+                import bleach
+                try:
+                    from bleach.css_sanitizer import CSSSanitizer
+                    css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
+                    property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
+                except Exception:
+                    property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, strip=True)
             except Exception:
                 property_obj.desc = desc
         if province:

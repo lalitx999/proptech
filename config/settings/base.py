@@ -96,7 +96,7 @@ PASSWORD_HASHERS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesStandaloneBackend',  # Evaluates failed attempts before standard auth
+    'axes.backends.AxesBackend',  # Evaluates failed attempts and implements get_user
     'django.contrib.auth.backends.ModelBackend',
 ]
 
