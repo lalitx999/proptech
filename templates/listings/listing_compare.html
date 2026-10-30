@@ -134,25 +134,6 @@
                         {% endfor %}
                     </tr>
 
-                    <!-- Avg 3M Revenue -->
-                    <tr class="hover:bg-neutral-50/50 transition">
-                        <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">ยอดขายเฉลี่ย (3 เดือน)</td>
-                        {% for listing in listings %}
-                        <td class="p-4 text-center border-l border-neutral-100 font-semibold text-neutral-800">
-                            {% if listing.avg_revenue_3m %}฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-
-                    <!-- Avg 3M Profit -->
-                    <tr class="hover:bg-neutral-50/50 transition">
-                        <td class="p-4 font-bold text-neutral-700 bg-neutral-50/40">กำไรสุทธิเฉลี่ย (3 เดือน)</td>
-                        {% for listing in listings %}
-                        <td class="p-4 text-center border-l border-neutral-100 font-bold text-emerald-600">
-                            {% if listing.avg_profit_3m %}฿{{ listing.avg_profit_3m|floatformat:0|intcomma }}/ด.{% else %}<span class="text-neutral-400">-</span>{% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
 
                     <!-- Floors -->
                     <tr class="hover:bg-neutral-50/50 transition">

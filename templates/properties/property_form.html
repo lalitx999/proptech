@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ title }} — เซ้งร้านด่วน{% endblock %}
 
@@ -176,90 +177,7 @@
                                 </span>
                             </div>
 
-                            <!-- Word/Excel Style Rich Text Editor Box -->
-                            <div class="rounded-2xl border border-neutral-300 bg-white overflow-hidden shadow-2xs focus-within:border-brand-500 focus-within:ring-1 focus-within:ring-brand-500 transition">
-                                <!-- Toolbar -->
-                                <div class="flex flex-wrap items-center gap-1.5 p-2 bg-neutral-50/95 border-b border-neutral-200 text-xs select-none">
-                                    <!-- Bold, Italic, Underline -->
-                                    <div class="flex items-center gap-0.5 bg-white p-0.5 rounded-xl border border-neutral-200 shadow-2xs">
-                                        <button type="button" class="btn-rte-cmd w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-800 transition cursor-pointer" data-cmd="bold" title="ตัวหนา (Ctrl+B)">
-                                            <span class="font-black text-xs">B</span>
-                                        </button>
-                                        <button type="button" class="btn-rte-cmd w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-800 transition cursor-pointer" data-cmd="italic" title="ตัวเอียง (Ctrl+I)">
-                                            <span class="font-serif italic font-bold text-xs">I</span>
-                                        </button>
-                                        <button type="button" class="btn-rte-cmd w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-800 transition cursor-pointer" data-cmd="underline" title="ขีดเส้นใต้ (Ctrl+U)">
-                                            <span class="underline font-bold text-xs">U</span>
-                                        </button>
-                                    </div>
-
-                                    <!-- Font Color Palette (Selection Color) -->
-                                    <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-neutral-200 shadow-2xs">
-                                        <span class="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
-                                            <i data-lucide="palette" class="w-3.5 h-3.5 text-brand-600"></i>
-                                            <span class="hidden sm:inline">สีฟอนต์:</span>
-                                        </span>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-red-600 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#dc2626" title="สีแดงเด่น"></button>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-emerald-600 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#16a34a" title="สีเขียว"></button>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-blue-600 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#2563eb" title="สีน้ำเงิน"></button>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-amber-500 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#d97706" title="สีทอง/ส้ม"></button>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-purple-600 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#9333ea" title="สีม่วง"></button>
-                                        <button type="button" class="btn-rte-color w-5 h-5 rounded-full bg-neutral-900 hover:scale-120 transition shadow-2xs border border-white cursor-pointer" data-color="#171717" title="สีดำเข้มปกติ"></button>
-                                        
-                                        <!-- Custom Color Picker -->
-                                        <label class="relative flex items-center justify-center w-5 h-5 rounded-full border border-neutral-300 hover:border-neutral-500 cursor-pointer overflow-hidden shadow-2xs bg-gradient-to-tr from-rose-500 via-amber-400 to-indigo-500" title="เลือกสีอื่นๆ ตามใจชอบ">
-                                            <input type="color" id="rte-custom-color-input" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
-                                        </label>
-                                    </div>
-
-                                    <!-- Highlight / Background Color -->
-                                    <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-neutral-200 shadow-2xs">
-                                        <span class="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
-                                            <i data-lucide="highlighter" class="w-3.5 h-3.5 text-amber-500"></i>
-                                            <span class="hidden sm:inline">ไฮไลท์:</span>
-                                        </span>
-                                        <button type="button" class="btn-rte-hilite w-5 h-5 rounded-md bg-yellow-200 hover:scale-120 transition border border-yellow-300 cursor-pointer" data-color="#fef08a" title="ไฮไลท์สีเหลือง"></button>
-                                        <button type="button" class="btn-rte-hilite w-5 h-5 rounded-md bg-emerald-200 hover:scale-120 transition border border-emerald-300 cursor-pointer" data-color="#a7f3d0" title="ไฮไลท์สีเขียว"></button>
-                                        <button type="button" class="btn-rte-hilite w-5 h-5 rounded-md bg-pink-200 hover:scale-120 transition border border-pink-300 cursor-pointer" data-color="#fbcfe8" title="ไฮไลท์สีชมพู"></button>
-                                        <button type="button" class="btn-rte-hilite px-1.5 py-0.5 rounded-md text-neutral-400 hover:text-neutral-700 text-[10px] font-bold hover:bg-neutral-100 transition cursor-pointer" data-color="transparent" title="ล้างสีไฮไลท์">ล้าง</button>
-                                    </div>
-
-                                    <!-- Insert Link -->
-                                    <div class="flex items-center gap-0.5 bg-white p-0.5 rounded-xl border border-neutral-200 shadow-2xs">
-                                        <button type="button" id="btn-rte-insert-link" class="px-2.5 h-7 flex items-center gap-1 rounded-lg hover:bg-neutral-100 text-neutral-700 text-xs font-bold transition cursor-pointer" title="แทรกลิงก์ลงในคำที่คลุมดำ">
-                                            <i data-lucide="link" class="w-3.5 h-3.5 text-blue-600"></i>
-                                            <span>ใส่ลิงก์</span>
-                                        </button>
-                                        <button type="button" id="btn-rte-remove-link" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition cursor-pointer" title="เอาลิงก์ออก">
-                                            <i data-lucide="unlink" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- Bullet List & Reset -->
-                                    <div class="flex items-center gap-0.5 bg-white p-0.5 rounded-xl border border-neutral-200 shadow-2xs">
-                                        <button type="button" class="btn-rte-cmd w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-700 transition cursor-pointer" data-cmd="insertUnorderedList" title="รายการแบบจุด (Bullet List)">
-                                            <i data-lucide="list" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                        <button type="button" class="btn-rte-cmd w-7 h-7 flex items-center justify-center rounded-lg hover:bg-neutral-100 text-neutral-700 transition cursor-pointer" data-cmd="insertOrderedList" title="รายการตัวเลข">
-                                            <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- Clear Format -->
-                                    <button type="button" class="btn-rte-cmd ml-auto px-2 h-7 flex items-center gap-1 rounded-lg hover:bg-neutral-200 text-neutral-400 hover:text-neutral-700 text-xs font-bold transition cursor-pointer" data-cmd="removeFormat" title="ล้างการจัดรูปแบบกลับเป็นปกติ">
-                                        <i data-lucide="remove-formatting" class="w-3.5 h-3.5"></i>
-                                        <span class="hidden md:inline text-[10px]">ล้างฟอร์แมต</span>
-                                    </button>
-                                </div>
-
-                                <!-- Editable Content Area -->
-                                <div contenteditable="true" id="desc-rich-editor"
-                                     class="min-h-[180px] max-h-[380px] overflow-y-auto p-3.5 text-xs sm:text-sm leading-relaxed focus:outline-none whitespace-pre-wrap select-text text-neutral-800"
-                                     placeholder="เล่าจุดเด่นของร้าน ทำเล ฐานลูกค้าประจำ รายได้ และเหตุผลที่ปล่อยเซ้ง...">{{ property.desc|safe }}</div>
-                                
-                                <!-- Hidden textarea that syncs and sends with standard form submit -->
-                                <textarea name="desc" id="desc-hidden-input" class="hidden">{{ property.desc|default:'' }}</textarea>
-                            </div>
+                            {% include "includes/rich_text_editor.html" with rte_name="desc" rte_value=property.desc rte_placeholder="เล่าจุดเด่นของร้าน ทำเล ฐานลูกค้าประจำ และเหตุผลที่ปล่อยเซ้ง..." %}
                         </div>
 
                         <div>
@@ -395,22 +313,6 @@
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-neutral-700 mb-1">
-                                    กำไรสุทธิ/ด. (3 ด.)
-                                </label>
-                                <input type="number" name="avg_profit_3m" value="{% if listing and listing.avg_profit_3m %}{{ listing.avg_profit_3m|floatformat:0 }}{% endif %}"
-                                       placeholder="เช่น 60000"
-                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-brand-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-neutral-700 mb-1">
-                                    รายได้เฉลี่ย/ด. (3 ด.)
-                                </label>
-                                <input type="number" name="avg_revenue_3m" value="{% if listing and listing.avg_revenue_3m %}{{ listing.avg_revenue_3m|floatformat:0 }}{% endif %}"
-                                       placeholder="เช่น 200000"
-                                       class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
-                            </div>
                             <div>
                                 <label class="block text-xs font-bold text-neutral-700 mb-1">
                                     สัญญาคงเหลือ (ด.)
@@ -640,6 +542,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<link rel="stylesheet" href="{% static 'css/form_widgets.css' %}?v=20261030">
+<script src="{% static 'js/rich_text_editor.js' %}?v=20261030" nonce="{{ request.csp_nonce }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ request.csp_nonce }}"></script>
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
@@ -853,195 +757,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    // Rich Text Editor Logic (Word/Excel Style Formatting)
-    const richEditor = document.getElementById('desc-rich-editor');
-    const descHiddenInput = document.getElementById('desc-hidden-input');
-
-    if (richEditor && descHiddenInput) {
-        // Initialize content
-        const rawContent = descHiddenInput.value || '';
-        if (rawContent.includes('<') && rawContent.includes('>')) {
-            richEditor.innerHTML = rawContent;
-        } else {
-            richEditor.innerHTML = rawContent.replace(/\n/g, '<br>');
-        }
-
-        // Keep text selection range
-        let savedRange = null;
-        function saveSelection() {
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-                const range = sel.getRangeAt(0);
-                if (richEditor.contains(range.commonAncestorContainer)) {
-                    savedRange = range;
-                }
-            }
-        }
-        function restoreSelection() {
-            if (savedRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(savedRange);
-            }
-        }
-
-        richEditor.addEventListener('mouseup', saveSelection);
-        richEditor.addEventListener('keyup', saveSelection);
-        richEditor.addEventListener('touchend', saveSelection);
-
-        function syncContent() {
-            descHiddenInput.value = richEditor.innerHTML;
-        }
-
-        richEditor.addEventListener('input', syncContent);
-        richEditor.addEventListener('blur', syncContent);
-
-        // Prevent toolbar buttons from stealing focus & collapsing selection
-        document.querySelectorAll('.btn-rte-cmd, .btn-rte-color, .btn-rte-hilite, #btn-rte-insert-link, #btn-rte-remove-link').forEach(btn => {
-            btn.addEventListener('mousedown', function (e) {
-                e.preventDefault();
-            });
-        });
-
-        // 1. Basic formatting commands (Bold, Italic, Underline, Lists, RemoveFormat)
-        document.querySelectorAll('.btn-rte-cmd').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                restoreSelection();
-                const cmd = this.getAttribute('data-cmd');
-                document.execCommand(cmd, false, null);
-                richEditor.focus();
-                saveSelection();
-                syncContent();
-            });
-        });
-
-        // 2. Font Colors
-        document.querySelectorAll('.btn-rte-color').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                restoreSelection();
-                const color = this.getAttribute('data-color');
-                document.execCommand('foreColor', false, color);
-                richEditor.focus();
-                saveSelection();
-                syncContent();
-            });
-        });
-
-        // Custom Color Picker
-        const customColorInput = document.getElementById('rte-custom-color-input');
-        if (customColorInput) {
-            customColorInput.addEventListener('input', function () {
-                restoreSelection();
-                document.execCommand('foreColor', false, this.value);
-                richEditor.focus();
-                saveSelection();
-                syncContent();
-            });
-        }
-
-        // 3. Highlight Background Colors
-        document.querySelectorAll('.btn-rte-hilite').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                restoreSelection();
-                const color = this.getAttribute('data-color');
-                if (!document.execCommand('hiliteColor', false, color)) {
-                    document.execCommand('backColor', false, color);
-                }
-                richEditor.focus();
-                saveSelection();
-                syncContent();
-            });
-        });
-
-        // 4. Insert Link
-        const insertLinkBtn = document.getElementById('btn-rte-insert-link');
-        if (insertLinkBtn) {
-            insertLinkBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                restoreSelection();
-                const sel = window.getSelection();
-                if (!sel.rangeCount || sel.isCollapsed) {
-                    alert('กรุณาคลุมดำ (ไฮไลท์) ข้อความที่ต้องการใส่ลิงก์ก่อนครับ');
-                    return;
-                }
-                const url = prompt('กรุณากรอกลิงก์ที่ต้องการเชื่อมโยง (เช่น https://facebook.com/...):', 'https://');
-                if (url && url.trim() && url.trim() !== 'https://') {
-                    document.execCommand('createLink', false, url.trim());
-                    // Enhance all links inside editor
-                    richEditor.querySelectorAll('a').forEach(a => {
-                        a.target = '_blank';
-                        a.rel = 'noopener noreferrer';
-                        a.className = 'text-blue-600 underline font-bold hover:text-blue-800 transition-colors';
-                    });
-                    richEditor.focus();
-                    saveSelection();
-                    syncContent();
-                }
-            });
-        }
-
-        // Remove Link
-        const removeLinkBtn = document.getElementById('btn-rte-remove-link');
-        if (removeLinkBtn) {
-            removeLinkBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                restoreSelection();
-                document.execCommand('unlink', false, null);
-                richEditor.focus();
-                saveSelection();
-                syncContent();
-            });
-        }
-
-        // Form Submit Backup Sync
-        const mainForm = document.querySelector('form');
-        if (mainForm) {
-            mainForm.addEventListener('submit', function () {
-                syncContent();
-            });
-        }
-    }
 });
 </script>
-<style nonce="{{ request.csp_nonce }}">
-#desc-rich-editor:empty:before {
-    content: attr(placeholder);
-    color: #9ca3af;
-    pointer-events: none;
-    display: block;
-}
-.sortable-ghost {
-    opacity: 0.35;
-    border: 2px dashed #f59e0b !important;
-    background-color: #fef3c7 !important;
-    transform: scale(0.96);
-}
-.sortable-chosen {
-    cursor: grabbing !important;
-}
-.sortable-drag {
-    opacity: 0.95;
-    transform: rotate(2deg) scale(1.04);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
-    z-index: 9999;
-}
-#desc-rich-editor a {
-    color: #2563eb;
-    text-decoration: underline;
-    font-weight: 700;
-}
-#desc-rich-editor ul {
-    list-style-type: disc;
-    padding-left: 1.5rem;
-    margin: 0.5rem 0;
-}
-#desc-rich-editor ol {
-    list-style-type: decimal;
-    padding-left: 1.5rem;
-    margin: 0.5rem 0;
-}
-</style>
 {% endblock %}

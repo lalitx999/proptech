@@ -35,11 +35,7 @@ def home_view(request):
             property__owner__role__in=['admin', 'staff']
         ).order_by('-created_at')[:8]
 
-    # Fallback สุดท้าย: โพสต์ที่มีตัวเลขกำไร หรือยอดเข้าชมสูง
-    if not verified_listings.exists():
-        verified_listings = base_qs.filter(
-            avg_profit_3m__isnull=False
-        ).order_by('-avg_profit_3m', '-created_at')[:8]
+    # Fallback สุดท้าย: โพสต์ที่มียอดเข้าชมสูง
     if not verified_listings.exists():
         verified_listings = base_qs.order_by('-view_count')[:8]
 

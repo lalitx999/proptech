@@ -2,6 +2,7 @@ from django import forms
 from apps.properties.models import Property, PropertyImage
 from apps.properties.utils import extract_google_maps_coordinates, get_default_coordinates_for_location
 from apps.core.utils.files import validate_and_sanitize_image
+from apps.core.utils.html import sanitize_rich_html
 
 class PropertyForm(forms.ModelForm):
     """
@@ -39,25 +40,7 @@ class PropertyForm(forms.ModelForm):
 
     def clean_desc(self):
         desc = self.cleaned_data.get('desc', '').strip()
-        if desc:
-            allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
-            allowed_attrs = {
-                'a': ['href', 'title', 'target', 'rel', 'class'],
-                'span': ['style', 'class'],
-                'font': ['color'],
-                '*': ['style', 'class']
-            }
-            try:
-                import bleach
-                try:
-                    from bleach.css_sanitizer import CSSSanitizer
-                    css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
-                    desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
-                except Exception:
-                    desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, strip=True)
-            except Exception:
-                pass
-        return desc
+        return sanitize_rich_html(desc)
 
     def clean(self):
         cleaned_data = super().clean()

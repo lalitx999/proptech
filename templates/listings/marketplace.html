@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}ค้นหาร้านเซ้ง & พื้นที่ธุรกิจทั่วไทย — เซ้งร้านด่วน.com{% endblock %}
-{% block meta_description %}ค้นหาร้านเซ้ง กิจการ และทำเลทองทั่วไทย คาเฟ่ ร้านอาหาร ชาบู นวดสปา ซาลอน พร้อมงบกำไรขาดทุน 3 เดือนโปร่งใส ปักหมุดพิกัดจริง{% endblock %}
+{% block meta_description %}ค้นหาร้านเซ้ง กิจการ และทำเลทองทั่วไทย คาเฟ่ ร้านอาหาร ชาบู นวดสปา ซาลอน พร้อมราคาเซ้งและค่าเช่าโปร่งใส ปักหมุดพิกัดจริง{% endblock %}
 
 {# SEO: canonical + noindex logic for faceted search #}
 {% block canonical %}{% if seo_has_filters %}{{ site_url }}/listings/{% elif page_obj.number > 1 %}{{ site_url }}/listings/?page={{ page_obj.number }}{% else %}{{ site_url }}/listings/{% endif %}{% endblock %}
@@ -18,7 +18,7 @@
       "@type": "CollectionPage",
       "@id": "{{ site_url }}/listings/#collection",
       "name": "ค้นหาร้านเซ้ง & ธุรกิจทั่วไทย — เซ้งร้านด่วน.com",
-      "description": "คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลรายได้ กำไรเฉลี่ย 3 เดือน และสัญญาชัดเจน",
+      "description": "คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลราคาเซ้ง ค่าเช่า และสัญญาชัดเจน",
       "url": "{{ site_url }}/listings/"
     },
     {
@@ -90,7 +90,7 @@
                     ค้นหาร้านเซ้ง & ธุรกิจทั่วไทย
                 </h1>
                 <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-300 max-w-xl line-clamp-1 sm:line-clamp-none">
-                    คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลรายได้ กำไรเฉลี่ย 3 เดือน และสัญญาชัดเจน
+                    คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลราคาเซ้ง ค่าเช่า และสัญญาชัดเจน
                 </p>
             </div>
         </div>

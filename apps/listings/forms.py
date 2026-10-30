@@ -17,8 +17,8 @@ class ListingForm(forms.ModelForm):
         fields = [
             'type', 'price', 'monthly_rent', 'security_deposit',
             'lease_remaining_months', 'lease_transfer_fee',
-            'lease_transfer_fee_payer', 'avg_revenue_3m',
-            'avg_profit_3m', 'includes_equipment', 'includes_staff'
+            'lease_transfer_fee_payer',
+            'includes_equipment', 'includes_staff'
         ]
 
     def clean_security_deposit(self):

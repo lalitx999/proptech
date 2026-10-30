@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize static %}
 
 {% block title %}ศูนย์ควบคุมระบบหลังบ้าน — เซ้งร้านด่วน.com (Admin Command Center){% endblock %}
 
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/form_widgets.css' %}?v=20261030">
 <style nonce="{{ request.csp_nonce }}">
     /* Clean, smooth horizontal scroll container for tables */
     .admin-table-scroll {
@@ -2040,9 +2041,11 @@
                             </div>
 
                             <div class="space-y-1">
-                                <label class="block font-bold text-neutral-700">จุดเด่น & รายละเอียดร้าน</label>
-                                <textarea name="description" id="fast-create-description" rows="3" placeholder="ทำเลติดถนนใหญ่ ใกล้สถานีรถไฟฟ้า พร้อมสูตรและฐานลูกค้าประจำ..."
-                                          class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs focus:outline-none focus:border-brand-500"></textarea>
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                    <label class="block font-bold text-neutral-700">จุดเด่น & รายละเอียดร้าน</label>
+                                    <span class="text-[10px] text-brand-600 font-medium">คลุมดำข้อความเพื่อเปลี่ยนสี ไฮไลท์ หรือใส่ลิงก์</span>
+                                </div>
+                                {% include "includes/rich_text_editor.html" with rte_name="description" rte_id="fast-create-description" rte_min_height="120px" rte_placeholder="ทำเลติดถนนใหญ่ ใกล้สถานีรถไฟฟ้า พร้อมสูตรและฐานลูกค้าประจำ..." %}
                             </div>
 
                             <div class="space-y-1">
@@ -2110,16 +2113,6 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
                                 <div class="space-y-1">
-                                    <label class="block font-bold text-neutral-700">กำไรสุทธิ/ด. (3 ด.)</label>
-                                    <input type="number" name="avg_profit_3m" placeholder="65000"
-                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-brand-500">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="block font-bold text-neutral-700">รายได้เฉลี่ย/ด. (3 ด.)</label>
-                                    <input type="number" name="avg_revenue_3m" placeholder="220000"
-                                           class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
-                                </div>
-                                <div class="space-y-1">
                                     <label class="block font-bold text-neutral-700">สัญญาคงเหลือ (ด.)</label>
                                     <input type="number" name="remaining_lease_months" value="18"
                                            class="w-full rounded-xl border border-neutral-300 bg-white p-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
@@ -2174,10 +2167,19 @@
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="block font-bold text-neutral-700">เลือกรูปถ่ายร้านค้า (เลือกได้พร้อมกันหลายรูป)</label>
-                                <input type="file" name="images" multiple accept="image/jpeg,image/png,image/webp"
+                                <label class="block font-bold text-neutral-700">เลือกรูปถ่ายร้านค้า (เลือกได้หลายรูป กดเลือกเพิ่มได้เรื่อยๆ สูงสุด 8 รูป)</label>
+                                <input type="file" name="images" id="fast-create-images" multiple accept="image/jpeg,image/png,image/webp"
                                        class="w-full rounded-xl border border-dashed border-neutral-300 bg-white p-3 text-xs focus:outline-none focus:border-brand-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-600 hover:file:bg-brand-100 cursor-pointer">
-                                <p class="text-[10px] text-neutral-400">รองรับ JPG, PNG, WEBP • รูปภาพแรกจะถูกตั้งเป็นภาพหน้าปกประกาศโดยอัตโนมัติ</p>
+                                <p class="text-[10px] text-neutral-400">รองรับ JPG, PNG, WEBP • ลากรูปเพื่อสลับลำดับ • รูปที่ 1 คือภาพหน้าปกประกาศ</p>
+                            </div>
+
+                            <!-- Sortable preview of the photos about to be uploaded -->
+                            <div id="fast-create-photos" class="hidden space-y-2">
+                                <div class="text-[11px] font-bold text-neutral-600 flex items-center justify-between">
+                                    <span>ลำดับรูป (<span id="fast-create-photos-count">0</span>/8)</span>
+                                    <button type="button" id="fast-create-photos-clear" class="text-[10px] text-red-500 hover:text-red-700 font-bold cursor-pointer">ล้างรูปทั้งหมด</button>
+                                </div>
+                                <div id="fast-create-photos-grid" class="grid grid-cols-3 gap-2"></div>
                             </div>
                         </div>
 
@@ -2650,6 +2652,8 @@
 </div>
 
 <!-- Admin Dashboard JavaScript (Strict CSP Nonce Compliant) -->
+<script src="{% static 'js/rich_text_editor.js' %}?v=20261030" nonce="{{ request.csp_nonce }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ request.csp_nonce }}"></script>
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {
     // 1. Fast Post Modal Controls
@@ -3109,7 +3113,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (lineInput) lineInput.value = line || '';
             if (fbInput) fbInput.value = facebook || '';
             if (districtInput && location) districtInput.value = location;
-            if (descInput) descInput.value = (notes ? notes + '\n\n' : '') + 'ติดต่อเจ้าของ: ' + (name || '-') + (phone ? ' โทร ' + phone : '') + (line ? ' LINE: ' + line : '') + (facebook ? ' FB: ' + facebook : '');
+            if (descInput) {
+                descInput.value = (notes ? notes + '\n\n' : '') + 'ติดต่อเจ้าของ: ' + (name || '-') + (phone ? ' โทร ' + phone : '') + (line ? ' LINE: ' + line : '') + (facebook ? ' FB: ' + facebook : '');
+                descInput.dispatchEvent(new Event('rte:reload'));
+            }
 
             // Open Fast Post Modal
             if (fastPostModal) {
@@ -3118,6 +3125,165 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // 9. Fast Post Photo Picker (สะสมรูป, ลากเรียงลำดับ, ตั้งปก, ลบรูป ก่อนอัปโหลด)
+    // The file input itself is rewritten (DataTransfer) in the order shown, so the
+    // server keeps saving request.FILES['images'] in order with the first as cover.
+    var photoInput = document.getElementById('fast-create-images');
+    var photoBox = document.getElementById('fast-create-photos');
+    var photoGrid = document.getElementById('fast-create-photos-grid');
+    var photoCount = document.getElementById('fast-create-photos-count');
+    var photoClear = document.getElementById('fast-create-photos-clear');
+    var MAX_PHOTOS = 8;
+    var canRewriteFiles = (function () {
+        try { return !!new DataTransfer().items; } catch (err) { return false; }
+    })();
+
+    if (photoInput && photoGrid && canRewriteFiles) {
+        var photos = [];  // [{id, file, src}] in display order
+        var nextPhotoId = 1;
+
+        function syncPhotoInput() {
+            var dt = new DataTransfer();
+            photos.forEach(function (p) { dt.items.add(p.file); });
+            photoInput.files = dt.files;
+        }
+
+        function makeBtn(cls, label, title) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = cls + ' w-6 h-6 rounded-lg bg-white/90 hover:bg-white text-neutral-800 text-[11px] font-black shadow flex items-center justify-center cursor-pointer disabled:opacity-30';
+            b.textContent = label;
+            b.title = title;
+            return b;
+        }
+
+        function renderPhotos() {
+            photoGrid.innerHTML = '';
+            photos.forEach(function (p, idx) {
+                var card = document.createElement('div');
+                card.className = 'fast-photo-card relative rounded-xl overflow-hidden bg-neutral-100 aspect-4/3 border-2 cursor-grab ' +
+                    (idx === 0 ? 'border-amber-400 ring-2 ring-amber-300/80' : 'border-neutral-200');
+                card.dataset.id = p.id;
+
+                var img = document.createElement('img');
+                img.src = p.src;
+                img.alt = 'รูปที่ ' + (idx + 1);
+                img.className = 'w-full h-full object-cover pointer-events-none';
+                card.appendChild(img);
+
+                var badge = document.createElement('span');
+                badge.className = 'absolute top-1 left-1 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow ' +
+                    (idx === 0 ? 'bg-amber-500 text-white' : 'bg-neutral-900/80 text-white');
+                badge.textContent = idx === 0 ? '★ ปก' : 'รูปที่ ' + (idx + 1);
+                card.appendChild(badge);
+
+                var del = makeBtn('fast-photo-del', '✕', 'ลบรูปนี้');
+                del.classList.add('absolute', 'top-1', 'right-1', 'text-red-600');
+                card.appendChild(del);
+
+                var bar = document.createElement('div');
+                bar.className = 'absolute bottom-1 inset-x-1 flex items-center justify-between gap-1';
+                var left = makeBtn('fast-photo-left', '◀', 'เลื่อนไปซ้าย');
+                left.disabled = idx === 0;
+                var cover = makeBtn('fast-photo-cover', '★', 'ตั้งเป็นภาพหน้าปก');
+                cover.classList.add('text-amber-600');
+                if (idx === 0) cover.classList.add('invisible');
+                var right = makeBtn('fast-photo-right', '▶', 'เลื่อนไปขวา');
+                right.disabled = idx === photos.length - 1;
+                bar.appendChild(left);
+                bar.appendChild(cover);
+                bar.appendChild(right);
+                card.appendChild(bar);
+
+                photoGrid.appendChild(card);
+            });
+            if (photoCount) photoCount.textContent = photos.length;
+            if (photoBox) photoBox.classList.toggle('hidden', photos.length === 0);
+            syncPhotoInput();
+        }
+
+        function indexOfCard(card) {
+            var id = Number(card.dataset.id);
+            return photos.findIndex(function (p) { return p.id === id; });
+        }
+
+        photoInput.addEventListener('change', function () {
+            var picked = Array.from(this.files || []).filter(function (f) {
+                return /^image\/(jpeg|png|webp)$/.test(f.type);
+            });
+            // Browser just replaced input.files with the new pick; previously
+            // chosen photos are still in `photos`, so restore them right away.
+            var room = MAX_PHOTOS - photos.length;
+            if (picked.length > room) {
+                alert('อัปโหลดได้สูงสุด ' + MAX_PHOTOS + ' รูปต่อประกาศ รูปที่เกินจะไม่ถูกเพิ่มครับ');
+                picked = picked.slice(0, Math.max(room, 0));
+            }
+            if (!picked.length) {
+                syncPhotoInput();
+                return;
+            }
+            var pending = picked.length;
+            picked.forEach(function (file) {
+                var entry = { id: nextPhotoId++, file: file, src: '' };
+                photos.push(entry);
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    entry.src = evt.target.result;
+                    if (--pending === 0) renderPhotos();
+                };
+                reader.onerror = function () {
+                    if (--pending === 0) renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            });
+            syncPhotoInput();
+        });
+
+        photoGrid.addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            e.preventDefault();
+            var i = indexOfCard(btn.closest('.fast-photo-card'));
+            if (i < 0) return;
+            if (btn.classList.contains('fast-photo-del')) {
+                photos.splice(i, 1);
+            } else if (btn.classList.contains('fast-photo-left') && i > 0) {
+                photos.splice(i - 1, 0, photos.splice(i, 1)[0]);
+            } else if (btn.classList.contains('fast-photo-right') && i < photos.length - 1) {
+                photos.splice(i + 1, 0, photos.splice(i, 1)[0]);
+            } else if (btn.classList.contains('fast-photo-cover')) {
+                photos.unshift(photos.splice(i, 1)[0]);
+            }
+            renderPhotos();
+        });
+
+        if (photoClear) {
+            photoClear.addEventListener('click', function () {
+                photos = [];
+                renderPhotos();
+            });
+        }
+
+        if (typeof Sortable !== 'undefined') {
+            new Sortable(photoGrid, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                filter: 'button',
+                preventOnFilter: false,
+                onEnd: function () {
+                    var byId = {};
+                    photos.forEach(function (p) { byId[p.id] = p; });
+                    photos = Array.from(photoGrid.querySelectorAll('.fast-photo-card')).map(function (card) {
+                        return byId[Number(card.dataset.id)];
+                    });
+                    renderPhotos();
+                }
+            });
+        }
+    }
 
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();

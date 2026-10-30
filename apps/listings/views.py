@@ -150,23 +150,6 @@ def consignment_wizard_view(request):
         from apps.listings.models import FeePayer
         fee_payer = request.POST.get('lease_transfer_fee_payer', FeePayer.FREE)
 
-        # Revenue & Profit
-        avg_revenue = None
-        rev_raw = request.POST.get('avg_revenue_3m', '').strip()
-        if rev_raw:
-            try:
-                avg_revenue = Decimal(rev_raw)
-            except (ValueError, InvalidOperation):
-                avg_revenue = None
-
-        avg_profit = None
-        profit_raw = request.POST.get('avg_profit_3m', '').strip()
-        if profit_raw:
-            try:
-                avg_profit = Decimal(profit_raw)
-            except (ValueError, InvalidOperation):
-                avg_profit = None
-
         # Dimensions & Specs
         try:
             area_sqm = Decimal(request.POST.get('area_sqm', '0') or '0')
@@ -269,8 +252,6 @@ def consignment_wizard_view(request):
             lease_remaining_months=lease_months,
             lease_transfer_fee=lease_transfer_fee,
             lease_transfer_fee_payer=fee_payer,
-            avg_revenue_3m=avg_revenue,
-            avg_profit_3m=avg_profit,
             includes_equipment=includes_equipment,
             includes_staff=includes_staff,
             contact_phone=contact_phone,

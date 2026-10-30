@@ -393,14 +393,14 @@
                     {% endif %}
                 </div>
 
-                <!-- 2.2 Financial Transparency 4-Block Grid (ความโปร่งใสทางการเงิน สไตล์ เซ้งร้าน.com) -->
+                <!-- 2.2 Financial Transparency 2-Block Grid (ความโปร่งใสทางการเงิน สไตล์ เซ้งร้าน.com) -->
                 <div class="rounded-3xl border border-brand-200/80 bg-gradient-to-br from-brand-50/70 via-rose-50/40 to-white p-5 sm:p-6 shadow-sm">
                     <div class="flex items-center gap-2 mb-4 pb-2 border-b border-brand-100">
                         <i data-lucide="calculator" class="w-5 h-5 text-brand-600"></i>
                         <h2 class="text-base font-bold text-neutral-900">ตัวเลขความโปร่งใสทางการเงิน (Financial Highlights)</h2>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 font-sans">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 font-sans">
                         <!-- 1. ราคาเซ้ง -->
                         <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
                             <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">ราคาเซ้งทั้งหมด</span>
@@ -417,21 +417,6 @@
                             </div>
                         </div>
 
-                        <!-- 3. ยอดขายเฉลี่ย -->
-                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
-                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">รายได้เฉลี่ย (3 ด.)</span>
-                            <div class="text-lg sm:text-xl font-bold text-emerald-600 mt-0.5">
-                                {% if listing.avg_revenue_3m %}฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }}{% else %}—{% endif %}
-                            </div>
-                        </div>
-
-                        <!-- 4. กำไรสุทธิเฉลี่ย -->
-                        <div class="rounded-2xl bg-white p-3.5 border border-brand-100 shadow-2xs">
-                            <span class="text-[10px] sm:text-xs font-semibold text-neutral-400 uppercase tracking-wider block">กำไรเฉลี่ยสุทธิ</span>
-                            <div class="text-lg sm:text-xl font-black text-emerald-700 mt-0.5">
-                                {% if listing.avg_profit_3m %}฿{{ listing.avg_profit_3m|floatformat:0|intcomma }}{% else %}—{% endif %}
-                            </div>
-                        </div>
                     </div>
                 </div>
 

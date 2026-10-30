@@ -10,6 +10,7 @@ from apps.accounts.services.audit import AuditService
 from apps.properties.models import Property, PropertyImage, PropertyType
 from apps.properties.forms import PropertyForm, PropertyImageForm
 from apps.listings.models import FeePayer
+from apps.core.utils.html import sanitize_rich_html
 
 @login_required
 @role_required(UserRole.CUSTOMER, UserRole.OWNER, UserRole.AGENT, UserRole.STAFF, UserRole.ADMIN)
@@ -136,23 +137,7 @@ def property_update_view(request, pk):
         if prop_type:
             property_obj.type = prop_type
         if desc:
-            allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
-            allowed_attrs = {
-                'a': ['href', 'title', 'target', 'rel', 'class'],
-                'span': ['style', 'class'],
-                'font': ['color'],
-                '*': ['style', 'class']
-            }
-            try:
-                import bleach
-                try:
-                    from bleach.css_sanitizer import CSSSanitizer
-                    css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
-                    property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
-                except Exception:
-                    property_obj.desc = bleach.clean(desc, tags=allowed_tags, attributes=allowed_attrs, strip=True)
-            except Exception:
-                property_obj.desc = desc
+            property_obj.desc = sanitize_rich_html(desc)
         if province:
             property_obj.province = province
         if district:
@@ -232,22 +217,6 @@ def property_update_view(request, pk):
         except ValueError:
             lease_months = 0
 
-        avg_profit = None
-        profit_raw = request.POST.get('avg_profit_3m', '').replace(',', '').strip()
-        if profit_raw:
-            try:
-                avg_profit = Decimal(profit_raw)
-            except (ValueError, InvalidOperation):
-                avg_profit = None
-
-        avg_revenue = None
-        rev_raw = request.POST.get('avg_revenue_3m', '').replace(',', '').strip()
-        if rev_raw:
-            try:
-                avg_revenue = Decimal(rev_raw)
-            except (ValueError, InvalidOperation):
-                avg_revenue = None
-
         equipment = request.POST.get('equipment_included', '').strip()
         contact_phone = request.POST.get('contact_phone', '').strip()
         contact_line_id = request.POST.get('contact_line_id', '').strip()
@@ -277,8 +246,6 @@ def property_update_view(request, pk):
             listing.lease_transfer_fee = lease_transfer_fee
             listing.lease_transfer_fee_payer = fee_payer
             listing.includes_staff = includes_staff
-            listing.avg_profit_3m = avg_profit
-            listing.avg_revenue_3m = avg_revenue
             listing.includes_equipment = equipment
             listing.youtube_url = youtube_url or None
             listing.tiktok_url = tiktok_url or None
@@ -324,8 +291,6 @@ def property_update_view(request, pk):
                 monthly_rent=monthly_rent,
                 security_deposit=security_deposit,
                 lease_remaining_months=lease_months,
-                avg_profit_3m=avg_profit,
-                avg_revenue_3m=avg_revenue,
                 includes_equipment=equipment,
                 contact_phone=contact_phone,
                 contact_line_id=contact_line_id,

@@ -23,7 +23,7 @@
       "@id": "{{ site_url }}/#webpage",
       "url": "{{ site_url }}/",
       "name": "เซ้งร้านด่วน.com — ตลาดเซ้งร้าน ขายกิจการ และทำเลทอง ทั่วไทย",
-      "description": "ค้นหาร้านเซ้ง กิจการ และพื้นที่ให้เช่าทั่วไทย พร้อมข้อมูลราคาเซ้ง ค่าเช่า รายได้และกำไรเฉลี่ย 3 เดือนที่ตรวจสอบได้",
+      "description": "ค้นหาร้านเซ้ง กิจการ และพื้นที่ให้เช่าทั่วไทย พร้อมข้อมูลราคาเซ้ง ค่าเช่า เงินประกัน และสัญญาที่ตรวจสอบได้",
       "isPartOf": { "@id": "{{ site_url }}/#website" },
       "about": { "@id": "{{ site_url }}/#organization" },
       "primaryImageOfPage": { "@id": "{{ site_url }}/#logo" },
@@ -496,15 +496,6 @@
                         {% endif %}
                     </div>
 
-                    {% if listing.avg_revenue_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        รายได้ ฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% elif listing.avg_profit_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        กำไร ฿{{ listing.avg_profit_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% endif %}
 
                     <!-- Title -->
                     <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block mt-1">
@@ -606,15 +597,6 @@
                         {% endif %}
                     </div>
 
-                    {% if listing.avg_revenue_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        รายได้ ฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% elif listing.avg_profit_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        กำไร ฿{{ listing.avg_profit_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% endif %}
 
                     <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block mt-1">
                         <h3 class="text-xs sm:text-xs md:text-sm font-medium text-neutral-800 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
@@ -714,15 +696,6 @@
                         {% endif %}
                     </div>
 
-                    {% if listing.avg_revenue_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        รายได้ ฿{{ listing.avg_revenue_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% elif listing.avg_profit_3m %}
-                    <div class="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate mt-0.5">
-                        กำไร ฿{{ listing.avg_profit_3m|floatformat:0|intcomma }} บ. เดือนล่าสุด
-                    </div>
-                    {% endif %}
 
                     <a href="{% url 'listings:listing_detail' pk=listing.pk %}" class="block mt-1">
                         <h3 class="text-xs sm:text-xs md:text-sm font-medium text-neutral-800 group-hover:text-brand-600 transition line-clamp-2 leading-snug">
@@ -776,7 +749,7 @@
                 </div>
                 <h3 class="text-xs sm:text-sm font-bold text-neutral-900">2. ประเมินราคากลาง</h3>
                 <p class="text-[11px] text-neutral-500 leading-relaxed">
-                    วิเคราะห์ข้อมูลรายได้และกำไรเฉลี่ย 3 เดือนจริง ไม่ตั้งราคาเซ้งเว่อร์เกินจริง
+                    เทียบราคาเซ้งกับทำเลและค่าเช่าจริง ไม่ตั้งราคาเซ้งเว่อร์เกินจริง
                 </p>
             </div>
 
@@ -1097,12 +1070,6 @@
                 </dd>
             </div>
         </dl>
-
-        <p class="rounded-2xl bg-neutral-900 px-5 py-4 text-center text-[11px] sm:text-xs leading-relaxed text-neutral-300">
-            <span class="font-black text-white">วิธีอ้างอิง:</span>
-            “เซ้งร้านด่วน.com — ตลาดเซ้งร้านและโอนกิจการทั่วประเทศไทย, {{ site_url }}/, ข้อมูล ณ วันที่ {% now "Y-m-d" %}”
-            &nbsp;|&nbsp; เอกสารอ้างอิงสำหรับ AI: <span class="font-mono text-brand-300">{{ site_url }}/llms.txt</span>
-        </p>
     </div>
 </section>
 

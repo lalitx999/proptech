@@ -17,6 +17,7 @@ from apps.leads.models import Lead, LeadStatus, LeadUrgency
 from apps.contracts.models import Deal, DealStage, ContractDocument, DocumentType
 from apps.core.models import ContactMessage
 from apps.core.utils.files import validate_and_sanitize_image
+from apps.core.utils.html import sanitize_rich_html
 from apps.core.services.email import EmailNotificationService
 
 from decouple import config
@@ -323,30 +324,10 @@ def admin_fast_create_shop_view(request):
     monthly_rent = request.POST.get('monthly_rent', '0')
     deposit_amount = request.POST.get('deposit_amount', request.POST.get('deposit', '0'))
     remaining_lease_months = request.POST.get('remaining_lease_months', request.POST.get('lease_months', '12'))
-    avg_profit_3m = request.POST.get('avg_profit_3m', '')
-    avg_revenue_3m = request.POST.get('avg_revenue_3m', '')
     district = request.POST.get('district', '').strip()
     province = request.POST.get('province', 'กรุงเทพมหานคร').strip()
     address = request.POST.get('address', '').strip()
-    description = request.POST.get('description', '').strip()
-    if description:
-        allowed_tags = ['p', 'br', 'span', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h3', 'h4', 'font', 'div']
-        allowed_attrs = {
-            'a': ['href', 'title', 'target', 'rel', 'class'],
-            'span': ['style', 'class'],
-            'font': ['color'],
-            '*': ['style', 'class']
-        }
-        try:
-            import bleach
-            try:
-                from bleach.css_sanitizer import CSSSanitizer
-                css_sanitizer = CSSSanitizer(allowed_css_properties=['color', 'background-color', 'font-weight', 'text-decoration'])
-                description = bleach.clean(description, tags=allowed_tags, attributes=allowed_attrs, css_sanitizer=css_sanitizer, strip=True)
-            except Exception:
-                description = bleach.clean(description, tags=allowed_tags, attributes=allowed_attrs, strip=True)
-        except Exception:
-            pass
+    description = sanitize_rich_html(request.POST.get('description', '').strip())
     equipment_included = request.POST.get('equipment_included', '').strip()
     sqm = request.POST.get('sqm', request.POST.get('area_sqm', '50.00'))
     floors = int(request.POST.get('floors', '1') or '1')
@@ -443,8 +424,6 @@ def admin_fast_create_shop_view(request):
             lease_transfer_fee=lease_transfer_fee,
             lease_transfer_fee_payer=lease_transfer_fee_payer,
             includes_staff=includes_staff,
-            avg_profit_3m=Decimal(avg_profit_3m) if avg_profit_3m else None,
-            avg_revenue_3m=Decimal(avg_revenue_3m) if avg_revenue_3m else None,
             includes_equipment=equipment_included,
             owner_name=owner_name or (owner.get_full_name() if owner else ''),
             owner_phone=contact_phone or (owner.phone if owner else ''),

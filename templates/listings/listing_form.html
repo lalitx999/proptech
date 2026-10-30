@@ -72,21 +72,6 @@
                 <p class="text-[11px] text-neutral-400">รองรับไฟล์ JPG, PNG, WebP ขนาดไม่เกิน 10MB ต่อรูป รูปแรกจะเป็นรูปภาพหน้าปก</p>
             </div>
 
-            <div class="rounded-xl bg-brand-50 p-4 border border-brand-100 space-y-3">
-                <h3 class="text-xs font-bold text-brand-800 uppercase tracking-wider">ข้อมูลทางการเงินเพื่อดึงดูดผู้ซื้อ (ถ้ามี)</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-neutral-700">ยอดขายเฉลี่ย (3 เดือนล่าสุด)</label>
-                        <input type="number" step="1000" name="avg_revenue_3m" value="{{ form.avg_revenue_3m.value|default:'' }}" placeholder="บาท/เดือน"
-                               class="mt-1 block w-full rounded-lg border border-neutral-300 bg-white p-2 text-xs shadow-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-neutral-700">กำไรสุทธิเฉลี่ย (3 เดือนล่าสุด)</label>
-                        <input type="number" step="1000" name="avg_profit_3m" value="{{ form.avg_profit_3m.value|default:'' }}" placeholder="บาท/เดือน"
-                               class="mt-1 block w-full rounded-lg border border-neutral-300 bg-white p-2 text-xs shadow-sm">
-                    </div>
-                </div>
-            </div>
 
             <div>
                 <label class="block text-sm font-medium text-neutral-700">รายการอุปกรณ์และทรัพย์สินที่ยกให้</label>
