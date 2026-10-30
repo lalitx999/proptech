@@ -47,8 +47,8 @@ class VIPMembershipAndQuotaTests(TestCase):
             email_verified=True,
         )
 
-    def test_unauthenticated_user_can_view_vip_and_packages_page(self):
-        """Unauthenticated guests can view VIP membership and packages page without login."""
+    def test_unauthenticated_user_can_view_vip_membership_page(self):
+        """Unauthenticated guests can view the VIP membership page without login."""
         url = reverse("accounts:vip_membership")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -56,10 +56,18 @@ class VIPMembershipAndQuotaTests(TestCase):
         self.assertContains(response, "Super VIP")
         self.assertContains(response, "ผู้เข้าชมทั่วไป")
 
-        # Core package alias
-        packages_url = reverse("core:packages")
-        res_pkg = self.client.get(packages_url)
-        self.assertEqual(res_pkg.status_code, 200)
+    def test_legacy_package_aliases_redirect_to_canonical_vip_url(self):
+        """
+        WHY SEO: /packages/ and /pricing/ used to render the exact same VIP pricing
+        document as /accounts/vip/, creating three indexable duplicates. They are now
+        permanent (301) redirects to the single canonical URL.
+        """
+        canonical = reverse("accounts:vip_membership")
+        for route in ("core:packages", "core:pricing"):
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route))
+                self.assertEqual(response.status_code, 301)
+                self.assertEqual(response["Location"], canonical)
 
     def test_unauthenticated_user_post_slip_redirects_to_login(self):
         """Unauthenticated guests attempting to submit a payment slip are redirected to login."""

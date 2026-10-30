@@ -31,6 +31,17 @@ def marketplace_view(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
+    # WHY SEO CRITICAL: Faceted/filtered search result URLs (?q=...&province=...&price_min=...)
+    # are programmatically infinite duplicates of the canonical /listings/ document. They are
+    # served as `noindex, follow` with a canonical pointing at /listings/ so link equity
+    # consolidates on the one page that should rank. Pure pagination stays indexable with a
+    # self-referencing canonical.
+    filter_keys = (
+        'q', 'type', 'category', 'property_type', 'province', 'district',
+        'price_min', 'price_max', 'rent_min', 'rent_max',
+    )
+    has_filters = any(request.GET.get(key) for key in filter_keys)
+
     context = {
         'page_obj': page_obj,
         'listings': page_obj.object_list,
@@ -38,6 +49,7 @@ def marketplace_view(request):
         'listing_types': ListingType.choices,
         'property_types': PropertyType.choices,
         'current_params': request.GET.dict(),
+        'seo_has_filters': has_filters,
     }
 
     if request.headers.get('HX-Request'):

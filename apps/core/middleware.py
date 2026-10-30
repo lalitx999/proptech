@@ -50,3 +50,68 @@ class LegacyWordpressRedirectMiddleware:
             return HttpResponsePermanentRedirect(reverse('listings:marketplace'))
 
         return self.get_response(request)
+
+
+# ==============================================================================
+# SEARCH-ENGINE INDEX CONTROL (META ROBOTS / X-ROBOTS-TAG)
+# ==============================================================================
+# WHY SEO CRITICAL:
+# Authenticated dashboards, editing wizards and user-private pages must never be
+# indexed. Instead of sprinkling `{% block robots %}` into a dozen templates we
+# enforce it once, at the response layer, via the X-Robots-Tag HTTP header.
+# Header-based directives are honoured by Googlebot, Bingbot and AI crawlers and
+# are impossible to forget when a new private view is added under these prefixes.
+SEO_NOINDEX_PREFIXES = (
+    '/accounts/',          # login, register, 2FA, OTP, VIP slip management
+    '/properties/',        # "my shops" CRUD
+    '/contracts/',          # broker CRM / deal pipeline
+    '/leads/',             # lead inboxes
+    '/admin-dashboard/',   # internal command center
+    '/dev-admin-only/',    # Django admin (dev only)
+    '/listings/create/',   # consignment wizard
+    '/listings/manage/',   # my listings
+    '/listings/favorites/',# personal favourites
+    '/listings/compare/',  # personal comparison matrix
+)
+
+# Public commercial landing pages that live *inside* the prefixes above and must
+# stay indexable (they are also listed in sitemap.xml and llms.txt).
+SEO_INDEXABLE_EXACT_PATHS = (
+    '/accounts/vip',
+)
+
+# Private dynamic sub-paths (e.g. /listings/12/approve/)
+SEO_NOINDEX_PATTERNS = (
+    re.compile(r'^/listings/\d+/approve/?$'),
+)
+
+
+class SeoIndexControlMiddleware:
+    """Adds `X-Robots-Tag: noindex` to private pages and to every 4xx/5xx response."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def _is_private(self, path):
+        normalized = path.rstrip('/') or '/'
+        if normalized in SEO_INDEXABLE_EXACT_PATHS:
+            return False
+        if any(path.startswith(prefix) for prefix in SEO_NOINDEX_PREFIXES):
+            return True
+        return any(pattern.match(path) for pattern in SEO_NOINDEX_PATTERNS)
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
+        # Only HTML documents carry meta/header indexing directives.
+        if not response.get('Content-Type', '').startswith('text/html'):
+            return response
+
+        # Never override a directive that a view already set deliberately.
+        if response.get('X-Robots-Tag'):
+            return response
+
+        if self._is_private(request.path) or response.status_code >= 400:
+            response['X-Robots-Tag'] = 'noindex, nofollow'
+
+        return response

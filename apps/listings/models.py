@@ -267,6 +267,37 @@ class Listing(models.Model):
         return reverse('listings:listing_detail', kwargs={'pk': self.pk})
 
     @builtins.property
+    def schema_availability(self):
+        """
+        WHY SEO / AEO CRITICAL:
+        The schema.org `Offer.availability` value must mirror the real deal state. A
+        hardcoded "InStock" keeps telling Google (and AI answer engines) that an already
+        sold-out shop is still available, which destroys trust signals and can trigger
+        rich-result penalties.
+        """
+        if self.status == ListingStatus.CLOSED:
+            return 'https://schema.org/SoldOut'
+        if self.status == ListingStatus.UNDER_NEGOTIATION:
+            return 'https://schema.org/LimitedAvailability'
+        if self.status == ListingStatus.PUBLISHED:
+            return 'https://schema.org/InStock'
+        return 'https://schema.org/OutOfStock'
+
+    @builtins.property
+    def offer_valid_until(self):
+        """
+        Rolling 12-month validity date for the schema.org Offer node.
+
+        WHY: `Offer.priceValidUntil` must never be a hardcoded future year that silently
+        expires; deriving it from the last modification keeps the structured data valid
+        for every listing, forever.
+        """
+        from datetime import timedelta
+        from django.utils import timezone
+        base = self.updated_at or self.created_at or timezone.now()
+        return (base + timedelta(days=365)).date()
+
+    @builtins.property
     def display_owner_name(self):
         if self.owner_name:
             return self.owner_name

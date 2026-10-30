@@ -22,9 +22,9 @@ class Command(BaseCommand):
 
         # 1. Accounts
         admin_user, _ = User.objects.get_or_create(
-            username='admin@sengranduan.com',
+            username='admin@xn--72ch2atb1d4a4f1fudfc.com',
             defaults={
-                'email': 'admin@sengranduan.com',
+                'email': 'admin@xn--72ch2atb1d4a4f1fudfc.com',
                 'first_name': 'ผู้ดูแลระบบ',
                 'last_name': 'แอดมิน',
                 'role': UserRole.ADMIN,
@@ -69,9 +69,9 @@ class Command(BaseCommand):
         free_owner.save()
 
         agent_user, _ = User.objects.get_or_create(
-            username='agent.somchai@sengranduan.com',
+            username='agent.somchai@xn--72ch2atb1d4a4f1fudfc.com',
             defaults={
-                'email': 'agent.somchai@sengranduan.com',
+                'email': 'agent.somchai@xn--72ch2atb1d4a4f1fudfc.com',
                 'first_name': 'สมชาย',
                 'last_name': 'มือทอง (นายหน้า)',
                 'role': UserRole.AGENT,

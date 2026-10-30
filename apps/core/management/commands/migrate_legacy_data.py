@@ -25,9 +25,9 @@ class Command(BaseCommand):
 
         # 1. Ensure Benchmark Users
         admin_user, _ = User.objects.get_or_create(
-            email='admin@sengranduan.com',
+            email='admin@xn--72ch2atb1d4a4f1fudfc.com',
             defaults={
-                'username': 'admin@sengranduan.com',
+                'username': 'admin@xn--72ch2atb1d4a4f1fudfc.com',
                 'first_name': 'ผู้ดูแลระบบ',
                 'last_name': 'สูงสุด',
                 'role': UserRole.ADMIN,
@@ -41,9 +41,9 @@ class Command(BaseCommand):
             admin_user.save()
 
         agent_somchai, _ = User.objects.get_or_create(
-            email='agent.somchai@sengranduan.com',
+            email='agent.somchai@xn--72ch2atb1d4a4f1fudfc.com',
             defaults={
-                'username': 'agent.somchai@sengranduan.com',
+                'username': 'agent.somchai@xn--72ch2atb1d4a4f1fudfc.com',
                 'first_name': 'สมชาย',
                 'last_name': 'ใจดี (ชลบุรี-พัทยา)',
                 'role': UserRole.AGENT,
@@ -56,9 +56,9 @@ class Command(BaseCommand):
             agent_somchai.save()
 
         agent_ying, _ = User.objects.get_or_create(
-            email='agent.ying@sengranduan.com',
+            email='agent.ying@xn--72ch2atb1d4a4f1fudfc.com',
             defaults={
-                'username': 'agent.ying@sengranduan.com',
+                'username': 'agent.ying@xn--72ch2atb1d4a4f1fudfc.com',
                 'first_name': 'สุภาวดี',
                 'last_name': 'มีทรัพย์ (กทม.-เชียงใหม่)',
                 'role': UserRole.AGENT,

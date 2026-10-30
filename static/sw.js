@@ -3,7 +3,7 @@
 // Security Policy: Strict Zero-Sensitive-Cache Policy & Same-Origin Only
 // ==============================================================================
 
-const CACHE_VERSION = 'proptech-v1.0.3';
+const CACHE_VERSION = 'proptech-v1.0.4';
 const STATIC_CACHE_NAME = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `dynamic-${CACHE_VERSION}`;
 

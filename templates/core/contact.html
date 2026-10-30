@@ -1,6 +1,54 @@
 {% extends "base.html" %}
 
 {% block title %}ติดต่อเรา — เซ้งร้านด่วน.com ช่องทางติดต่อทีมงานและสำนักงาน{% endblock %}
+{% block meta_description %}ติดต่อทีมงานเซ้งร้านด่วน.com โทร 087-666-1778 แชท LINE @shopforsale หรือส่งข้อความผ่านแบบฟอร์ม ทีมงานตอบกลับทุกวัน 08:00–21:00 น.{% endblock %}
+
+{% block canonical %}{{ site_url }}/contact/{% endblock %}
+{% block og_url %}{{ site_url }}/contact/{% endblock %}
+{% block hreflang_th %}{{ site_url }}/contact/{% endblock %}
+{% block hreflang_x_default %}{{ site_url }}/contact/{% endblock %}
+
+{% block extra_head %}
+<!-- Structured Data: ContactPage + Organization contactPoint (SEO & AEO — Google/AI contact extraction) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ContactPage",
+      "@id": "{{ site_url }}/contact/#webpage",
+      "url": "{{ site_url }}/contact/",
+      "name": "ติดต่อเรา — เซ้งร้านด่วน.com",
+      "description": "ช่องทางติดต่อทีมงานเซ้งร้านด่วน.com ทั้งทางโทรศัพท์ LINE และแบบฟอร์มออนไลน์",
+      "inLanguage": "th-TH",
+      "isPartOf": { "@id": "{{ site_url }}/#website" },
+      "about": { "@id": "{{ site_url }}/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "{{ site_url }}/#organization",
+      "name": "เซ้งร้านด่วน.com",
+      "url": "{{ site_url }}/",
+      "logo": "{{ site_url }}/static/images/logo.png",
+      "contactPoint": [{
+        "@type": "ContactPoint",
+        "telephone": "+66876661778",
+        "contactType": "customer support",
+        "areaServed": "TH",
+        "availableLanguage": ["th", "en"]
+      }]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "หน้าแรก", "item": "{{ site_url }}/" },
+        { "@type": "ListItem", "position": 2, "name": "ติดต่อเรา", "item": "{{ site_url }}/contact/" }
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="bg-[#fcfcfa] py-12 sm:py-16">

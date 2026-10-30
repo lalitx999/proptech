@@ -3,6 +3,11 @@
 {% block title %}ค้นหาร้านเซ้ง & พื้นที่ธุรกิจทั่วไทย — เซ้งร้านด่วน.com{% endblock %}
 {% block meta_description %}ค้นหาร้านเซ้ง กิจการ และทำเลทองทั่วไทย คาเฟ่ ร้านอาหาร ชาบู นวดสปา ซาลอน พร้อมงบกำไรขาดทุน 3 เดือนโปร่งใส ปักหมุดพิกัดจริง{% endblock %}
 
+{# SEO: canonical + noindex logic for faceted search #}
+{% block canonical %}{% if seo_has_filters %}{{ site_url }}/listings/{% elif page_obj.number > 1 %}{{ site_url }}/listings/?page={{ page_obj.number }}{% else %}{{ site_url }}/listings/{% endif %}{% endblock %}
+{% block robots %}{% if seo_has_filters %}noindex, follow{% else %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endif %}{% endblock %}
+{% block og_url %}{{ site_url }}/listings/{% endblock %}
+
 {% block extra_head %}
 <!-- Structured Data: CollectionPage & BreadcrumbList for Marketplace (SEO / AEO) -->
 <script type="application/ld+json">
@@ -15,6 +20,19 @@
       "name": "ค้นหาร้านเซ้ง & ธุรกิจทั่วไทย — เซ้งร้านด่วน.com",
       "description": "คัดสรรร้านเซ้งทำเลทอง ครบครันทุกหมวดหมู่ มีข้อมูลรายได้ กำไรเฉลี่ย 3 เดือน และสัญญาชัดเจน",
       "url": "{{ site_url }}/listings/"
+    },
+    {
+      "@type": "ItemList",
+      "@id": "{{ site_url }}/listings/#itemlist",
+      "name": "รายการร้านเซ้งและพื้นที่ธุรกิจที่เปิดให้เซ้ง/เช่า",
+      "numberOfItems": {{ listings|length }},
+      "itemListOrder": "https://schema.org/ItemListOrderAscending",
+      "itemListElement": [{% for item in listings %}{
+        "@type": "ListItem",
+        "position": {{ forloop.counter }},
+        "url": "{{ site_url }}/listings/{{ item.id }}/",
+        "name": "{{ item.property.title|escapejs }}"
+      }{% if not forloop.last %},{% endif %}{% endfor %}]
     },
     {
       "@type": "BreadcrumbList",
@@ -48,8 +66,20 @@
 <div class="min-h-screen bg-[#fcfcfa] pb-20">
     <!-- 1. Page Header Hero Banner (Responsive Height) -->
     <div class="relative h-44 sm:h-56 md:h-64 overflow-hidden bg-neutral-900">
-        <!-- Background Storefront Photo with Dark Overlay -->
-        <img src="/static/images/hero_banner.jpg" alt="ค้นหาร้านเซ้ง" class="absolute inset-0 w-full h-full object-cover object-center opacity-30">
+        <!-- Background Storefront Photo with Dark Overlay.
+             WHY <picture> + fetchpriority=low: this banner is a decorative backdrop at
+             30% opacity, so it must never compete with the LCP text block for bandwidth.
+             The WebP variant is ~75% smaller than the 536 KB source JPEG. -->
+        <picture>
+            <source type="image/webp" srcset="/static/images/hero_banner-1200.webp 1200w, /static/images/hero_banner-800.webp 800w"
+                    sizes="100vw">
+            <img src="/static/images/hero_banner-1200.jpg"
+                 alt="ค้นหาร้านเซ้งและพื้นที่ธุรกิจให้เช่าทั่วประเทศไทย"
+                 width="1600" height="1200"
+                 fetchpriority="low"
+                 decoding="async"
+                 class="absolute inset-0 w-full h-full object-cover object-center opacity-30">
+        </picture>
         <div class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-900/90 to-neutral-950/40"></div>
         
         <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">

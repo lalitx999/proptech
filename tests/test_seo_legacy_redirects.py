@@ -82,7 +82,7 @@ class LegacyWordpressSEORedirectTestCase(TestCase):
         self.assertContains(response, 'นโยบายความเป็นส่วนตัว')
         self.assertContains(response, 'PDPA')
         self.assertContains(response, 'schema.org')
-        self.assertContains(response, 'dpo@sengranduan.com')
+        self.assertContains(response, 'dpo@xn--72ch2atb1d4a4f1fudfc.com')
 
     def test_terms_of_service_page_renders_successfully(self):
         """Terms of Service page must return HTTP 200 and contain platform rules and disclaimer."""

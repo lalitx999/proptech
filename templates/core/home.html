@@ -14,13 +14,28 @@
           "@type": "ListItem",
           "position": 1,
           "name": "หน้าแรก",
-          "item": "https://sengranduan.com/"
+          "item": "{{ site_url }}/"
         }
       ]
     },
     {
+      "@type": "WebPage",
+      "@id": "{{ site_url }}/#webpage",
+      "url": "{{ site_url }}/",
+      "name": "เซ้งร้านด่วน.com — ตลาดเซ้งร้าน ขายกิจการ และทำเลทอง ทั่วไทย",
+      "description": "ค้นหาร้านเซ้ง กิจการ และพื้นที่ให้เช่าทั่วไทย พร้อมข้อมูลราคาเซ้ง ค่าเช่า รายได้และกำไรเฉลี่ย 3 เดือนที่ตรวจสอบได้",
+      "isPartOf": { "@id": "{{ site_url }}/#website" },
+      "about": { "@id": "{{ site_url }}/#organization" },
+      "primaryImageOfPage": { "@id": "{{ site_url }}/#logo" },
+      "inLanguage": "th-TH",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["#key-facts", "#faq-section"]
+      }
+    },
+    {
       "@type": "FAQPage",
-      "@id": "https://sengranduan.com/#faq",
+      "@id": "{{ site_url }}/#faq",
       "mainEntity": [
         {
           "@type": "Question",
@@ -75,12 +90,27 @@
 <!-- ============================================================================== -->
 <section class="mx-auto max-w-6xl px-3 sm:px-6 my-2 sm:my-6">
     <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[175px] sm:min-h-[380px] shadow-sm flex items-center justify-center text-center p-3.5 sm:p-8 bg-neutral-900">
-        <!-- Background Storefront Photo (Centered) - LCP optimized with brighter, vibrant treatment -->
-        <img src="/static/images/hero_banner.jpg"
-             alt="ค้นหาร้านเซ้ง ร้านให้เช่า"
-             fetchpriority="high"
-             decoding="async"
-             class="absolute inset-0 w-full h-full object-cover object-center brightness-110 contrast-105 saturate-125">
+        <!-- Background Storefront Photo (Centered) — this IS the LCP element.
+             WHY <picture>: the original JPEG is 536 KB, which alone misses the
+             2.5 s LCP budget on 4G. The WebP variants are ~93 KB (800w) / ~188 KB
+             (1200w), and the browser picks per viewport via `sizes`. The JPEG
+             fallback keeps pre-WebP clients working. width/height lock the 4:3
+             intrinsic ratio and `object-cover` fills the crop, so nothing shifts
+             once the bytes land (CLS = 0). -->
+        <picture class="absolute inset-0">
+            <source type="image/webp"
+                    srcset="/static/images/hero_banner-800.webp 800w,
+                            /static/images/hero_banner-1200.webp 1200w,
+                            /static/images/hero_banner-1600.webp 1600w"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1200px) 92vw, 1152px">
+            <img src="/static/images/hero_banner-1200.jpg"
+                 alt="ค้นหาร้านเซ้ง ร้านให้เช่า และทำเลทองสำหรับเปิดธุรกิจทั่วประเทศไทย"
+                 width="1600"
+                 height="1200"
+                 fetchpriority="high"
+                 decoding="async"
+                 class="w-full h-full object-cover object-center brightness-110 contrast-105 saturate-125">
+        </picture>
         <!-- Sunlit & Warm Vibrant Overlay (สว่าง สดใส มีมิติ) -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/30 to-black/15"></div>
         <div class="absolute inset-0 bg-gradient-to-tr from-brand-600/15 via-transparent to-amber-300/20 mix-blend-overlay"></div>
@@ -1001,6 +1031,78 @@
             </div>
         </div>
 
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- 9.5 KEY FACTS (AEO / GEO) — ข้อเท็จจริงที่ผู้ช่วย AI นำไปอ้างอิงได้ทันที          -->
+<!-- WHY: Answer engines (ChatGPT Search, Perplexity, Google AI Overviews) quote   -->
+<!-- pages that state verifiable facts as short, self-contained, label:value pairs. -->
+<!-- The values below mirror the Organization schema in base.html exactly, so the   -->
+<!-- machine-readable and human-readable versions can never contradict each other.  -->
+<!-- ============================================================================== -->
+<section id="key-facts" class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-white to-brand-50/40 border-t border-neutral-200/80">
+    <div class="mx-auto max-w-5xl space-y-6">
+        <div class="text-center space-y-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-200 px-3 py-1 text-xs font-bold text-brand-700">
+                <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
+                <span>ข้อเท็จจริงโดยสรุป (Key Facts)</span>
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+                ข้อมูลมาตรฐานของเซ้งร้านด่วน.com
+            </h2>
+            <p class="text-xs sm:text-sm text-neutral-500 max-w-2xl mx-auto">
+                สรุปข้อมูลที่ตรวจสอบได้ของแพลตฟอร์ม สำหรับผู้ที่ต้องการอ้างอิงข้อมูลอย่างถูกต้อง
+                (นักข่าว นักวิเคราะห์ และผู้ช่วย AI สามารถยกข้อความในส่วนนี้ไปอ้างอิงพร้อมระบุแหล่งที่มาได้)
+            </p>
+        </div>
+
+        <dl class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">ชื่อแพลตฟอร์ม</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">เซ้งร้านด่วน.com (Seng Ran Duan)</dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">ประเภทธุรกิจ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">ตลาดกลางออนไลน์ (Marketplace) สำหรับเซ้งร้าน โอนกิจการ และให้เช่าพื้นที่พาณิชย์</dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">พื้นที่ให้บริการ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">ทั่วประเทศไทย — กรุงเทพฯ, ชลบุรี/พัทยา, เชียงใหม่, ภูเก็ต และปริมณฑล</dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">จำนวนประกาศที่เปิดอยู่</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">{{ total_listings|intcomma }} รายการ <span class="font-normal text-neutral-500">(นับแบบเรียลไทม์จากฐานข้อมูล)</span></dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">หมวดหมู่ธุรกิจ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">7 หมวด: ร้านอาหาร/ชาบู, คาเฟ่/เครื่องดื่ม, ผับ/บาร์, ตัดผม/เสริมสวย, นวด/สปา, อาคาร/ที่ดิน/คอนโด, ล็อค/พื้นที่ให้เช่า</dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">ค่าบริการ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">
+                    ลงประกาศฟรี 1 รายการ/เดือน &middot; VIP 1,000 บาท/เดือน (4 รายการ) &middot; SUPER VIP 5,000 บาท/เดือน (15 รายการ)
+                </dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">การยืนยันความน่าเชื่อถือ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">
+                    ตรา Admin Verified (ตรวจสถานที่จริง + สัญญาเช่า) และระบบตรวจสลิปโอนเงินอัตโนมัติผ่าน EasySlip
+                </dd>
+            </div>
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
+                <dt class="text-[11px] font-black uppercase tracking-wide text-neutral-400">ช่องทางติดต่อ</dt>
+                <dd class="mt-1 text-sm font-bold text-neutral-900">
+                    โทร 087-666-1778 &middot; LINE @shopforsale &middot; ทุกวัน 08:00–21:00 น. (เวลาไทย)
+                </dd>
+            </div>
+        </dl>
+
+        <p class="rounded-2xl bg-neutral-900 px-5 py-4 text-center text-[11px] sm:text-xs leading-relaxed text-neutral-300">
+            <span class="font-black text-white">วิธีอ้างอิง:</span>
+            “เซ้งร้านด่วน.com — ตลาดเซ้งร้านและโอนกิจการทั่วประเทศไทย, {{ site_url }}/, ข้อมูล ณ วันที่ {% now "Y-m-d" %}”
+            &nbsp;|&nbsp; เอกสารอ้างอิงสำหรับ AI: <span class="font-mono text-brand-300">{{ site_url }}/llms.txt</span>
+        </p>
     </div>
 </section>
 

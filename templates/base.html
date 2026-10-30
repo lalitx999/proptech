@@ -7,23 +7,53 @@
     <meta name="description" content="{% block meta_description %}เซ้งร้านด่วน.com — แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองระดับแนวหน้าของไทย พร้อมข้อมูลการเงินและกำไรเฉลี่ย 3 เดือนโปร่งใส ปักหมุดแผนที่จริง{% endblock %}">
     <title>{% block title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}</title>
 
+    <!-- ========================================================================== -->
+    <!-- CANONICAL, INDEXING DIRECTIVES & HREFLANG (SEO Core)                        -->
+    <!-- WHY: Canonical prevents duplicate-content dilution from filtered/paged      -->
+    <!-- marketplace URLs. Every child template may override these three blocks.     -->
+    <!-- ========================================================================== -->
+    <link rel="canonical" href="{% block canonical %}{{ site_url }}{{ request.path }}{% endblock %}">
+    <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}">
+    <meta name="googlebot" content="{% block googlebot %}index, follow{% endblock %}">
+    <link rel="alternate" hreflang="th-TH" href="{% block hreflang_th %}{{ site_url }}{{ request.path }}{% endblock %}">
+    <link rel="alternate" hreflang="x-default" href="{% block hreflang_x_default %}{{ site_url }}{{ request.path }}{% endblock %}">
+    {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+    {% if bing_site_verification %}<meta name="msvalidate.01" content="{{ bing_site_verification }}">{% endif %}
+
     <!-- OpenGraph & Social Sharing Meta Tags (SEO / AEO) -->
     <meta property="og:site_name" content="เซ้งร้านด่วน.com">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{% block og_title %}เซ้งร้านด่วน.com — ตลาดซื้อขายและเซ้งร้านค้า ธุรกิจ ทำเลทอง ทั่วไทย{% endblock %}">
     <meta property="og:description" content="{% block og_description %}แพลตฟอร์มเซ้งร้าน ขายกิจการ และเช่าทำเลทองระดับแนวหน้าของไทย ข้อมูลการเงินโปร่งใส ตรวจสอบสัญญาสิทธิ ปักหมุดพิกัดแผนที่จริง{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{{ site_url }}/static/images/og-cover.png{% endblock %}">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{% block og_image_alt %}เซ้งร้านด่วน.com — ตลาดซื้อขาย เซ้งร้านค้า ขายกิจการ และทำเลทองทั่วไทย{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ site_url }}{{ request.path }}{% endblock %}">
     <meta property="og:locale" content="th_TH">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@shopforsale">
 
     <!-- AI / LLM Reference Discovery Tags (AEO / GEO Standard) -->
     <link rel="help" type="text/plain" href="/llms.txt" title="LLM Context">
     <link rel="author" type="text/plain" href="/llms-full.txt" title="Full LLM Knowledge Base">
 
-    <!-- Core Web Vitals: Preconnect & Font Display Swap -->
+    <!-- ========================================================================== -->
+    <!-- CORE WEB VITALS: CONNECTION HINTS FOR EVERY THIRD-PARTY ORIGIN             -->
+    <!-- WHY: the head references 4 external origins (Google Fonts, the Tailwind     -->
+    <!-- CDN, unpkg for HTMX/Lucide/Leaflet). Without `preconnect` the browser only  -->
+    <!-- discovers each origin AFTER parsing the tag that uses it, paying a full     -->
+    <!-- DNS + TCP + TLS round trip (~150-400 ms on 4G) before the first byte of     -->
+    <!-- CSS/JS arrives — that latency lands directly on FCP and LCP.                -->
+    <!-- ========================================================================== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <!-- `display=swap` guarantees text is painted with the fallback face instead of
+         staying invisible (FOIT) while the Thai subset downloads. -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Favicon & PWA -->
@@ -44,17 +74,40 @@
         {
           "@type": "Organization",
           "@id": "{{ site_url }}/#organization",
-          "name": "เซ้งร้านด่วน.com",
+          "name": "{{ site_name }}",
+          "alternateName": ["เซ้งร้านด่วน", "Seng Ran Duan", "Sengranduan"],
           "url": "{{ site_url }}",
           "logo": {
             "@type": "ImageObject",
+            "@id": "{{ site_url }}/#logo",
             "url": "{{ site_url }}/static/images/logo.png",
-            "caption": "เซ้งร้านด่วน.com"
+            "contentUrl": "{{ site_url }}/static/images/logo.png",
+            "width": 1024,
+            "height": 576,
+            "caption": "{{ site_name }}"
           },
+          "image": { "@id": "{{ site_url }}/#logo" },
+          "slogan": "ตลาดเซ้งร้าน ขายกิจการ ทำเลทอง ทั่วไทย",
           "description": "แพลตฟอร์มศูนย์รวมการซื้อขาย เซ้งร้านค้า เซ้งกิจการ และปล่อยเช่าทำเลทองระดับแนวหน้าของประเทศไทย ตรวจสอบสัญญาสิทธิและงบการเงินโปร่งใส",
+          "email": "ple1930@gmail.com",
+          "knowsAbout": [
+            "การเซ้งร้าน",
+            "การโอนกิจการ",
+            "สัญญาเช่าพื้นที่พาณิชย์",
+            "ค่ากีย์มันนี่ (Key Money)",
+            "เงินประกันสัญญาเช่า",
+            "อสังหาริมทรัพย์เพื่อการพาณิชย์",
+            "ทำเลทองสำหรับธุรกิจค้าปลีกและร้านอาหาร"
+          ],
+          "areaServed": {
+            "@type": "Country",
+            "name": "Thailand"
+          },
+          "currenciesAccepted": "THB",
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+66-87-666-1778",
+            "email": "ple1930@gmail.com",
             "contactType": "customer service",
             "areaServed": "TH",
             "availableLanguage": ["Thai", "English"]
@@ -76,7 +129,8 @@
           "@type": "WebSite",
           "@id": "{{ site_url }}/#website",
           "url": "{{ site_url }}",
-          "name": "เซ้งร้านด่วน.com",
+          "name": "{{ site_name }}",
+          "alternateName": "เซ้งร้านด่วน",
           "publisher": { "@id": "{{ site_url }}/#organization" },
           "potentialAction": {
             "@type": "SearchAction",
@@ -136,7 +190,9 @@
     <!-- Lucide Icons, HTMX & Leaflet Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script defer src="https://unpkg.com/htmx.org@1.9.12" nonce="{{ request.csp_nonce }}"></script>
-    <script defer src="https://unpkg.com/lucide@latest" nonce="{{ request.csp_nonce }}"></script>
+    <!-- WHY pinned: the unversioned dist-tag costs an extra 302 round trip on every cold
+         cache and cannot be cached immutably because the resolved file changes under it. -->
+    <script defer src="https://unpkg.com/lucide@1.64.0" nonce="{{ request.csp_nonce }}"></script>
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" nonce="{{ request.csp_nonce }}"></script>
 
     <style>

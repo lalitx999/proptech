@@ -4,12 +4,20 @@
 {% block title %}[{{ listing.ref_code }}] {{ listing.property.title }} — เซ้งร้านด่วน.com{% endblock %}
 {% block meta_description %}[{{ listing.ref_code }}] {{ listing.property.title }} เซ้งราคา ฿{{ listing.price|floatformat:0|intcomma }} (ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0|intcomma }}/ด.) ทำเล{{ listing.property.district }} {{ listing.property.province }} พร้อมอุปกรณ์ครบครัน ดำเนินกิจการต่อได้ทันที{% endblock %}
 
+{# SEO: one canonical URL per listing, independent of any tracking query string #}
+{% block canonical %}{{ site_url }}{{ listing.get_absolute_url }}{% endblock %}
+{% block og_url %}{{ site_url }}{{ listing.get_absolute_url }}{% endblock %}
+{% block hreflang_th %}{{ site_url }}{{ listing.get_absolute_url }}{% endblock %}
+{% block hreflang_x_default %}{{ site_url }}{{ listing.get_absolute_url }}{% endblock %}
+{% block og_image_alt %}{{ listing.property.title }} — เซ้งร้านด่วน.com{% endblock %}
+
 {% block og_type %}article{% endblock %}
 {% block og_title %}[{{ listing.ref_code }}] {{ listing.property.title }} (เซ้ง ฿{{ listing.price|floatformat:0|intcomma }}) — เซ้งร้านด่วน.com{% endblock %}
 {% block og_description %}เซ้งร้าน {{ listing.property.title }} ทำเล{{ listing.property.district }} {{ listing.property.province }} ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0|intcomma }}/เดือน พร้อมอุปกรณ์ครบ สนใจติดต่อด่วน{% endblock %}
 {% block og_image %}{% if listing.property.cover_image %}{{ request.scheme }}://{{ request.get_host }}{{ listing.property.cover_image.image.url }}{% else %}{{ site_url }}/static/images/og-cover.png{% endif %}{% endblock %}
 
 {% block extra_head %}
+{% with gallery=listing.property.images.all %}
 <!-- Structured Data: RealEstateListing, Product/Offer & BreadcrumbList (SEO & AEO) -->
 <script type="application/ld+json">
 {
@@ -21,21 +29,23 @@
       "name": "[{{ listing.ref_code }}] {{ listing.property.title|escapejs }}",
       "description": "{{ listing.property.desc|striptags|truncatewords:60|escapejs }}",
       "url": "{{ request.build_absolute_uri }}",
+      "image": [{% for img in gallery %}"{{ request.scheme }}://{{ request.get_host }}{{ img.image.url }}"{% if not forloop.last %},{% endif %}{% endfor %}{% if not gallery %}"{{ site_url }}/static/images/og-cover.png"{% endif %}],
+      "sku": "{{ listing.ref_code }}",
+      "brand": { "@type": "Brand", "name": "เซ้งร้านด่วน.com" },
       "datePosted": "{{ listing.created_at|date:'c' }}",
       "dateModified": "{{ listing.updated_at|date:'c' }}",
       "category": "{{ listing.property.get_type_display|escapejs }}",
-      "price": "{{ listing.price }}",
-      "priceCurrency": "THB",
       "offers": {
         "@type": "Offer",
         "price": "{{ listing.price }}",
         "priceCurrency": "THB",
-        "availability": "https://schema.org/InStock",
-        "priceValidUntil": "2027-12-31",
+        "availability": "{{ listing.schema_availability }}",
+        "priceValidUntil": "{{ listing.offer_valid_until|date:'Y-m-d' }}",
         "url": "{{ request.build_absolute_uri }}",
         "seller": {
-          "@type": "Person",
-          "name": "{{ listing.property.owner.get_full_name|default:'เจ้าของร้าน'|escapejs }}"
+          "@type": "Organization",
+          "@id": "{{ site_url }}/#organization",
+          "name": "เซ้งร้านด่วน.com"
         }
       },
       "itemOffered": {
@@ -90,6 +100,7 @@
   ]
 }
 </script>
+{% endwith %}
 
 <!-- Check if any 360 panorama image exists for this property -->
 {% for img in listing.property.images.all %}

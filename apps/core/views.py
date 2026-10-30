@@ -195,13 +195,40 @@ def llms_full_txt_view(request):
 def sitemap_xml_view(request):
     """
     Dynamic sitemap.xml listing all active published takeover opportunities and core pages.
+
+    WHY SEO CRITICAL:
+    * Only PUBLISHED listings are exposed — drafts/rejected listings must never leak.
+    * `lastmod` is fed from the real `updated_at` timestamp (ISO-8601) so crawlers can
+      prioritise genuinely changed inventory instead of blindly recrawling everything.
+    * Cover images are eager-loaded with `to_attr='seo_images'` (cover first) to power the
+      Google Image sitemap extension without an N+1 query per listing.
+    * The result set is capped so a very large catalogue can never blow up response time;
+      past the cap a sitemap index should be introduced.
     """
-    from django.conf import settings
-    site_url = getattr(settings, 'SITE_URL', 'https://sengranduan.com').rstrip('/')
-    listings = Listing.objects.filter(status=ListingStatus.PUBLISHED).order_by('-updated_at')
+    from django.db.models import Max, Prefetch
+    from apps.properties.models import PropertyImage
+
+    site_url = getattr(settings, 'SITE_URL', 'https://www.xn--72ch2atb1d4a4f1fudfc.com').rstrip('/')
+    published = Listing.objects.filter(status=ListingStatus.PUBLISHED)
+
+    listings = (
+        published.select_related('property')
+        .prefetch_related(
+            Prefetch(
+                'property__images',
+                queryset=PropertyImage.objects.order_by('-is_cover', 'order', 'id'),
+                to_attr='seo_images',
+            )
+        )
+        .order_by('-updated_at')[:5000]
+    )
+
+    latest_update = published.aggregate(latest=Max('updated_at'))['latest']
+
     context = {
         'site_url': site_url,
         'listings': listings,
+        'latest_update': latest_update,
     }
     return render(request, 'seo/sitemap.xml', context, content_type='application/xml; charset=utf-8')
 

@@ -1,11 +1,20 @@
 # ==============================================================================
-# เซ้งร้านด่วน.com (sengranduan.com) — Modern Robots.txt for Search & AI Crawlers
+# เซ้งร้านด่วน.com — {{ site_url }} — Robots.txt for Search & AI Crawlers
 # ==============================================================================
+# WHY SEO CRITICAL:
+# 1. `Allow:` rules are evaluated against the LONGEST matching path, so the specific
+#    /accounts/vip/ allow wins over the broader /accounts/ disallow (the VIP page is
+#    a commercial landing page that MUST be indexable).
+# 2. Private, authenticated and transactional areas are disallowed to save crawl
+#    budget and prevent thin/duplicate pages entering the index.
+# 3. AI answer engines are explicitly welcomed so the brand can be cited in
+#    ChatGPT / Claude / Perplexity / Gemini answers (AEO / GEO).
 
 # 1. General Search Engines
 User-agent: *
 Allow: /
 Allow: /listings/
+Allow: /accounts/vip/
 Allow: /about/
 Allow: /contact/
 Allow: /llms.txt
@@ -15,12 +24,34 @@ Disallow: /dev-admin-only/
 Disallow: /accounts/
 Disallow: /properties/
 Disallow: /contracts/
+Disallow: /leads/
+Disallow: /listings/create/
+Disallow: /listings/manage/
+Disallow: /listings/favorites/
+Disallow: /listings/compare/
 
 # 2. AI / LLM Search & Citation Bots (Welcome to crawl & index for Answer Engines)
+# WHY: These bots feed RAG pipelines that produce AI Overviews / citations.
+# Blocking them costs visibility in AI-generated answers (AEO).
 User-agent: GPTBot
 Allow: /
 Allow: /llms.txt
 Allow: /llms-full.txt
+Allow: /accounts/vip/
+Disallow: /accounts/
+Disallow: /properties/
+Disallow: /contracts/
+Disallow: /admin-dashboard/
+
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /accounts/vip/
+Disallow: /accounts/
+Disallow: /properties/
+Disallow: /contracts/
+Disallow: /admin-dashboard/
 
 User-agent: ChatGPT-User
 Allow: /
@@ -29,11 +60,21 @@ User-agent: ClaudeBot
 Allow: /
 Allow: /llms.txt
 Allow: /llms-full.txt
+Allow: /accounts/vip/
+Disallow: /accounts/
+Disallow: /properties/
+Disallow: /contracts/
+Disallow: /admin-dashboard/
 
 User-agent: PerplexityBot
 Allow: /
 Allow: /llms.txt
 Allow: /llms-full.txt
+Allow: /accounts/vip/
+Disallow: /accounts/
+Disallow: /properties/
+Disallow: /contracts/
+Disallow: /admin-dashboard/
 
 User-agent: Google-Extended
 Allow: /
@@ -49,6 +90,10 @@ Allow: /
 User-agent: meta-externalagent
 Allow: /
 
-# Sitemap & AI Reference Declarations
+# Sitemap Declaration (standard directive understood by every crawler)
 Sitemap: {{ site_url }}/sitemap.xml
-Llms-Txt: {{ site_url }}/llms.txt
+
+# AI reference files (declared for humans/crawlers reading this file)
+# llms.txt      -> {{ site_url }}/llms.txt
+# llms-full.txt -> {{ site_url }}/llms-full.txt
+

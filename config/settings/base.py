@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'apps.core.middleware.LegacyWordpressRedirectMiddleware', # SEO 301 preservation for WordPress links
+    'apps.core.middleware.SeoIndexControlMiddleware',        # X-Robots-Tag noindex for private/error pages
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -255,5 +256,14 @@ EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)
 # ==============================================================================
 # PUBLIC SITE URL (canonical, sitemap, schema.org, OpenGraph, llms.txt)
 # ==============================================================================
-SITE_URL = config('SITE_URL', default='https://sengranduan.com').rstrip('/')
+SITE_URL = config('SITE_URL', default='https://www.xn--72ch2atb1d4a4f1fudfc.com').rstrip('/')
+SITE_NAME = config('SITE_NAME', default='เซ้งร้านด่วน.com')
+
+# ==============================================================================
+# SEARCH CONSOLE / WEBMASTER VERIFICATION (SEO)
+# ==============================================================================
+# WHY: Verification meta tags are rendered conditionally in base.html. Leaving the
+# values empty simply omits the tag — no template edits needed per environment.
+GOOGLE_SITE_VERIFICATION = config('GOOGLE_SITE_VERIFICATION', default='')
+BING_SITE_VERIFICATION = config('BING_SITE_VERIFICATION', default='')
 
