@@ -22,12 +22,28 @@ class TelegramAlertService:
         chat_id = getattr(settings, 'TELEGRAM_CHAT_ID', '') or config('TELEGRAM_CHAT_ID', default='')
         return token, chat_id
 
+    @staticmethod
+    def _is_markdown_error(response) -> bool:
+        # User-typed values (LINE IDs like "@shop_for_sale", usernames, shop titles)
+        # often contain _ * ` [ which break Telegram's legacy Markdown parser.
+        return response.status_code == 400 and "can't parse entities" in response.text
+
+    @classmethod
+    def _missing_credentials(cls, event_title: str) -> bool:
+        bot_token, chat_id = cls.get_credentials()
+        if bot_token and chat_id:
+            return False
+        # WARNING (not INFO) so it shows up in production logs, where root level is WARNING.
+        logger.warning(
+            f"Telegram alert skipped, TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not configured: {event_title}"
+        )
+        return True
+
     @classmethod
     def send_alert(cls, message_text: str, event_title: str = "🔔 แจ้งเตือนระบบ") -> bool:
-        bot_token, chat_id = cls.get_credentials()
-        if not bot_token or not chat_id:
-            logger.info(f"[Telegram Mock] {event_title}:\n{message_text}")
+        if cls._missing_credentials(event_title):
             return False
+        bot_token, chat_id = cls.get_credentials()
 
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
         payload = {
@@ -39,6 +55,14 @@ class TelegramAlertService:
 
         try:
             response = requests.post(url, json=payload, timeout=5)
+            if cls._is_markdown_error(response):
+                # Resend as plain text so the alert still arrives.
+                plain_payload = {
+                    'chat_id': chat_id,
+                    'text': f"{event_title}\n{message_text}",
+                    'disable_web_page_preview': True
+                }
+                response = requests.post(url, json=plain_payload, timeout=5)
             if response.status_code == 200:
                 return True
             logger.warning(f"Telegram API responded with status {response.status_code}: {response.text}")
@@ -53,10 +77,9 @@ class TelegramAlertService:
         Sends an image (such as payment slip or shop photo) with Markdown caption to Telegram group.
         Falls back to send_alert if photo upload fails.
         """
-        bot_token, chat_id = cls.get_credentials()
-        if not bot_token or not chat_id:
-            logger.info(f"[Telegram Mock Photo] {event_title}:\n{caption}")
+        if cls._missing_credentials(event_title):
             return False
+        bot_token, chat_id = cls.get_credentials()
 
         full_caption = f"*{event_title}*\n{caption}" if event_title else caption
         # Telegram caption length limit is 1024 characters
@@ -97,7 +120,9 @@ class TelegramAlertService:
 
             if response.status_code == 200:
                 return True
-            logger.warning(f"Telegram sendPhoto failed ({response.status_code}): {response.text}")
+            if not cls._is_markdown_error(response):
+                logger.warning(f"Telegram sendPhoto failed ({response.status_code}): {response.text}")
+            # send_alert retries as plain text if the caption's Markdown is the problem
             return cls.send_alert(caption, event_title=event_title)
         except Exception as e:
             if file_to_close:
