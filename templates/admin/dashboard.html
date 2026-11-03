@@ -292,8 +292,7 @@
                             </div>
 
                             <div class="space-y-2">
-                                {% for shop in shops_list %}
-                                    {% if shop.status == 'pending' %}
+                                {% for shop in pending_shops_list %}
                                     <div class="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
                                         <div class="space-y-0.5 max-w-xs md:max-w-sm xl:max-w-md truncate">
                                             <div class="font-bold text-neutral-900 truncate">{{ shop.property.title }}</div>
@@ -307,7 +306,6 @@
                                             </button>
                                         </form>
                                     </div>
-                                    {% endif %}
                                 {% empty %}
                                     <div class="py-6 text-center text-xs text-neutral-400">ไม่มีร้านค้ารออนุมัติในขณะนี้</div>
                                 {% endfor %}
@@ -412,7 +410,7 @@
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <h2 class="text-base font-black text-neutral-900 flex items-center gap-2">
                                 <i data-lucide="store" class="w-5 h-5 text-sunset-500"></i>
-                                <span>รายการร้านค้าเซ้งทั้งหมด ({{ shops_list|length }} รายการ)</span>
+                                <span>รายการร้านค้าเซ้งทั้งหมด ({{ shops_page.paginator.count|intcomma }} รายการ)</span>
                             </h2>
                             <button type="button" id="table-fast-post-btn"
                                     class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-xs font-bold transition shadow-xs">
@@ -460,7 +458,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100">
-                                    {% for shop in shops_list %}
+                                    {% for shop in shops_page %}
                                     <tr class="group hover:bg-neutral-50/90 transition-all duration-200">
                                         <td class="py-3.5 pl-4 sm:pl-6 pr-3 relative">
                                             <!-- Row Hover Left Accent Bar -->
@@ -546,6 +544,7 @@
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="approve">
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" title="อนุมัติเผยแพร่"
                                                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="check" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -555,6 +554,7 @@
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="reject">
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" title="ระงับประกาศ"
                                                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="pause" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -566,6 +566,7 @@
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="toggle_verified">
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" title="{% if shop.is_admin_verified %}ถอดป้าย Admin Verified{% else %}มอบป้าย Admin Verified (ผ่านการตรวจสอบแล้ว){% endif %}"
                                                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg {% if shop.is_admin_verified %}bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs hover:shadow-sm{% else %}bg-neutral-100 hover:bg-emerald-50 text-neutral-400 hover:text-emerald-600 shadow-2xs{% endif %} flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="shield-check" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -575,6 +576,7 @@
                                                 <form method="post" action="{% url 'accounts:admin_shop_action' shop.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="toggle_vip">
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" title="สลับสิทธิ์ VIP ของเจ้าของร้าน"
                                                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="crown" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -599,6 +601,7 @@
                                                       onsubmit="return confirm('⚠️ ยืนยันการลบประกาศร้าน &quot;{{ shop.property.title|default:shop.ref_code|escapejs }}&quot; หรือไม่?\nข้อมูลประกาศและข้อมูลร้านจะถูกลบออกจากระบบอย่างถาวร');">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" title="ลบประกาศร้านนี้ถาวร"
                                                             class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center shadow-2xs hover:shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer">
                                                         <i data-lucide="trash-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -617,11 +620,13 @@
                                 </tbody>
                             </table>
                         </div>
+                        {% include "includes/pagination.html" with page_obj=shops_page page_range=shop_page_range page_param="shop_page" query=shop_filter_query %}
                     </div>
                     <!-- Hidden Form for Editing Ref Code -->
                     <form id="edit-refcode-form" method="post" action="" class="hidden">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="edit_ref_code">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
                         <input type="hidden" name="ref_code" id="edit-refcode-input" value="">
                     </form>
                 </div>

@@ -84,8 +84,9 @@ class Property(models.Model):
 
     @property
     def cover_image(self):
-        cover = self.images.filter(is_cover=True).first()
-        return cover or self.images.first()
+        # .all() reuses prefetch_related('images'); .filter()/.first() would query per row
+        images = list(self.images.all())
+        return next((img for img in images if img.is_cover), images[0] if images else None)
 
 class PropertyImage(models.Model):
     """

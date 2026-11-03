@@ -3,6 +3,8 @@ from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.db.models import Sum, Count, Q, Avg
@@ -13,6 +15,7 @@ from apps.accounts.models import User, UserRole, VIPPaymentTransaction, AgentPro
 from apps.accounts.services.audit import AuditService
 from apps.properties.models import Property, PropertyType, PropertyImage
 from apps.listings.models import Listing, ListingStatus, ListingType, FeePayer, ShopOwnerRecord
+from apps.listings.selectors.shop_selector import get_admin_shops, get_pending_admin_shops
 from apps.leads.models import Lead, LeadStatus, LeadUrgency
 from apps.contracts.models import Deal, DealStage, ContractDocument, DocumentType
 from apps.core.models import ContactMessage
@@ -23,6 +26,16 @@ from apps.core.services.email import EmailNotificationService
 from decouple import config
 
 logger = logging.getLogger(__name__)
+
+SHOPS_PER_PAGE = 30
+
+
+def _post_next_url(request, default):
+    """WHY SECURE: `next` comes from the client, so only same-site paths are followed (no open redirect)."""
+    next_url = request.POST.get('next', '')
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return next_url
+    return default
 
 
 @login_required
@@ -70,27 +83,19 @@ def admin_command_center_view(request):
     # -------------------------------------------------------------------------
     # 2. Shop Management Data
     # -------------------------------------------------------------------------
-    shop_qs = Listing.objects.select_related('property', 'property__owner', 'agent').prefetch_related('property__images').order_by('-created_at')
-    
-    # Filtering
-    shop_query = request.GET.get('shop_q', '').strip()
-    if shop_query:
-        shop_qs = shop_qs.filter(
-            Q(property__title__icontains=shop_query) |
-            Q(ref_code__icontains=shop_query) |
-            Q(property__district__icontains=shop_query) |
-            Q(property__province__icontains=shop_query)
-        )
-    
-    shop_status_filter = request.GET.get('shop_status', '')
-    if shop_status_filter:
-        shop_qs = shop_qs.filter(status=shop_status_filter)
-
-    shop_category_filter = request.GET.get('shop_cat', '')
-    if shop_category_filter:
-        shop_qs = shop_qs.filter(property__type=shop_category_filter)
-
-    shops_list = shop_qs[:50]
+    shop_paginator = Paginator(
+        get_admin_shops(
+            query=request.GET.get('shop_q', '').strip(),
+            status=request.GET.get('shop_status', ''),
+            category=request.GET.get('shop_cat', ''),
+        ),
+        SHOPS_PER_PAGE,
+    )
+    # get_page tolerates bad input: page=abc gives page 1, page=999 gives the last page
+    shops_page = shop_paginator.get_page(request.GET.get('shop_page'))
+    shop_page_range = list(shop_paginator.get_elided_page_range(shops_page.number, on_each_side=2, on_ends=1))
+    shop_filter_params = request.GET.copy()
+    shop_filter_params.pop('shop_page', None)
 
     # -------------------------------------------------------------------------
     # 3. CRM & Leads Data
@@ -191,7 +196,10 @@ def admin_command_center_view(request):
         'new_leads_count': new_leads_count,
         'immediate_leads_count': immediate_leads_count,
         # Lists
-        'shops_list': shops_list,
+        'shops_page': shops_page,
+        'shop_page_range': shop_page_range,
+        'shop_filter_query': shop_filter_params.urlencode(),
+        'pending_shops_list': get_pending_admin_shops(),
         'leads_list': leads_list,
         'agents_list': agents_list,
         'agent_profiles': AgentProfile.objects.all().order_by('-created_at'),
@@ -306,7 +314,7 @@ def admin_shop_action_view(request, pk):
             prop.delete()
         messages.success(request, f'🗑️ ลบประกาศร้าน "{title}" เรียบร้อยแล้ว')
 
-    return redirect('/admin-dashboard/?tab=shops')
+    return redirect(_post_next_url(request, '/admin-dashboard/?tab=shops'))
 
 
 @login_required

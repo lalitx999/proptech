@@ -1,0 +1,38 @@
+{% comment %}
+Numbered pager for server-rendered tables.
+Usage:
+    {% include "includes/pagination.html" with page_obj=shops_page page_range=shop_page_range page_param="shop_page" query=shop_filter_query %}
+page_range comes from Paginator.get_elided_page_range (as a list); query is the
+current urlencoded filter string without the page parameter.
+{% endcomment %}
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-neutral-100">
+    <div class="text-[11px] text-neutral-500">
+        แสดง <strong class="text-neutral-800">{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+        จาก <strong class="text-neutral-800">{{ page_obj.paginator.count }}</strong> รายการ
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="flex items-center flex-wrap justify-center gap-1.5" aria-label="เปลี่ยนหน้า">
+        {% if page_obj.has_previous %}
+        <a href="?{% if query %}{{ query }}&amp;{% endif %}{{ page_param }}={{ page_obj.previous_page_number }}"
+           class="rounded-xl border border-neutral-200 bg-white px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition">ก่อนหน้า</a>
+        {% endif %}
+
+        {% for p in page_range %}
+            {% if p == page_obj.number %}
+            <span aria-current="page" class="rounded-xl bg-brand-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs">{{ p }}</span>
+            {% elif p == page_obj.paginator.ELLIPSIS %}
+            <span class="px-1 text-xs text-neutral-400">{{ p }}</span>
+            {% else %}
+            <a href="?{% if query %}{{ query }}&amp;{% endif %}{{ page_param }}={{ p }}"
+               class="rounded-xl border border-neutral-200 bg-white px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?{% if query %}{{ query }}&amp;{% endif %}{{ page_param }}={{ page_obj.next_page_number }}"
+           class="rounded-xl border border-neutral-200 bg-white px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 shadow-2xs transition">ถัดไป</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</div>
