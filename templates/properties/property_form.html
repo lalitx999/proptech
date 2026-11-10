@@ -135,14 +135,6 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-neutral-700 mb-1">
-                                รหัสไปรษณีย์
-                            </label>
-                            <input type="text" name="postal" value="{{ property.postal|default:'20000' }}"
-                                   class="w-full rounded-xl border border-neutral-200 p-3 text-xs font-mono focus:outline-none focus:border-brand-500">
-                        </div>
-
-                        <div>
                             <label class="block text-xs font-bold text-neutral-700 mb-1 flex items-center justify-between">
                                 <span>ลิงก์ Google Maps ของร้าน</span>
                                 <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">
@@ -542,8 +534,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<link rel="stylesheet" href="{% static 'css/form_widgets.css' %}?v=20261030">
-<script src="{% static 'js/rich_text_editor.js' %}?v=20261030" nonce="{{ request.csp_nonce }}"></script>
+<link rel="stylesheet" href="{% static 'css/form_widgets.css' %}?v=20261110">
+<script src="{% static 'js/rich_text_editor.js' %}?v=20261110" nonce="{{ request.csp_nonce }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ request.csp_nonce }}"></script>
 <script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function () {

@@ -14,6 +14,7 @@ import tempfile
 from decimal import Decimal
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -144,3 +145,38 @@ class AdminFastPostTests(TestCase):
         self.assertIn('id="fast-create-photos-grid"', body)
         self.assertNotIn('name="avg_profit_3m"', body)
         self.assertNotIn('name="avg_revenue_3m"', body)
+
+    def test_edit_page_has_no_postal_field_and_keeps_stored_postal(self):
+        prop = self.fast_post()
+        Property.objects.filter(pk=prop.pk).update(postal="20150")
+        url = reverse("properties:property_update", args=[prop.pk])
+
+        self.assertNotContains(self.client.get(url), 'name="postal"')
+
+        self.client.post(url, {
+            "title": "ร้านทดสอบ Fast Post",
+            "type": PropertyType.CAFE_BEVERAGE,
+            "province": "ชลบุรี",
+            "district": "เมือง",
+            "address": "ถนนสุขุมวิท",
+            "desc": "แก้ไข",
+            "price": "800000",
+            "monthly_rent": "20000",
+        })
+        prop.refresh_from_db()
+        self.assertEqual(prop.postal, "20150")
+
+    def test_description_has_no_leading_whitespace_in_pre_wrap_box(self):
+        # The box uses white-space: pre-wrap, so template indentation would render
+        # as an empty first line and an indent before the text.
+        prop = self.fast_post(description="ร้านสวย   ทำเลดี")
+        listing = prop.listings.first()
+        body = self.client.get(reverse("listings:listing_detail", args=[listing.pk])).content.decode()
+        self.assertIn('rich-description break-words">ร้านสวย   ทำเลดี</div>', body)
+
+    def test_editor_pastes_plain_text_and_assets_are_versioned(self):
+        js = (settings.BASE_DIR / "static" / "js" / "rich_text_editor.js").read_text(encoding="utf-8")
+        self.assertIn("addEventListener('paste'", js)
+        self.assertIn("getData('text/plain')", js)
+        body = self.client.get(reverse("accounts:admin_dashboard") + "?tab=shops").content.decode()
+        self.assertIn("rich_text_editor.js?v=20261110", body)

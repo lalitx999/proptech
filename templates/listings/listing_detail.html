@@ -194,6 +194,12 @@
     padding-left: 1.5rem;
     margin: 0.5rem 0;
 }
+/* Text pasted from Facebook arrives as one <div> per paragraph holding one <div> per
+   line, and relied on Facebook's own CSS for the gap between paragraphs. Restore that
+   gap, unless the paragraph already ends with an empty line (<div><br></div>). */
+.rich-description > div:has(> div):not(:last-child):not(:has(> div:last-child > br:only-child)) {
+    margin-bottom: 1.25em;
+}
 </style>
 {% endblock %}
 
@@ -426,9 +432,7 @@
                         <i data-lucide="file-text" class="w-5 h-5 text-brand-600"></i>
                         <span>รายละเอียดและจุดเด่นของร้าน</span>
                     </h2>
-                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap rich-description break-words">
-                        {{ listing.property.desc|safe }}
-                    </div>
+                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap rich-description break-words">{{ listing.property.desc|safe }}</div>
                 </div>
 
                 {% if listing.youtube_url or listing.tiktok_url or listing.facebook_post_url %}

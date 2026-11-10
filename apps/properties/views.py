@@ -119,7 +119,6 @@ def property_update_view(request, pk):
         province = request.POST.get('province', '').strip()
         district = request.POST.get('district', '').strip()
         address = request.POST.get('address', '').strip()
-        postal = request.POST.get('postal', '20000').strip()
         google_maps_url = request.POST.get('google_maps_url', '').strip()
 
         try:
@@ -144,8 +143,6 @@ def property_update_view(request, pk):
             property_obj.district = district
         if address:
             property_obj.address = address
-        if postal:
-            property_obj.postal = postal
         property_obj.google_maps_url = google_maps_url
         property_obj.area_sqm = area_sqm
         property_obj.floors = floors

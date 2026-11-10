@@ -59,6 +59,18 @@
         editor.addEventListener('input', syncContent);
         editor.addEventListener('blur', syncContent);
 
+        // Paste as plain text. Copied Facebook posts carry their own markup: paragraph
+        // gaps come from Facebook's CSS (lost here) and emoji are <img> tags (stripped
+        // by the server sanitizer). The plain-text flavour keeps both blank lines and
+        // emoji. Formatting can be reapplied with the toolbar.
+        editor.addEventListener('paste', function (e) {
+            const text = e.clipboardData && e.clipboardData.getData('text/plain');
+            if (!text) return;
+            e.preventDefault();
+            document.execCommand('insertText', false, text.replace(/\r\n?/g, '\n'));
+            syncContent();
+        });
+
         function afterCommand() {
             editor.focus();
             saveSelection();
