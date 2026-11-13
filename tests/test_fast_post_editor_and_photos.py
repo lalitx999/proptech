@@ -17,7 +17,7 @@ from unittest.mock import patch
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
@@ -180,3 +180,34 @@ class AdminFastPostTests(TestCase):
         self.assertIn("getData('text/plain')", js)
         body = self.client.get(reverse("accounts:admin_dashboard") + "?tab=shops").content.decode()
         self.assertIn("rich_text_editor.js?v=20261110", body)
+
+
+class LinkifyTests(SimpleTestCase):
+    def test_pasted_urls_become_links_without_eating_thai_text(self):
+        html = sanitize_rich_html('<div>สนใจ https://lin.ee/SML8YAr</div><div>แผนที่https://share.google/I4THP4cเลย</div>')
+        self.assertIn('<a href="https://lin.ee/SML8YAr" target="_blank" rel="noopener noreferrer nofollow">https://lin.ee/SML8YAr</a>', html)
+        self.assertIn('>https://share.google/I4THP4c</a>เลย', html)
+
+    def test_plain_numbers_and_existing_links_are_left_alone(self):
+        html = sanitize_rich_html('ราคา 1.5 ล้าน ไฟล์ test.py <a href="https://x.com/a">ดูโพสต์</a>')
+        self.assertIn('ราคา 1.5 ล้าน ไฟล์ test.py', html)
+        self.assertEqual(html.count('<a '), 1)
+        self.assertIn('>ดูโพสต์</a>', html)
+
+    def test_javascript_urls_never_become_links(self):
+        html = sanitize_rich_html('javascript:alert(1) <a href="javascript:alert(1)">x</a>')
+        self.assertNotIn('href="javascript', html)
+
+
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+class LinkifyDisplayTests(TestCase):
+    setUp = AdminFastPostTests.setUp
+    fast_post = AdminFastPostTests.fast_post
+
+    def test_old_descriptions_get_links_on_the_listing_page(self):
+        prop = self.fast_post()
+        # stored before auto-linking existed
+        Property.objects.filter(pk=prop.pk).update(desc='<div>ไลน์ https://lin.ee/abc</div>')
+        listing = prop.listings.first()
+        body = self.client.get(reverse("listings:listing_detail", args=[listing.pk])).content.decode()
+        self.assertIn('<a href="https://lin.ee/abc" target="_blank" rel="noopener noreferrer nofollow">https://lin.ee/abc</a>', body)

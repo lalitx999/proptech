@@ -1,6 +1,9 @@
+import re
+
 from django.utils.html import escape, strip_tags
 
 import bleach
+from bleach.linkifier import Linker
 
 try:
     from bleach.css_sanitizer import CSSSanitizer
@@ -35,6 +38,38 @@ def sanitize_rich_html(raw):
         kwargs = {}
         if CSSSanitizer is not None:
             kwargs['css_sanitizer'] = CSSSanitizer(allowed_css_properties=RICH_TEXT_CSS)
-        return bleach.clean(raw, tags=RICH_TEXT_TAGS, attributes=RICH_TEXT_ATTRS, strip=True, **kwargs)
+        clean = bleach.clean(raw, tags=RICH_TEXT_TAGS, attributes=RICH_TEXT_ATTRS, strip=True, **kwargs)
     except Exception:
         return escape(strip_tags(raw))
+    return linkify_rich_html(clean)
+
+
+# Only explicit links (http(s):// or www.) so prices like "1.5" or words like "test.py"
+# stay text. ASCII-only, so Thai text written right after a URL is not swallowed
+# ("ดูที่https://lin.ee/abcเลย" links only https://lin.ee/abc).
+LINKIFY_URL_RE = re.compile(
+    r"(?:https?://|www\.)[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?"
+    r"(?:[/?#][a-z0-9\-._~%!$&'()*+,;=:@/?#]*)?",
+    re.IGNORECASE,
+)
+
+
+def _external_link_attrs(attrs, new=False):
+    attrs[(None, 'target')] = '_blank'
+    attrs[(None, 'rel')] = 'noopener noreferrer nofollow'
+    return attrs
+
+
+def linkify_rich_html(html):
+    """
+    Turn bare URLs (typed or pasted as plain text) into clickable links.
+    Existing <a> tags are kept; text inside them is not linked twice.
+    Input must already be sanitized: this only adds <a href="http(s)://..."> tags.
+    """
+    if not html:
+        return ''
+    try:
+        linker = Linker(url_re=LINKIFY_URL_RE, parse_email=False, callbacks=[_external_link_attrs])
+        return linker.linkify(html)
+    except Exception:
+        return html

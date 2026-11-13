@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static humanize %}
+{% load static humanize rich_text %}
 
 {% block title %}[{{ listing.ref_code }}] {{ listing.property.title }} — เซ้งร้านด่วน.com{% endblock %}
 {% block meta_description %}[{{ listing.ref_code }}] {{ listing.property.title }} เซ้งราคา ฿{{ listing.price|floatformat:0|intcomma }} (ค่าเช่า ฿{{ listing.monthly_rent|floatformat:0|intcomma }}/ด.) ทำเล{{ listing.property.district }} {{ listing.property.province }} พร้อมอุปกรณ์ครบครัน ดำเนินกิจการต่อได้ทันที{% endblock %}
@@ -432,7 +432,7 @@
                         <i data-lucide="file-text" class="w-5 h-5 text-brand-600"></i>
                         <span>รายละเอียดและจุดเด่นของร้าน</span>
                     </h2>
-                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap rich-description break-words">{{ listing.property.desc|safe }}</div>
+                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap rich-description break-words">{{ listing.property.desc|linkify_urls }}</div>
                 </div>
 
                 {% if listing.youtube_url or listing.tiktok_url or listing.facebook_post_url %}

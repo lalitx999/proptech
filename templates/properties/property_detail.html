@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize rich_text %}
 
 {% block title %}{{ property.title }} — เซ้งร้านด่วน{% endblock %}
 
@@ -57,7 +57,7 @@
                 <dd class="font-semibold text-neutral-900">{{ property.postal }}</dd>
             </div>
         </div>
-        <div class="border-t pt-4 text-sm text-neutral-700 whitespace-pre-wrap break-words">{{ property.desc|safe }}</div>
+        <div class="border-t pt-4 text-sm text-neutral-700 whitespace-pre-wrap break-words">{{ property.desc|linkify_urls }}</div>
     </div>
 
     <!-- Active Listings for this Property -->
